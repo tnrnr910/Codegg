@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react'
 
 function Loding() {
-  return <div>Loding</div>;
+  return <div>Loding</div>
 }
 
-export default Loding;
+export default Loding
