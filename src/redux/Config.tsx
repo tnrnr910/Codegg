@@ -1,7 +1,7 @@
-import { configureStore } from "@reduxjs/toolkit/dist/configureStore";
+import { type ToolkitStore, configureStore } from "@reduxjs/toolkit/dist/configureStore";
 import Category from "./Category";
 
-const store = configureStore( {
+const store: ToolkitStore = configureStore( {
     reducer: {
         category: Category.reducer
     }

@@ -1,6 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { type Slice, createSlice } from "@reduxjs/toolkit";
 
-const Category = createSlice(
+
+const Category:Slice = createSlice(
     {
         name: "category",
         initialState: [{

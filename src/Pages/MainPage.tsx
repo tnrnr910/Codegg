@@ -1,7 +1,20 @@
 import React from "react"
+import { useNavigate } from "react-router"
 import { styled } from "styled-components"
+import { useQuery} from "react-query";
+import { getPosts } from "../axios/api";
 
 function MainPage() {
+
+  const navigate = useNavigate()
+  const{ isLoading, data} = useQuery("posts",getPosts);
+
+  const list:any = data;
+
+  if (isLoading) {
+    return <div>로딩중입니다..</div>
+  }
+
   return (<>
   <Banner><div>배너</div></Banner>
   <Container>
@@ -9,44 +22,68 @@ function MainPage() {
   <PostsContainer>
     <PostBox>
       <Title>
-        <TitleDiv>질의응답</TitleDiv><TitleDiv2>더보기</TitleDiv2>
+        <TitleDiv>질의응답</TitleDiv><TitleDiv2 onClick={() => {
+                navigate("/QnAPage")}}>더보기</TitleDiv2>
         </Title>
         <Body>
         <BodyDiv>
-          내용
+          {list.filter((item: { postCategory: string; })=>item.postCategory==="질의응답")
+          .map((info: { id: string; postTitle: string; })=>{
+            return(<>
+            <div key={info.id}>{info.postTitle}</div>
+            </>)
+          })}
           </BodyDiv>
         </Body>
     </PostBox>
     <PostBox>
-       <Title>
-        <TitleDiv>모임</TitleDiv><TitleDiv2>더보기</TitleDiv2>
+      <Title>
+        <TitleDiv>모임</TitleDiv><TitleDiv2 onClick={() => {
+                navigate("/TogetherPage")}}>더보기</TitleDiv2>
         </Title>
         <Body>
         <BodyDiv>
-          내용
+          {list.filter((item: { postCategory: string; })=>item.postCategory==="모임")
+          .map((info: { id: string; postTitle: string; })=>{
+            return(<>
+            <div key={info.id}>{info.postTitle}</div>
+            </>)
+          })}
           </BodyDiv>
-          </Body>
+        </Body>
     </PostBox>
     <PostBox>
-        <Title>
-        <TitleDiv>코딩 팁</TitleDiv><TitleDiv2>더보기</TitleDiv2>
-        </Title>
-        <Body>          
-          <BodyDiv>
-          내용
-          </BodyDiv>
-          </Body>
-    </PostBox>
-    <PostBox>      
       <Title>
-        <TitleDiv>공지사항</TitleDiv><TitleDiv2>더보기</TitleDiv2>
+        <TitleDiv>코딩팁</TitleDiv><TitleDiv2 onClick={() => {
+                navigate("/TipPage")}}>더보기</TitleDiv2>
         </Title>
         <Body>
-          <BodyDiv>
-          내용
+        <BodyDiv>
+          {list.filter((item: { postCategory: string; })=>item.postCategory==="코딩팁")
+          .map((info: { id: string; postTitle: string; })=>{
+            return(<>
+            <div key={info.id}>{info.postTitle}</div>
+            </>)
+          })}
           </BodyDiv>
-          </Body>
-      </PostBox>
+        </Body>
+    </PostBox>
+    <PostBox>
+      <Title>
+        <TitleDiv>공지사항</TitleDiv><TitleDiv2 onClick={() => {
+                navigate("/NoticePage")}}>더보기</TitleDiv2>
+        </Title>
+        <Body>
+        <BodyDiv>
+          {list.filter((item: { postCategory: string; })=>item.postCategory==="공지사항")
+          .map((info: { id: string; postTitle: string; })=>{
+            return(<>
+            <div key={info.id}>{info.postTitle}</div>
+            </>)
+          })}
+          </BodyDiv>
+        </Body>
+    </PostBox>
   </PostsContainer>
   </Container>
 
