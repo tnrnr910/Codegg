@@ -87,6 +87,7 @@ const ProfileRightSide = styled.div`
   display: flex;
   text-align: center;
   width: 40.125rem;
+  height: 46.4375rem;
   flex-direction: column;
   border-left: solid 1px #dadada;
 `
