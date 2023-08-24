@@ -29,10 +29,10 @@ function DetailPage() {
       <DetailUser>{postInfo.postDisplayName} </DetailUser>
       <DetailContent>{postInfo.postContent}</DetailContent>
     </DetailContainer>
-    <div>
-      <div>댓글</div>
-      <div>댓글컴포넌트</div>
-    </div>
+    <ComentContainer>
+      <ComentHead>댓글</ComentHead>
+      <Comentdoby>댓글컴포넌트</Comentdoby>
+    </ComentContainer>
   </Container>
   </>
   )
@@ -41,10 +41,11 @@ function DetailPage() {
 export default DetailPage;
 
 const Container = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px;
+  padding: 5rem;
 `
 
 const Title= styled.div`
@@ -90,4 +91,19 @@ const DetailContainer = styled.div`
    border: solid #DADADA 1px;
    border-radius: 7px;
    background-color: white; 
+  `
+
+  const ComentContainer = styled.div`
+
+    padding-top: 48px;
+  `
+
+  const ComentHead = styled.div`
+    width: 7rem;
+    height: 2rem;
+  `
+
+  const Comentdoby = styled.div`
+    width: 58rem;
+    border: solid #DADADA 1px;
   `

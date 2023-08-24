@@ -121,5 +121,5 @@ const StLayout = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 90vh;
-  padding: 40px;
+  padding: 0px;
 `;
