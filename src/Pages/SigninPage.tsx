@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import styled from "styled-components"
 import { FcGoogle } from "react-icons/fc"
-import { auth } from "../firebase"
+import { auth } from "../axios/firebase"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 
 function SigninPage() {
