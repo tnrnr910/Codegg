@@ -46,10 +46,10 @@ function SigninPage() {
   }
 
   // 회원가입 버튼 클릭 시 실행
-  const signUp = async (event: any) => {
+  const signUp = (event: any) => {
     event.preventDefault()
     if (password === confirmPassword) {
-      await createUserWithEmailAndPassword(auth, email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential: any) => {
           // Signed in
           const user = userCredential.user
@@ -201,6 +201,7 @@ function SigninPage() {
                 </p>
               </CheckLabel>
               <SigninButton
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={signUp}
                 style={{
                   backgroundColor: "#0C356A",
