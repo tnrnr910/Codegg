@@ -24,7 +24,7 @@ const MyPostPage: React.FC = () => {
   const [posts] = useState<Post[]>([
     // ... your post data ...
   ])
-
+  // 탭탭탭
   const tabOptions: TabOption[] = [
     { value: "questions", label: "질의응답" },
     { value: "tips", label: "코딩 팁" },
