@@ -1,32 +1,85 @@
 import React, { useState } from "react"
 import styled from "styled-components"
 import { FcGoogle } from "react-icons/fc"
+import { auth } from "../firebase"
+import { createUserWithEmailAndPassword } from "firebase/auth"
 
 function SigninPage() {
   // Tab Menu 중 현재 어떤 Tab이 선택되어 있는지 확인하기 위한 currentTab 상태와 currentTab을 갱신하는 함수가 존재해야 하고, 초기값은 0.
-  const [currentTab, clickTab] = useState(0)
+  const [currentTab, setCurrentTab] = useState(0)
 
-  const menuArr = [
-    { name: "로그인", content: "Tab menu ONE" },
-    { name: "회원가입", content: "Tab menu TWO" }
-  ]
+  // Tab Menu 이름
+  const menuArr = [{ name: "로그인" }, { name: "회원가입" }]
 
+  // 현재 선택된 Tab Menu 가 갱신되는 함수
   const selectMenuHandler = (index: any) => {
     // parameter로 현재 선택한 인덱스 값을 전달해야 하며, 이벤트 객체(event)는 쓰지 않는다
-    // 해당 함수가 실행되면 현재 선택된 Tab Menu 가 갱신.
-    clickTab(index)
+    setCurrentTab(index)
+  }
+
+  // 이메일과 패스워드 초기값
+  const [email, setEmail] = useState("")
+  const [nickname, setNickname] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const inputChange = (event: any) => {
+    const {
+      target: { name, value }
+    } = event
+    if (name === "email") {
+      setEmail(value)
+      console.log(email)
+    }
+    if (name === "nickname") {
+      setNickname(value)
+      console.log(nickname)
+    }
+    if (name === "password") {
+      setPassword(value)
+      console.log(password)
+    }
+    if (name === "confirmPassword") {
+      setConfirmPassword(value)
+      console.log(confirmPassword)
+    }
+  }
+
+  // 회원가입 버튼 클릭 시 실행
+  const signUp = async (event: any) => {
+    event.preventDefault()
+    if (password === confirmPassword) {
+      await createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential: any) => {
+          // Signed in
+          const user = userCredential.user
+          console.log(user)
+          selectMenuHandler(0)
+        })
+        .catch((error: any) => {
+          const errorCode = error.code
+          const errorMessage = error.message
+          console.log(errorCode, errorMessage)
+        })
+    } else {
+      alert("비밀번호를 다시 확인해 주세요")
+    }
+  }
+
+  // 로그인 버튼 클릭 시 실행
+  const signIn = (event: any) => {
+    event.preventDefault()
+  }
+
+  // 로그아웃 버튼 클릭 시 실행
+  const logOut = (event: any) => {
+    event.preventDefault()
   }
 
   return (
     <SigninSignoutContainer>
       <TabBox>
         <TabMenu>
-          {/* 아래 하드코딩된 내용 대신에, map을 이용한 반복으로 코드를 수정 //
-          li 엘리먼트의 class명의 경우 선택된 tab 은 'submenu focused', 나머지
-          2개의 tab은 'submenu' */}
-          {/* <li className="submenu">{menuArr[0].name}</li>
-          <li className="submenu">{menuArr[1].name}</li>
-          <li className="submenu">{menuArr[2].name}</li> */}
           {menuArr.map((el, index) => (
             <li
               key={el.name}
@@ -50,19 +103,28 @@ function SigninPage() {
               <p>또는 이메일 로그인</p>
               <SigninInput>
                 <div>이메일</div>
-                <input
-                  type="text"
+                {/* <input
+                  type="email"
+                  name="email"
+                  value={email}
                   placeholder="이메일을 입력해 주세요."
-                ></input>
+                  onChange={inputChange}
+                  required
+                ></input> */}
               </SigninInput>
               <SigninInput>
                 <div>비밀번호</div>
-                <input
+                {/* <input
                   type="password"
+                  name="password"
+                  value={password}
                   placeholder="비밀번호를 입력해 주세요."
-                ></input>
+                  onChange={inputChange}
+                  required
+                ></input> */}
               </SigninInput>
               <SigninButton
+                onClick={signIn}
                 style={{
                   backgroundColor: "#0C356A",
                   color: "#fff",
@@ -81,6 +143,7 @@ function SigninPage() {
                   회원가입
                 </span>
               </OtherTap>
+              <button onClick={logOut}>로그아웃</button>
             </TapContents>
           ) : (
             // 회원가입 탭 영역
@@ -88,29 +151,46 @@ function SigninPage() {
               <SigninInput>
                 <div>이메일</div>
                 <input
-                  type="text"
+                  type="email"
+                  name="email"
+                  value={email}
                   placeholder="이메일을 입력해 주세요."
+                  onChange={inputChange}
+                  required
                 ></input>
               </SigninInput>
               <SigninInput>
                 <div>닉네임</div>
                 <input
                   type="text"
+                  name="nickname"
+                  value={nickname}
                   placeholder="닉네임을 입력해 주세요."
+                  onChange={inputChange}
+                  required
                 ></input>
               </SigninInput>
               <SigninInput>
                 <div>비밀번호</div>
                 <input
                   type="password"
-                  placeholder="비밀번호를 입력해 주세요."
+                  name="password"
+                  value={password}
+                  placeholder="비밀번호를 확인해 주세요."
+                  onChange={inputChange}
+                  required
                 ></input>
               </SigninInput>
               <SigninInput>
                 <div>비밀번호 확인</div>
+
                 <input
                   type="password"
-                  placeholder="비밀번호를 확인해 주세요."
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  placeholder="비밀번호를 입력해 주세요."
+                  onChange={inputChange}
+                  required
                 ></input>
               </SigninInput>
               <CheckLabel htmlFor="check">
@@ -121,6 +201,7 @@ function SigninPage() {
                 </p>
               </CheckLabel>
               <SigninButton
+                onClick={signUp}
                 style={{
                   backgroundColor: "#0C356A",
                   color: "#fff",
