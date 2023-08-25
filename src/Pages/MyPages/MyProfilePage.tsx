@@ -59,7 +59,6 @@ const ProfileWrap = styled.div`
   margin-top: 4.875rem;
   height: 47.66rem;
 `
-
 const ProfileTap = styled.div`
   display: flex;
   width: 53.0625rem;
@@ -117,7 +116,6 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
 `
-
 const ProfileLevelAndNickName = styled.div`
   display: flex;
   justify-content: center;
@@ -153,7 +151,6 @@ const Follower = styled.div`
   display: flex;
   border-left: solid 1px #fff;
 `
-
 const Following = styled.div`
   border-left: solid 1px #dadada;
   justify-content: center;
@@ -162,7 +159,6 @@ const Following = styled.div`
   align-items: center;
   display: flex;
 `
-
 const MyPost = styled.div`
   border-left: solid 1px #dadada;
   justify-content: center;
