@@ -1,11 +1,11 @@
-import { getFirestore } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore"
+import { initializeApp } from "firebase/app"
 // eslint-disable-next-line import/no-duplicates
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
+import { getAuth } from "firebase/auth"
+import { getStorage } from "firebase/storage"
 // eslint-disable-next-line import/no-duplicates
-import { GoogleAuthProvider } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
+import { GoogleAuthProvider } from "firebase/auth"
+import { getAnalytics } from "firebase/analytics"
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FB_API_KEY,
@@ -15,16 +15,16 @@ const firebaseConfig = {
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
   appId: process.env.REACT_APP_APP_ID,
   measurementId: process.env.REACT_APP_GOOGLE_ID
-};
+}
 
-const firebaseApp = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig)
 
-export const db = getFirestore(firebaseApp);
-export const auth = getAuth(firebaseApp);
-export const storage = getStorage(firebaseApp);
+export const db = getFirestore(firebaseApp)
+export const auth = getAuth(firebaseApp)
+export const storage = getStorage(firebaseApp)
 
-export const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
-export const provider = new GoogleAuthProvider();
+export const app = initializeApp(firebaseConfig)
+export const analytics = getAnalytics(app)
+export const provider = new GoogleAuthProvider()
 
-export default firebaseApp;
+export default firebaseApp
