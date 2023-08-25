@@ -5,7 +5,6 @@ import DetailPage from "../Pages/DetailPage"
 import ErrorPage from "../Pages/ErrorPage"
 import PointShopPage from "../Pages/PointShopPage"
 import SigninPage from "../Pages/SigninPage"
-import SignupPage from "../Pages/SignupPage"
 import NoticePage from "../Pages/Post/NoticePage"
 import QnAPage from "../Pages/Post/QnAPage"
 import SearchResultPage from "../Pages/Post/SearchResultPage"
@@ -27,11 +26,11 @@ function Router(): any {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<MainPage />} />
+          {/* <Route path="/" element={<WritePage />} /> */}
           <Route path="/DetailPage/:id" element={<DetailPage />} />
           <Route path="/*" element={<ErrorPage />} />
           <Route path="/PointShopPage" element={<PointShopPage />} />
           <Route path="/SigninPage" element={<SigninPage />} />
-          <Route path="/SignupPage" element={<SignupPage />} />
           <Route path="/NoticePage" element={<NoticePage />} />
           <Route path="/QnAPage" element={<QnAPage />} />
           <Route path="/SearchResultPage" element={<SearchResultPage />} />
