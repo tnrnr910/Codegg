@@ -1,7 +1,12 @@
-import React from "react";
+import React from "react"
+import Write from "../../Components/wirte/Write"
 
 function WritePage() {
-  return <div>WritePage</div>;
+  return (
+    <>
+      <Write />
+    </>
+  )
 }
 
-export default WritePage;
+export default WritePage

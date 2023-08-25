@@ -27,6 +27,7 @@ function Router(): any {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<MainPage />} />
+          {/* <Route path="/" element={<WritePage />} /> */}
           <Route path="/DetailPage/:id" element={<DetailPage />} />
           <Route path="/*" element={<ErrorPage />} />
           <Route path="/PointShopPage" element={<PointShopPage />} />
