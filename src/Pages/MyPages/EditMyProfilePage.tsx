@@ -2,9 +2,8 @@ import React from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
 
-function MyProfilePage() {
+function EditMyProfilePage() {
   const navigate = useNavigate()
-
   return (
     <ProfileWrap>
       <ProfileTap>
@@ -17,41 +16,42 @@ function MyProfilePage() {
             <ProfileImgs>
               <ProfileImgBox>
                 <ProfileImage src={require("./profile.jpg")} alt="프사" />
+                <ProfileImageChange
+                  src={require("./ProfileChange.png")}
+                  alt="프사"
+                />
               </ProfileImgBox>
-              <ProfileLevelAndNickName>
-                <div>
-                  <BadgeWrap>
-                    <BadgeImage src={require("./profile.jpg")} alt="프사" />
-                    <div>입문자</div>
-                  </BadgeWrap>
-                </div>
-                <NickName>에그마요</NickName>
-              </ProfileLevelAndNickName>
             </ProfileImgs>
             <MyDataWrap>
-              <MyData>
-                <Follower>팔로워 8</Follower>
-                <Following>팔로잉 15</Following>
-                <MyPost>작성글 32</MyPost>
-              </MyData>
-              <MyPoint>보유 포인트</MyPoint>
-              <PointScore>10,000p</PointScore>
               <MyEmail>이메일</MyEmail>
               <EmailAd>123@123.123</EmailAd>
+              <NickNameWrap>
+                <NickName>닉네임</NickName>
+                <NickNameInput type="text" placeholder="에그마요" />
+              </NickNameWrap>
               <MyStackAndPW>
-                <StackNotice>관심 있는 기술 태그</StackNotice>
+                <StackArea>관심 있는 기술 태그</StackArea>
+                <StackNotice>
+                  사용 중인 기술이나 관심있는 기술 태그를 선택해주세요.
+                </StackNotice>
                 <Stacks>React / Node / Spring</Stacks>
-                <PassWordHead>비밀번호 변경</PassWordHead>
-                <PassWordChange>
-                  변경을 원하시면 `수정` 버튼을 클릭해주세요.
-                </PassWordChange>
-                <EditBottom
+                <PassWordChange>비밀번호 변경</PassWordChange>
+                <PassWordChangeInPut
+                  type="text"
+                  placeholder="비밀번호를 입력해주세요"
+                />
+                <PassWordCheck>비밀번호 확인</PassWordCheck>
+                <PassWordConfirmInPut
+                  type="text"
+                  placeholder="입력한 비밀번호를 다시 한 번 입력해주세요."
+                />
+                <SaveBottom
                   onClick={() => {
-                    navigate("/EditMyProfilePage")
+                    navigate("/MyProfilePage")
                   }}
                 >
-                  수정
-                </EditBottom>
+                  저장
+                </SaveBottom>
               </MyStackAndPW>
             </MyDataWrap>
           </ProfileDetail>
@@ -61,7 +61,7 @@ function MyProfilePage() {
   )
 }
 
-export default MyProfilePage
+export default EditMyProfilePage
 
 const ProfileWrap = styled.div`
   display: flex;
@@ -110,6 +110,7 @@ const ProfileImgs = styled.div`
   margin-bottom: 2.5rem;
 `
 const ProfileImgBox = styled.div`
+  position: relative;
   width: 6.125rem;
   height: 6.125rem;
   display: flex;
@@ -125,65 +126,12 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
 `
-const ProfileLevelAndNickName = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-`
-const BadgeImage = styled.img`
-  width: 1.375rem;
-  height: 1.375rem;
-  border-radius: 50%;
-  object-fit: cover;
-`
-const BadgeWrap = styled.div`
-  display: flex;
-  margin-bottom: 0.375rem;
-`
-const NickName = styled.div`
-  font-weight: bold;
-`
-const MyData = styled.div`
-  display: flex;
-  border: 1px solid #d9d9d9;
-  margin-top: 2.1875rem;
-  margin-bottom: 3rem;
-  width: 15.4375rem;
-  height: 2.125rem;
-  justify-content: center;
-`
-const Follower = styled.div`
-  justify-content: center;
-  width: 100%;
-  height: 2.125rem;
-  align-items: center;
-  display: flex;
-  border-left: solid 1px #fff;
-`
-const Following = styled.div`
-  border-left: solid 1px #dadada;
-  justify-content: center;
-  width: 100%;
-  height: 2.125rem;
-  align-items: center;
-  display: flex;
-`
-const MyPost = styled.div`
-  border-left: solid 1px #dadada;
-  justify-content: center;
-  width: 100%;
-  height: 2.125rem;
-  align-items: center;
-  display: flex;
-`
-const MyPoint = styled.div`
-  font-weight: bold;
-  margin-bottom: 0.625rem;
-`
-const PointScore = styled.div`
-  color: #979797;
-  margin-bottom: 3.125rem;
-  font-size: 0.7656rem;
+const ProfileImageChange = styled.img`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30%;
+  height: auto;
 `
 const MyDataWrap = styled.div`
   display: flex;
@@ -201,35 +149,84 @@ const EmailAd = styled.div`
   font-size: 0.7656rem;
 `
 const MyStackAndPW = styled.div`
-  width: 15.4375rem;
+  width: 22.25rem;
   height: 2.125rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 `
-const StackNotice = styled.div`
+const StackArea = styled.div`
   margin-bottom: 0.625rem;
   font-weight: bold;
 `
 const Stacks = styled.div`
   margin-bottom: 3.125rem;
-  font-size: 0.7656rem;
+  font-weight: bold;
 `
-const PassWordHead = styled.div`
+const PassWordChange = styled.div`
   font-weight: bold;
   margin-bottom: 0.625rem;
 `
-const PassWordChange = styled.div`
-  width: 100%;
-  font-size: 0.7656rem;
-  margin-bottom: 5rem;
+const PassWordCheck = styled.div`
+  font-weight: bold;
+  margin-bottom: 0.625rem;
 `
-const EditBottom = styled.button`
+const PassWordChangeInPut = styled.input`
+  width: 22.25rem;
+  height: 2.5rem;
+  padding: 0.5rem;
+  border: 1px solid #d9d9d9;
+  border-radius: 0.25rem;
+  font-size: 0.7656rem;
+  color: #979797;
+  margin-bottom: 3.75rem;
+`
+const PassWordConfirmInPut = styled.input`
+  width: 22.25rem;
+  height: 2.5rem;
+  padding: 0.5rem;
+  border: 1px solid #d9d9d9;
+  border-radius: 0.25rem;
+  font-size: 0.7656rem;
+  color: #979797;
+  margin-bottom: 2.75rem;
+`
+
+const SaveBottom = styled.button`
   width: 4rem;
   height: 2rem;
-  margin-left: 18rem;
-  background-color: #fff;
+  margin-left: 19.4rem;
+  background-color: #333333;
   border: 1px solid #d9d9d9;
   cursor: pointer;
+  color: #fff;
   font-weight: bold;
+`
+const NickName = styled.div`
+  font-weight: bold;
+  margin-bottom: 0.625rem;
+`
+const NickNameInput = styled.input`
+  width: 22.25rem;
+  height: 2.5rem;
+  padding: 0.5rem;
+  border: 1px solid #d9d9d9;
+  border-radius: 0.25rem;
+  font-size: 0.7656rem;
+  color: #979797;
+`
+const NickNameWrap = styled.div`
+  width: 22.25rem;
+  height: 2.125rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 4.125rem;
+`
+const StackNotice = styled.div`
+  width: 100%;
+  font-size: 0.7656rem;
+  color: #979797;
+  text-align: left;
+  margin-bottom: 1.25rem;
 `
