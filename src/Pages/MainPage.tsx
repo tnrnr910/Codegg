@@ -49,22 +49,20 @@ function MainPage() {
                       postCategory: string
                     }) => {
                       return (
-                        <>
-                          <ListContainer key={info.id}>
-                            <ListDiv
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              <ListCategory> {info.postCategory}</ListCategory>
-                              {info.postTitle}
-                            </ListDiv>
-                            <ListBox>
-                              <div>좋아요</div>
-                              <div>댓글수</div>
-                            </ListBox>
-                          </ListContainer>
-                        </>
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            <ListCategory> {info.postCategory}</ListCategory>
+                            {info.postTitle}
+                          </ListDiv>
+                          <ListBox>
+                            <div>좋아요</div>
+                            <div>댓글수</div>
+                          </ListBox>
+                        </ListContainer>
                       )
                     }
                   )}
@@ -95,22 +93,20 @@ function MainPage() {
                       postCategory: string
                     }) => {
                       return (
-                        <>
-                          <ListContainer key={info.id}>
-                            <ListDiv
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              <ListCategory> {info.postCategory}</ListCategory>
-                              {info.postTitle}
-                            </ListDiv>
-                            <ListBox>
-                              <div>좋아요</div>
-                              <div>댓글수</div>
-                            </ListBox>
-                          </ListContainer>
-                        </>
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            <ListCategory> {info.postCategory}</ListCategory>
+                            {info.postTitle}
+                          </ListDiv>
+                          <ListBox>
+                            <div>좋아요</div>
+                            <div>댓글수</div>
+                          </ListBox>
+                        </ListContainer>
                       )
                     }
                   )}
@@ -142,22 +138,20 @@ function MainPage() {
                       postCategory: string
                     }) => {
                       return (
-                        <>
-                          <ListContainer key={info.id}>
-                            <ListDiv
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              <ListCategory> {info.postCategory}</ListCategory>
-                              {info.postTitle}
-                            </ListDiv>
-                            <ListBox>
-                              <div>좋아요</div>
-                              <div>댓글수</div>
-                            </ListBox>
-                          </ListContainer>
-                        </>
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            <ListCategory> {info.postCategory}</ListCategory>
+                            {info.postTitle}
+                          </ListDiv>
+                          <ListBox>
+                            <div>좋아요</div>
+                            <div>댓글수</div>
+                          </ListBox>
+                        </ListContainer>
                       )
                     }
                   )}
@@ -189,17 +183,15 @@ function MainPage() {
                       postCategory: string
                     }) => {
                       return (
-                        <>
-                          <ListContainer key={info.id}>
-                            <ListDiv
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              {info.postTitle}
-                            </ListDiv>
-                          </ListContainer>
-                        </>
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            {info.postTitle}
+                          </ListDiv>
+                        </ListContainer>
                       )
                     }
                   )}
