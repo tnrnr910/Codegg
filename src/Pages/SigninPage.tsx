@@ -1,10 +1,21 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styled from "styled-components"
+import { useNavigate } from "react-router"
 import { FcGoogle } from "react-icons/fc"
 import { auth } from "../axios/firebase"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+  setPersistence,
+  browserSessionPersistence
+} from "firebase/auth"
 
 function SigninPage() {
+  const navigate = useNavigate()
+
   // Tab Menu 중 현재 어떤 Tab이 선택되어 있는지 확인하기 위한 currentTab 상태와 currentTab을 갱신하는 함수가 존재해야 하고, 초기값은 0.
   const [currentTab, setCurrentTab] = useState(0)
 
@@ -17,44 +28,47 @@ function SigninPage() {
     setCurrentTab(index)
   }
 
-  // 이메일과 패스워드 초기값
-  const [email, setEmail] = useState("")
-  const [nickname, setNickname] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  // 유저정보 초기값
+  const userInitialState = {
+    email: "",
+    displayName: "",
+    password: "",
+    confirmPassword: "",
+    photo:
+      "https://pixabay.com/get/g7effabd2f82e664f5fc0b1e95dc0a25bd225980e1ba21c3b50b28cf1b1c10a6605bf50c1143c52da511ba225fbcc86f3_1920.png"
+  }
 
-  const inputChange = (event: any) => {
-    const {
-      target: { name, value }
-    } = event
-    if (name === "email") {
-      setEmail(value)
-      console.log(email)
-    }
-    if (name === "nickname") {
-      setNickname(value)
-      console.log(nickname)
-    }
-    if (name === "password") {
-      setPassword(value)
-      console.log(password)
-    }
-    if (name === "confirmPassword") {
-      setConfirmPassword(value)
-      console.log(confirmPassword)
+  const [input, setInput] = useState(userInitialState)
+
+  // 현재 로그인한 유저 가져오기
+  const currentUser = auth.currentUser
+
+  // 회원가입 시 로그인된 사용자가 있는 경우에만 실행되는 함수
+  const loggedInSignUp = () => {
+    if (auth.currentUser != null) {
+      void updateProfile(auth.currentUser, {
+        displayName: input.displayName,
+        photoURL: input.photo
+      })
+      selectMenuHandler(0)
+      setInput(userInitialState)
+      void signOut(auth)
+    } else {
+      console.log("No user is signed in.") // 사용자가 로그인되어 있지 않은 경우
     }
   }
 
   // 회원가입 버튼 클릭 시 실행
   const signUp = (event: any) => {
     event.preventDefault()
-    if (password === confirmPassword) {
-      createUserWithEmailAndPassword(auth, email, password)
+    if (input.password === input.confirmPassword) {
+      createUserWithEmailAndPassword(auth, input.email, input.password)
         .then((userCredential: any) => {
           // Signed in
           const user = userCredential.user
           console.log(user)
-          selectMenuHandler(0)
+
+          loggedInSignUp()
         })
         .catch((error: any) => {
           const errorCode = error.code
@@ -69,12 +83,35 @@ function SigninPage() {
   // 로그인 버튼 클릭 시 실행
   const signIn = (event: any) => {
     event.preventDefault()
+    try {
+      const userCredential = signInWithEmailAndPassword(
+        auth,
+        input.email,
+        input.password
+      )
+      console.log("signIn", userCredential)
+      setInput(userInitialState)
+      navigate("/")
+      alert("정상적으로 로그인 되었습니다.")
+    } catch (error) {
+      console.error("sihnInError", error)
+    }
   }
 
-  // 로그아웃 버튼 클릭 시 실행
-  const logOut = (event: any) => {
-    event.preventDefault()
-  }
+  useEffect(() => {
+    // 사용자 인증 정보 확인하기
+    onAuthStateChanged(auth, (user) => {
+      console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
+    })
+    // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => {
+        console.log("Session persistence successfully set!")
+      })
+      .catch((error) => {
+        console.error("Error setting session persistence:", error)
+      })
+  }, [])
 
   return (
     <SigninSignoutContainer>
@@ -86,6 +123,7 @@ function SigninPage() {
               className={index === currentTab ? "submenu focused" : "submenu"}
               onClick={() => {
                 selectMenuHandler(index)
+                setInput(userInitialState)
               }}
             >
               {el.name}
@@ -103,25 +141,30 @@ function SigninPage() {
               <p>또는 이메일 로그인</p>
               <SigninInput>
                 <div>이메일</div>
-                {/* <input
+                <input
                   type="email"
                   name="email"
-                  value={email}
+                  value={input.email}
                   placeholder="이메일을 입력해 주세요."
-                  onChange={inputChange}
+                  onChange={(e) => {
+                    setInput({ ...input, email: e.target.value })
+                    console.log(input.email)
+                  }}
                   required
-                ></input> */}
+                ></input>
               </SigninInput>
               <SigninInput>
                 <div>비밀번호</div>
-                {/* <input
+                <input
                   type="password"
                   name="password"
-                  value={password}
+                  value={input.password}
                   placeholder="비밀번호를 입력해 주세요."
-                  onChange={inputChange}
+                  onChange={(e) => {
+                    setInput({ ...input, password: e.target.value })
+                  }}
                   required
-                ></input> */}
+                ></input>
               </SigninInput>
               <SigninButton
                 onClick={signIn}
@@ -138,12 +181,26 @@ function SigninPage() {
                 <span
                   onClick={() => {
                     selectMenuHandler(1)
+                    setInput(userInitialState)
                   }}
                 >
                   회원가입
                 </span>
               </OtherTap>
-              <button onClick={logOut}>로그아웃</button>
+              <button
+                onClick={() => {
+                  if (currentUser != null) {
+                    // User is signed in, see docs for a list of available properties
+                    // https://firebase.google.com/docs/reference/js/auth.user
+                    console.log("current user", currentUser)
+                  } else {
+                    // No user is signed in.
+                    console.log("no current user")
+                  }
+                }}
+              >
+                현재유저
+              </button>
             </TapContents>
           ) : (
             // 회원가입 탭 영역
@@ -153,9 +210,11 @@ function SigninPage() {
                 <input
                   type="email"
                   name="email"
-                  value={email}
+                  value={input.email}
                   placeholder="이메일을 입력해 주세요."
-                  onChange={inputChange}
+                  onChange={(e) => {
+                    setInput({ ...input, email: e.target.value })
+                  }}
                   required
                 ></input>
               </SigninInput>
@@ -163,10 +222,12 @@ function SigninPage() {
                 <div>닉네임</div>
                 <input
                   type="text"
-                  name="nickname"
-                  value={nickname}
+                  name="displayName"
+                  value={input.displayName}
                   placeholder="닉네임을 입력해 주세요."
-                  onChange={inputChange}
+                  onChange={(e) => {
+                    setInput({ ...input, displayName: e.target.value })
+                  }}
                   required
                 ></input>
               </SigninInput>
@@ -175,9 +236,11 @@ function SigninPage() {
                 <input
                   type="password"
                   name="password"
-                  value={password}
+                  value={input.password}
                   placeholder="비밀번호를 확인해 주세요."
-                  onChange={inputChange}
+                  onChange={(e) => {
+                    setInput({ ...input, password: e.target.value })
+                  }}
                   required
                 ></input>
               </SigninInput>
@@ -187,9 +250,11 @@ function SigninPage() {
                 <input
                   type="password"
                   name="confirmPassword"
-                  value={confirmPassword}
+                  value={input.confirmPassword}
                   placeholder="비밀번호를 입력해 주세요."
-                  onChange={inputChange}
+                  onChange={(e) => {
+                    setInput({ ...input, confirmPassword: e.target.value })
+                  }}
                   required
                 ></input>
               </SigninInput>
@@ -215,6 +280,7 @@ function SigninPage() {
                 <span
                   onClick={() => {
                     selectMenuHandler(0)
+                    setInput(userInitialState)
                   }}
                 >
                   로그인
@@ -393,37 +459,3 @@ const OtherTap = styled.div`
     cursor: pointer;
   }
 `
-
-// const TapContents = styled.div`
-//   width: 90%;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   align-items: center;
-//   text-align: start;
-//   gap: 2rem;
-//   margin: 2rem 0;
-
-//   & > div {
-//     width: 100%;
-//   }
-
-//   & > p {
-//     color: #999999;
-//     font-size: 0.9rem;
-//     display: flex;
-//     width: 100%;
-//     align-items: center;
-//   }
-
-//   & > p::before,
-//   p::after {
-//     background: #dadada;
-//     content: "";
-//     flex-grow: 1;
-//     margin: 0 10px;
-//     height: 0.5px;
-//     font-size: 0;
-//     line-height: 1px;
-//   }
-// `
