@@ -39,19 +39,33 @@ function MainPage() {
                     (item: { postBoard: string }) =>
                       item.postBoard === "질의응답"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
-                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
-                        </ListContainer>
-                      </>
-                    )
-                  })}
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <>
+                          <ListContainer>
+                            <ListDiv
+                              key={info.id}
+                              onClick={() => {
+                                navigate(`/detailPage/${info.id}`)
+                              }}
+                            >
+                              <ListCategory> {info.postCategory}</ListCategory>
+                              {info.postTitle}
+                            </ListDiv>
+                            <ListBox>
+                              <div>좋아요</div>
+                              <div>댓글수</div>
+                            </ListBox>
+                          </ListContainer>
+                        </>
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -72,19 +86,33 @@ function MainPage() {
                   .filter(
                     (item: { postBoard: string }) => item.postBoard === "모임"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
-                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
-                        </ListContainer>
-                      </>
-                    )
-                  })}
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <>
+                          <ListContainer>
+                            <ListDiv
+                              key={info.id}
+                              onClick={() => {
+                                navigate(`/detailPage/${info.id}`)
+                              }}
+                            >
+                              <ListCategory> {info.postCategory}</ListCategory>
+                              {info.postTitle}
+                            </ListDiv>
+                            <ListBox>
+                              <div>좋아요</div>
+                              <div>댓글수</div>
+                            </ListBox>
+                          </ListContainer>
+                        </>
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -103,21 +131,36 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postBoard: string }) => item.postBoard === "코딩팁"
+                    (item: { postBoard: string; postCategory: string }) =>
+                      item.postBoard === "코딩팁"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
-                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
-                        </ListContainer>
-                      </>
-                    )
-                  })}
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <>
+                          <ListContainer>
+                            <ListDiv
+                              key={info.id}
+                              onClick={() => {
+                                navigate(`/detailPage/${info.id}`)
+                              }}
+                            >
+                              <ListCategory> {info.postCategory}</ListCategory>
+                              {info.postTitle}
+                            </ListDiv>
+                            <ListBox>
+                              <div>좋아요</div>
+                              <div>댓글수</div>
+                            </ListBox>
+                          </ListContainer>
+                        </>
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -139,26 +182,28 @@ function MainPage() {
                     (item: { postBoard: string }) =>
                       item.postBoard === "공지사항"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
-                          <ListDiv
-                            key={info.id}
-                            onClick={() => {
-                              navigate(`/detailPage/${info.id}`)
-                            }}
-                          >
-                            {info.postTitle}
-                          </ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
-                        </ListContainer>
-                      </>
-                    )
-                  })}
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <>
+                          <ListContainer>
+                            <ListDiv
+                              key={info.id}
+                              onClick={() => {
+                                navigate(`/detailPage/${info.id}`)
+                              }}
+                            >
+                              {info.postTitle}
+                            </ListDiv>
+                          </ListContainer>
+                        </>
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -214,16 +259,21 @@ const PostBox = styled.div`
 const Title = styled.div`
   width: 35rem;
   height: 4rem;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 `
 const TitleDiv = styled.div`
   margin-left: 24px;
+  font-weight: bold;
+  font-size: 25px;
 `
 
 const TitleDiv2 = styled.div`
   margin-right: 26px;
+  font-weight: Medium;
+  font-size: 15px;
   cursor: pointer;
 `
 const Body = styled.div`
@@ -235,12 +285,23 @@ const BodyDiv = styled.div`
   margin-left: 24px;
 `
 const ListDiv = styled.div`
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
+`
+
+const ListCategory = styled.div`
+  border: solid #e7e7e7 1px;
+  padding: 3px 3px 3px 3px;
+  color: #9f9f9f;
 `
 
 const ListContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding-top: 27px;
 `
 
