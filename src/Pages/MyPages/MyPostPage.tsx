@@ -19,7 +19,7 @@ interface TabOption {
 const MyPostPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
-  const [categorySelected, setCategorySelected] = useState("")
+  const [categorySelected, setCategorySelected] = useState("모든 카테고리")
 
   const [posts] = useState<Post[]>([
     // ... your post data ...
@@ -42,6 +42,60 @@ const MyPostPage: React.FC = () => {
     )
   })
 
+  function DropDown() {
+    return (
+      <StyledCategoryDropdown open={categoryOpen}>
+        <StyledCategoryList>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("JS")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "JS"}
+          >
+            JS
+          </StyledCategoryItem>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("React")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "React"}
+          >
+            React
+          </StyledCategoryItem>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("Node")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "Node"}
+          >
+            Node
+          </StyledCategoryItem>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("Next")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "Next"}
+          >
+            Next
+          </StyledCategoryItem>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("파이썬")
+              setCategoryOpen(false) // 자동으로 닫히게 하는 로직
+            }}
+            selected={categorySelected === "파이썬"}
+          >
+            파이썬
+          </StyledCategoryItem>
+          {/* ... Add other categories ... */}
+        </StyledCategoryList>
+      </StyledCategoryDropdown>
+    )
+  }
   return (
     <StyledContainer>
       <StyledTitle>내가 쓴 글</StyledTitle>
@@ -68,8 +122,20 @@ const MyPostPage: React.FC = () => {
         </NumberBox>
 
         <SelectAndSearchBox>
+          <SearchWord>검색 &nbsp;</SearchWord>
           <SelectPageBox>
-            검색 &nbsp; <SelectPages>모든 카테고리</SelectPages>
+            <SelectPages>
+              <StyledSearchContainer>
+                <StyledCategoryButton
+                  onClick={() => {
+                    setCategoryOpen(!categoryOpen)
+                  }}
+                >
+                  {categorySelected} {categoryOpen ? "▲" : "▼"}
+                </StyledCategoryButton>
+                {categoryOpen && <DropDown />}
+              </StyledSearchContainer>
+            </SelectPages>
           </SelectPageBox>
 
           <StyledSearchInput
@@ -83,72 +149,11 @@ const MyPostPage: React.FC = () => {
         </SelectAndSearchBox>
       </NumberAndSearchBox>
       <StyledPostTitleBox>
-        <StyledSearchContainer>
-          <StyledCategoryButton
-            onClick={() => {
-              setCategoryOpen(!categoryOpen)
-            }}
-          >
-            카테고리 {categoryOpen ? "▲" : "▼"} {categorySelected}
-          </StyledCategoryButton>
-
-          {categoryOpen && (
-            <StyledCategoryDropdown open={categoryOpen}>
-              <StyledCategoryList>
-                <StyledCategoryItem
-                  onClick={() => {
-                    setCategorySelected("JS")
-                    setCategoryOpen(false)
-                  }}
-                  selected={categorySelected === "JS"}
-                >
-                  JS
-                </StyledCategoryItem>
-                <StyledCategoryItem
-                  onClick={() => {
-                    setCategorySelected("React")
-                    setCategoryOpen(false)
-                  }}
-                  selected={categorySelected === "React"}
-                >
-                  React
-                </StyledCategoryItem>
-                <StyledCategoryItem
-                  onClick={() => {
-                    setCategorySelected("Node")
-                    setCategoryOpen(false)
-                  }}
-                  selected={categorySelected === "Node"}
-                >
-                  Node
-                </StyledCategoryItem>
-                <StyledCategoryItem
-                  onClick={() => {
-                    setCategorySelected("Next")
-                    setCategoryOpen(false)
-                  }}
-                  selected={categorySelected === "Next"}
-                >
-                  Next
-                </StyledCategoryItem>
-                <StyledCategoryItem
-                  onClick={() => {
-                    setCategorySelected("파이썬")
-                    setCategoryOpen(false) // 자동으로 닫히게 하는 로직
-                  }}
-                  selected={categorySelected === "파이썬"}
-                >
-                  파이썬
-                </StyledCategoryItem>
-                {/* ... Add other categories ... */}
-              </StyledCategoryList>
-            </StyledCategoryDropdown>
-          )}
-        </StyledSearchContainer>
-        <StyledPostTitelPostName>글제목</StyledPostTitelPostName>
-        <StyledPostTitelPostDay>작성일자 </StyledPostTitelPostDay>
-        <StyledPostTitelPostLikes>좋아요 수 </StyledPostTitelPostLikes>
-        <StyledPostTitelPostCommentNum>댓글 수 </StyledPostTitelPostCommentNum>
+        <StyledPostTitleCategory>카테고리</StyledPostTitleCategory>
+        <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
+        <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
+        <StyledPostTitlePostLikes>좋아요 수 </StyledPostTitlePostLikes>
+        <StyledPostTitlePostCommentNum>댓글 수 </StyledPostTitlePostCommentNum>
       </StyledPostTitleBox>
       <StyledPostContainer>
         {filteredPosts.length === 0 ? (
@@ -170,40 +175,36 @@ const MyPostPage: React.FC = () => {
     </StyledContainer>
   )
 }
-
 const StyledContainer = styled.div`
-  padding: 20px;
-  width: 1000px;
-  margin: auto;
+  padding: 1.25rem;
+  width: 62.5rem;
+  margin: auto, 0;
 `
 
 const StyledTitle = styled.div`
-  margin-top: 78px;
-  margin-bottom: 50px;
-  font-size: 25px;
+  margin-top: 4.875rem;
+  margin-bottom: 3.125rem;
+  font-size: 1.5625rem;
   font-weight: bold;
 `
 
 const StyledSearchContainer = styled.span`
   display: inline;
-  width: 100px;
+  width: 8rem;
 `
 
 const StyledCategoryButton = styled.button`
   border: none;
   cursor: pointer;
-  float: left;
-  margin-top: -2px;
-  margin-left: 16px;
-  font-size: 14px;
+  float: right;
+  font-size: 0.875rem;
   background-color: white;
+  width: auto;
 `
 
 const StyledCategoryDropdown = styled.div<{ open: boolean }>`
   position: absolute;
-  top: ${({ open }) => (open ? "40px" : "-200px")};
-  left: 0;
-  width: 40px;
+  top: ${({ open }) => (open ? "2.5rem" : "-12.5rem")};
   transition: top 0.3s ease;
   z-index: 1;
 `
@@ -212,46 +213,46 @@ const StyledCategoryList = styled.ul`
   list-style: none;
   padding: 0;
   background-color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 0.0625rem solid #ccc;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
 `
 
 const StyledCategoryItem = styled.li<{ selected: boolean }>`
-  padding: 3px 40px;
-  margin: 2px 10px;
+  padding: 0.1875rem 2.5rem;
+  margin: 0.125rem 0.625rem;
   cursor: pointer;
   background-color: ${(props) => (props.selected ? "#f0f0f0" : "transparent")};
 `
 
 const StyledSearchInput = styled.input`
-  padding: 10px;
-  width: 360px;
-  height: 16px;
+  padding: 0.625rem;
+  width: 22.5rem;
+  height: 1rem;
   background-color: var(--color-line-gray-200);
   float: right;
-  border-radius: 5px;
-  border: 1px solid #dadada;
+  border-radius: 0.3125rem;
+  border: 0.0625rem solid #dadada;
 `
 
 const StyledTabButtons = styled.div`
   background-color: #f4f4f4;
-  height: 50px;
+  height: 3.125rem;
   display: flex;
-  border: 1px solid #dadada;
-  margin-bottom: 20px;
-  border-radius: 10px 10px 0px 0px;
+  border: 0.0625rem solid #dadada;
+  margin-bottom: 1.25rem;
+  border-radius: 0.625rem 0.625rem 0 0;
 `
 
 const StyledButton = styled.button`
   border-radius: ${(props) =>
-    props.children === "질의응답" ? " 9px 0px 0px 0px" : ""};
+    props.children === "질의응답" ? "0.5625rem 0 0 0" : ""};
   background-color: ${(props) =>
     props.className === "active" ? "#fff" : "transparent"};
   border-style: solid;
   border-color: #dadada;
-  border-width: 0px 1px 0px 0px;
-  padding: 10px 20px;
-  height: ${(props) => (props.className === "active" ? "51px" : "")};
+  border-width: 0 0.0625rem 0 0;
+  padding: 0.625rem 1.25rem;
+  height: ${(props) => (props.className === "active" ? "3.1875rem" : "")};
   cursor: pointer;
   color: #333;
   font-weight: ${(props) => (props.className === "active" ? "bold" : "normal")};
@@ -264,10 +265,10 @@ const StyledButton = styled.button`
 `
 
 const StyledPostContainer = styled.div`
-  border: 1px solid #ccc;
+  border: 0.0625rem solid #ccc;
   background-color: #f8f8f8;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
 `
 
 const StyledPostList = styled.ul`
@@ -276,15 +277,15 @@ const StyledPostList = styled.ul`
 `
 
 const StyledPost = styled.li`
-  border: 1px solid #ccc;
-  padding: 20px;
-  margin-bottom: 20px;
+  border: 0.0625rem solid #ccc;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
   background-color: #f8f8f8;
 `
 
 const StyledPostCategory = styled.p`
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 0.3125rem;
 `
 
 const StyledNumberBlue = styled.span`
@@ -294,72 +295,87 @@ const StyledNumberBlue = styled.span`
 
 const NumberAndSearchBox = styled.div`
   position: relative;
-  height: 60px;
+  height: 3.75rem;
   width: 100%;
 `
 
 const NumberBox = styled.span`
   position: absolute;
-  margin-top: 13px;
-  margin-left: 20px;
+  margin-top: 0.8125rem;
+  margin-left: 1.25rem;
 `
 
 const SelectAndSearchBox = styled.span`
   float: right;
-  width: 630px;
+  width: 39.375rem;
 `
 
 const SelectPageBox = styled.span`
-  font-size: 14px;
+  font-size: 0.875rem;
+  margin-left: 5.2rem;
 `
 
 const SelectPages = styled.span`
   display: inline-block;
-  border: 1px solid #dadada;
-  padding: 10px;
-  width: 170px;
-  border-radius: 5px;
-  font-size: 14px;
-  height: 16px;
+  border: 0.0625rem solid #dadada;
+  padding: 0.625rem;
+  width: 8rem;
+  border-radius: 0.3125rem;
+  font-size: 0.875rem;
+  height: 1rem;
 `
 
 const StyledPostTitleBox = styled.div`
   width: 100%;
   text-align: right;
-  height: 30px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  border-top: 1px solid #dadada;
-  padding-top: 14px;
-  border-bottom: 1px solid #333333;
+  height: 1.875rem;
+  margin-top: 0.625rem;
+  margin-bottom: 1.25rem;
+  border-top: 0.0625rem solid #dadada;
+  padding-top: 0.875rem;
+  border-bottom: 0.0625rem solid #333333;
 `
 
-const StyledPostTitelPostName = styled.span`
+const StyledPostTitlePostName = styled.span`
   float: left;
-  width: 500px;
+  width: 31.25rem;
   text-align: center;
-  font-size: 14px;
+  font-size: 0.875rem;
 `
 
-const StyledPostTitelPostDay = styled.span`
+const StyledPostTitlePostDay = styled.span`
   display: inline-block;
-  width: 110px;
+  width: 6.875rem;
   text-align: center;
-  font-size: 14px;
+  font-size: 0.875rem;
 `
 
-const StyledPostTitelPostLikes = styled.span`
+const StyledPostTitlePostLikes = styled.span`
   display: inline-block;
-  width: 100px;
+  width: 6.25rem;
   text-align: center;
-  font-size: 14px;
+  font-size: 0.875rem;
 `
 
-const StyledPostTitelPostCommentNum = styled.span`
+const StyledPostTitlePostCommentNum = styled.span`
   display: inline-block;
-  width: 90px;
+  width: 5.625rem;
   text-align: center;
-  font-size: 14px;
+  font-size: 0.875rem;
+`
+
+const StyledPostTitleCategory = styled.span`
+  float: left;
+  width: 5.625rem;
+  text-align: center;
+  font-size: 0.875rem;
+`
+
+const SearchWord = styled.span`
+  position: absolute;
+  margin-top: 12px;
+  margin-left: 2.8rem;
+  font-size: 0.875rem;
 `
 
 export default MyPostPage

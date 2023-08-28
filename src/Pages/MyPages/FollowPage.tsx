@@ -1,7 +1,7 @@
-import React from "react";
+import React from "react"
 
 function FollowPage() {
-  return <div>FollowPage</div>;
+  return <div>FollowPage</div>
 }
 
-export default FollowPage;
+export default FollowPage
