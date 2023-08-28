@@ -83,7 +83,13 @@ function Header() {
             </>
           ) : (
             <>
-              <StAuth>{auth.currentUser.email}</StAuth>
+              <StAuth
+                onClick={() => {
+                  navigate("/MyProfilePage")
+                }}
+              >
+                {auth.currentUser.displayName}님, 어서오세요.
+              </StAuth>
               <StAuth
                 // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={logOut}

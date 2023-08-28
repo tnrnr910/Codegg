@@ -1,6 +1,12 @@
 import React from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
+import { auth } from "../../axios/firebase"
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+interface auth {
+  currentUser: string
+}
 
 function EditMyProfilePage() {
   const navigate = useNavigate()
@@ -33,7 +39,14 @@ function EditMyProfilePage() {
               <EmailAd>123@123.123</EmailAd>
               <NickNameWrap>
                 <NickName>닉네임</NickName>
-                <NickNameInput type="text" placeholder="에그마요" />
+                <NickNameInput
+                  type="text"
+                  placeholder={
+                    auth.currentUser?.displayName !== null
+                      ? auth.currentUser?.displayName
+                      : ""
+                  }
+                />
               </NickNameWrap>
               <MyStackAndPW>
                 <StackArea>관심 있는 기술 태그</StackArea>
