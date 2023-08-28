@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useState } from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
+import { updatePassword } from "firebase/auth"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
@@ -11,8 +12,38 @@ interface auth {
 function EditMyProfilePage() {
   const navigate = useNavigate()
 
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmNewPassword, setConfirmNewPassword] = useState("")
+
+  const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPassword(e.target.value)
+  }
+
+  const handleConfirmNewPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmNewPassword(e.target.value)
+  }
+
+  const changePassword = async () => {
+    if (newPassword !== confirmNewPassword) {
+      alert("비밀번호가 일치하지 않습니다.")
+      return
+    }
+    try {
+      if (auth.currentUser?.uid != null) {
+        await updatePassword(auth.currentUser, newPassword)
+        alert("비밀번호가 변경되었습니다.")
+        navigate("/MyProfilePage")
+      }
+    } catch (error) {
+      console.error("비밀번호 변경 오류:", error)
+      alert("비밀번호 변경 중 오류가 발생했습니다.")
+    }
+  }
+
   const handleImageChange = () => {
-    console.log("프로필 변경")
+    console.log(auth.currentUser?.uid)
   }
 
   return (
@@ -36,7 +67,7 @@ function EditMyProfilePage() {
             </ProfileImgs>
             <MyDataWrap>
               <MyEmail>이메일</MyEmail>
-              <EmailAd>123@123.123</EmailAd>
+              <EmailAd>{auth.currentUser?.email}</EmailAd>
               <NickNameWrap>
                 <NickName>닉네임</NickName>
                 <NickNameInput
@@ -56,21 +87,20 @@ function EditMyProfilePage() {
                 <Stacks>React / Node / Spring</Stacks>
                 <PassWordChange>비밀번호 변경</PassWordChange>
                 <PassWordChangeInPut
-                  type="text"
-                  placeholder="비밀번호를 입력해주세요"
+                  type="password"
+                  placeholder="새로운 비밀번호를 입력해주세요."
+                  value={newPassword}
+                  onChange={handleNewPasswordChange}
                 />
                 <PassWordCheck>비밀번호 확인</PassWordCheck>
                 <PassWordConfirmInPut
-                  type="text"
-                  placeholder="입력한 비밀번호를 다시 한 번 입력해주세요."
+                  type="password"
+                  placeholder="새로운 비밀번호를 다시 한 번 입력해주세요."
+                  value={confirmNewPassword}
+                  onChange={handleConfirmNewPasswordChange}
                 />
-                <SaveBottom
-                  onClick={() => {
-                    navigate("/MyProfilePage")
-                  }}
-                >
-                  저장
-                </SaveBottom>
+                {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+                <SaveBottom onClick={changePassword}>저장</SaveBottom>
               </MyStackAndPW>
             </MyDataWrap>
           </ProfileDetail>
