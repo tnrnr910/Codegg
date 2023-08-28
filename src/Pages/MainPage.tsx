@@ -42,7 +42,13 @@ function MainPage() {
                   .map((info: { id: string; postTitle: string }) => {
                     return (
                       <>
-                        <div key={info.id}>{info.postTitle}</div>
+                        <ListContainer>
+                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
+                          <ListBox>
+                            <div>좋아요</div>
+                            <div>댓글수</div>
+                          </ListBox>
+                        </ListContainer>
                       </>
                     )
                   })}
@@ -69,7 +75,13 @@ function MainPage() {
                   .map((info: { id: string; postTitle: string }) => {
                     return (
                       <>
-                        <div key={info.id}>{info.postTitle}</div>
+                        <ListContainer>
+                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
+                          <ListBox>
+                            <div>좋아요</div>
+                            <div>댓글수</div>
+                          </ListBox>
+                        </ListContainer>
                       </>
                     )
                   })}
@@ -96,7 +108,13 @@ function MainPage() {
                   .map((info: { id: string; postTitle: string }) => {
                     return (
                       <>
-                        <div key={info.id}>{info.postTitle}</div>
+                        <ListContainer>
+                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
+                          <ListBox>
+                            <div>좋아요</div>
+                            <div>댓글수</div>
+                          </ListBox>
+                        </ListContainer>
                       </>
                     )
                   })}
@@ -124,7 +142,20 @@ function MainPage() {
                   .map((info: { id: string; postTitle: string }) => {
                     return (
                       <>
-                        <div key={info.id}>{info.postTitle}</div>
+                        <ListContainer>
+                          <ListDiv
+                            key={info.id}
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            {info.postTitle}
+                          </ListDiv>
+                          <ListBox>
+                            <div>좋아요</div>
+                            <div>댓글수</div>
+                          </ListBox>
+                        </ListContainer>
                       </>
                     )
                   })}
@@ -202,4 +233,17 @@ const Body = styled.div`
 
 const BodyDiv = styled.div`
   margin-left: 24px;
+`
+const ListDiv = styled.div`
+  cursor: pointer;
+`
+
+const ListContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-top: 27px;
+`
+
+const ListBox = styled.div`
+  display: flex;
 `
