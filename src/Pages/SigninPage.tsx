@@ -201,7 +201,6 @@ function SigninPage() {
                 </p>
               </CheckLabel>
               <SigninButton
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={signUp}
                 style={{
                   backgroundColor: "#0C356A",
