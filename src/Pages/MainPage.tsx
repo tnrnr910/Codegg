@@ -36,8 +36,8 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "질의응답"
+                    (item: { postBoard: string }) =>
+                      item.postBoard === "질의응답"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (
@@ -70,8 +70,7 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "모임"
+                    (item: { postBoard: string }) => item.postBoard === "모임"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (
@@ -104,8 +103,7 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "코딩팁"
+                    (item: { postBoard: string }) => item.postBoard === "코딩팁"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (
@@ -138,14 +136,21 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "공지사항"
+                    (item: { postBoard: string }) =>
+                      item.postBoard === "공지사항"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (
                       <>
                         <ListContainer>
-                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
+                          <ListDiv
+                            key={info.id}
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            {info.postTitle}
+                          </ListDiv>
                           <ListBox>
                             <div>좋아요</div>
                             <div>댓글수</div>
@@ -229,7 +234,9 @@ const Body = styled.div`
 const BodyDiv = styled.div`
   margin-left: 24px;
 `
-const ListDiv = styled.div``
+const ListDiv = styled.div`
+  cursor: pointer;
+`
 
 const ListContainer = styled.div`
   display: flex;
