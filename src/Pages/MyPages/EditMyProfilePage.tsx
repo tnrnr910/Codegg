@@ -4,6 +4,11 @@ import { useNavigate } from "react-router"
 
 function EditMyProfilePage() {
   const navigate = useNavigate()
+
+  const handleImageChange = () => {
+    console.log("프로필 변경")
+  }
+
   return (
     <ProfileWrap>
       <ProfileTap>
@@ -18,7 +23,8 @@ function EditMyProfilePage() {
                 <ProfileImage src={require("./profile.jpg")} alt="프사" />
                 <ProfileImageChange
                   src={require("./ProfileChange.png")}
-                  alt="프사"
+                  alt="변경"
+                  onClick={handleImageChange}
                 />
               </ProfileImgBox>
             </ProfileImgs>
@@ -132,6 +138,7 @@ const ProfileImageChange = styled.img`
   right: 0;
   width: 30%;
   height: auto;
+  cursor: pointer;
 `
 const MyDataWrap = styled.div`
   display: flex;
