@@ -36,8 +36,8 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "질의응답"
+                    (item: { postBoard: string }) =>
+                      item.postBoard === "질의응답"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (
@@ -64,8 +64,7 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "모임"
+                    (item: { postBoard: string }) => item.postBoard === "모임"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (
@@ -92,8 +91,7 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "코딩팁"
+                    (item: { postBoard: string }) => item.postBoard === "코딩팁"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (
@@ -120,8 +118,8 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postCategory: string }) =>
-                      item.postCategory === "공지사항"
+                    (item: { postBoard: string }) =>
+                      item.postBoard === "공지사항"
                   )
                   .map((info: { id: string; postTitle: string }) => {
                     return (

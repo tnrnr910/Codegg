@@ -92,15 +92,10 @@ function SigninPage() {
       console.log("signIn", userCredential)
       setInput(userInitialState)
       navigate("/")
+      alert("정상적으로 로그인 되었습니다.")
     } catch (error) {
       console.error("sihnInError", error)
     }
-  }
-
-  // 로그아웃 함수
-  const logOut = async (event: any) => {
-    event.preventDefault()
-    await signOut(auth)
   }
 
   useEffect(() => {
@@ -192,12 +187,6 @@ function SigninPage() {
                   회원가입
                 </span>
               </OtherTap>
-              <button
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                onClick={logOut}
-              >
-                로그아웃
-              </button>
               <button
                 onClick={() => {
                   if (currentUser != null) {

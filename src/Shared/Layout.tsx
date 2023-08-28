@@ -1,9 +1,20 @@
 import React from "react"
 import { useNavigate, Outlet } from "react-router"
 import { styled } from "styled-components"
+import { auth } from "../axios/firebase"
+import { signOut } from "firebase/auth"
 
 function Header() {
   const navigate = useNavigate()
+
+  // 로그아웃 함수
+  const logOut = async (event: any) => {
+    event.preventDefault()
+    await signOut(auth)
+    alert("정상적으로 로그아웃 되었습니다.")
+    navigate("/")
+  }
+
   return (
     <>
       <StHeader>
@@ -14,7 +25,7 @@ function Header() {
         >
           codegg
         </p>
-        <StPagelist>
+        <Pagelist>
           <Stp
             onClick={() => {
               navigate("/QnAPage")
@@ -51,23 +62,37 @@ function Header() {
             포인트 샾
           </Stp>
           <input />
-        </StPagelist>
-        <StAuthcontainer>
-          <StAuth
-            onClick={() => {
-              navigate("/SigninPage")
-            }}
-          >
-            로그인
-          </StAuth>
-          <StAuth
-            onClick={() => {
-              navigate("/SigninPage")
-            }}
-          >
-            회원가입
-          </StAuth>
-        </StAuthcontainer>
+        </Pagelist>
+        <Authcontainer>
+          {auth.currentUser == null ? (
+            <>
+              <StAuth
+                onClick={() => {
+                  navigate("/SigninPage")
+                }}
+              >
+                로그인
+              </StAuth>
+              <StAuth
+                onClick={() => {
+                  navigate("/SigninPage")
+                }}
+              >
+                회원가입
+              </StAuth>
+            </>
+          ) : (
+            <>
+              <StAuth>{auth.currentUser.email}</StAuth>
+              <StAuth
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onClick={logOut}
+              >
+                로그아웃
+              </StAuth>
+            </>
+          )}
+        </Authcontainer>
       </StHeader>
     </>
   )
@@ -114,7 +139,7 @@ const StHeader = styled.div`
   font-weight: 600;
 `
 
-const StPagelist = styled.div`
+const Pagelist = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,7 +148,7 @@ const StPagelist = styled.div`
 const Stp = styled.p`
   cursor: pointer;
 `
-const StAuthcontainer = styled.div`
+const Authcontainer = styled.div`
   width: 15%;
   display: flex;
   gap: 24px;
