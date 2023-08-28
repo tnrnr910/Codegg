@@ -19,7 +19,10 @@ function MainPage() {
         <div>배너</div>
       </Banner>
       <Container>
-        <RankedBox>Top Writers</RankedBox>
+        <RankedBox>
+          <RankedTitle>Top Writers</RankedTitle>
+          <div></div>
+        </RankedBox>
         <PostsContainer>
           <PostBox>
             <Title>
@@ -47,9 +50,8 @@ function MainPage() {
                     }) => {
                       return (
                         <>
-                          <ListContainer>
+                          <ListContainer key={info.id}>
                             <ListDiv
-                              key={info.id}
                               onClick={() => {
                                 navigate(`/detailPage/${info.id}`)
                               }}
@@ -94,9 +96,8 @@ function MainPage() {
                     }) => {
                       return (
                         <>
-                          <ListContainer>
+                          <ListContainer key={info.id}>
                             <ListDiv
-                              key={info.id}
                               onClick={() => {
                                 navigate(`/detailPage/${info.id}`)
                               }}
@@ -142,9 +143,8 @@ function MainPage() {
                     }) => {
                       return (
                         <>
-                          <ListContainer>
+                          <ListContainer key={info.id}>
                             <ListDiv
-                              key={info.id}
                               onClick={() => {
                                 navigate(`/detailPage/${info.id}`)
                               }}
@@ -190,9 +190,8 @@ function MainPage() {
                     }) => {
                       return (
                         <>
-                          <ListContainer>
+                          <ListContainer key={info.id}>
                             <ListDiv
-                              key={info.id}
                               onClick={() => {
                                 navigate(`/detailPage/${info.id}`)
                               }}
@@ -239,7 +238,12 @@ const RankedBox = styled.div`
   margin: 10rem 102px 48px;
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
 `
-
+const RankedTitle = styled.div`
+  border-bottom: solid #d9d9d9 1px;
+  font-size: 15px;
+  font-weight: bold;
+  padding-bottom: 14px;
+`
 const PostsContainer = styled.div`
   width: 72rem;
   height: 51rem;
