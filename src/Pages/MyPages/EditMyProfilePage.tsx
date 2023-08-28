@@ -46,6 +46,8 @@ function EditMyProfilePage() {
     console.log(auth.currentUser?.uid)
   }
 
+  console.log(auth.currentUser)
+
   return (
     <ProfileWrap>
       <ProfileTap>
@@ -57,7 +59,13 @@ function EditMyProfilePage() {
           <ProfileDetail>
             <ProfileImgs>
               <ProfileImgBox>
-                <ProfileImage src={require("./profile.jpg")} alt="프사" />
+                <ProfileImage
+                  src={
+                    auth.currentUser?.photoURL != null ||
+                    require("./profile.jpg")
+                  }
+                  alt="프사"
+                />
                 <ProfileImageChange
                   src={require("./ProfileChange.png")}
                   alt="변경"
@@ -174,6 +182,7 @@ const ProfileImage = styled.img`
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  src: ${auth.currentUser?.photoURL};
 `
 const ProfileImageChange = styled.img`
   position: absolute;
