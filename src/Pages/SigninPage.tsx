@@ -5,7 +5,6 @@ import { FcGoogle } from "react-icons/fc"
 import { auth } from "../axios/firebase"
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -99,10 +98,6 @@ function SigninPage() {
   }
 
   useEffect(() => {
-    // 사용자 인증 정보 확인하기
-    onAuthStateChanged(auth, (user) => {
-      console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
-    })
     // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
     setPersistence(auth, browserSessionPersistence)
       .then(() => {
@@ -139,8 +134,9 @@ function SigninPage() {
                 Sign In with Google
               </SigninButton>
               <p>또는 이메일 로그인</p>
+              {/* <form> */}
               <SigninInput>
-                <div>이메일</div>
+                <label>이메일</label>
                 <input
                   type="email"
                   name="email"
@@ -154,7 +150,7 @@ function SigninPage() {
                 ></input>
               </SigninInput>
               <SigninInput>
-                <div>비밀번호</div>
+                <label>비밀번호</label>
                 <input
                   type="password"
                   name="password"
@@ -176,6 +172,7 @@ function SigninPage() {
               >
                 로그인
               </SigninButton>
+              {/* </form> */}
               <OtherTap>
                 <span>아직 회원이 아니신가요?</span>
                 <span
@@ -206,7 +203,7 @@ function SigninPage() {
             // 회원가입 탭 영역
             <TapContents>
               <SigninInput>
-                <div>이메일</div>
+                <label>이메일</label>
                 <input
                   type="email"
                   name="email"
@@ -219,7 +216,7 @@ function SigninPage() {
                 ></input>
               </SigninInput>
               <SigninInput>
-                <div>닉네임</div>
+                <label>닉네임</label>
                 <input
                   type="text"
                   name="displayName"
@@ -232,7 +229,7 @@ function SigninPage() {
                 ></input>
               </SigninInput>
               <SigninInput>
-                <div>비밀번호</div>
+                <label>비밀번호</label>
                 <input
                   type="password"
                   name="password"
@@ -245,7 +242,7 @@ function SigninPage() {
                 ></input>
               </SigninInput>
               <SigninInput>
-                <div>비밀번호 확인</div>
+                <label>비밀번호 확인</label>
 
                 <input
                   type="password"
@@ -404,6 +401,7 @@ const SigninButton = styled.button`
 
 const SigninInput = styled.div`
   font-weight: bold;
+
   & > input {
     width: 96.5%;
     height: 2rem;

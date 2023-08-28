@@ -1,11 +1,21 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { useNavigate, Outlet } from "react-router"
 import { styled } from "styled-components"
 import { auth } from "../axios/firebase"
-import { signOut } from "firebase/auth"
+import { onAuthStateChanged, signOut } from "firebase/auth"
 
 function Header() {
   const navigate = useNavigate()
+
+  const [currentUser, setCurrentUser] = useState(auth.currentUser)
+  useEffect(() => {
+    // 사용자 인증 정보 확인하기
+    onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user)
+      console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
+    })
+    console.log("currentUser", currentUser)
+  }, [])
 
   // 로그아웃 함수
   const logOut = async (event: any) => {
