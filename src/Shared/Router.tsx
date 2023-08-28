@@ -19,6 +19,7 @@ import MyProfilePage from "../Pages/MyPages/MyProfilePage"
 import OtherPostPage from "../Pages/MyPages/OtherPostPage"
 import ProfilePage from "../Pages/MyPages/ProfilePage"
 import Layout from "./Layout"
+import EditMyProfilePage from "../Pages/MyPages/EditMyProfilePage"
 
 function Router(): any {
   return (
@@ -44,6 +45,7 @@ function Router(): any {
           <Route path="/MyProfilePage" element={<MyProfilePage />} />
           <Route path="/OtherPostPage" element={<OtherPostPage />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
+          <Route path="/EditMyProfilePage" element={<EditMyProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

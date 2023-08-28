@@ -48,7 +48,7 @@ function Header() {
               navigate("/PointShopPage")
             }}
           >
-            포인트 샾
+            포인트 샵
           </Stp>
           <input />
         </StPagelist>
