@@ -1,12 +1,14 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
-import { auth } from "../../axios/firebase"
-import { updatePassword } from "firebase/auth"
+import { auth, storageRef } from "../../axios/firebase"
+import { updatePassword, updateProfile } from "firebase/auth"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
   currentUser: string
+  updateProfile: string
 }
 
 function EditMyProfilePage() {
@@ -42,8 +44,60 @@ function EditMyProfilePage() {
     }
   }
 
+  const [nickName, setNickName] = useState<string | null>(
+    auth.currentUser?.displayName ?? null
+  )
+  const handleNickNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickName(e.target.value)
+  }
+
+  const [userPhoto, setUserPhoto] = useState<string | null>(
+    auth.currentUser?.displayName ?? null
+  )
+
+  const fileRef = useRef<HTMLInputElement | null>(null)
+
   const handleImageChange = () => {
-    console.log(auth.currentUser?.uid)
+    fileRef.current?.click()
+  }
+
+  const handleUserPhotoChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0]
+
+    if (file != null) {
+      try {
+        const storageRefPath = ref(
+          storageRef as any,
+          "user_photos/" + file.name
+        )
+        await uploadBytes(storageRefPath, file)
+        const downloadURL = await getDownloadURL(storageRefPath)
+        setUserPhoto(downloadURL)
+      } catch (error) {
+        console.error("프로필 사진 변경 오류:", error)
+        alert("프로필 사진 변경 중 오류가 발생했습니다.")
+      }
+    }
+  }
+
+  const saveProfile = async () => {
+    try {
+      const currentUser = auth.currentUser
+      if (currentUser != null && nickName !== null && userPhoto !== null) {
+        await updateProfile(currentUser, {
+          displayName: nickName,
+          photoURL: userPhoto
+        })
+        alert("프로필 정보가 변경되었습니다.")
+      } else {
+        alert("사용자가 로그인하지 않았거나 닉네임이 비어있습니다.")
+      }
+    } catch (error) {
+      console.error("프로필 변경 오류:", error)
+      alert("프로필 변경 중 오류가 발생했습니다.")
+    }
   }
 
   console.log(auth.currentUser)
@@ -71,6 +125,14 @@ function EditMyProfilePage() {
                   alt="변경"
                   onClick={handleImageChange}
                 />
+                <ProfileImageChangeinput
+                  src={require("./ProfileChange.png")}
+                  type="file"
+                  accept="image/*"
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                  onChange={handleUserPhotoChange}
+                  ref={fileRef}
+                />
               </ProfileImgBox>
             </ProfileImgs>
             <MyDataWrap>
@@ -85,6 +147,8 @@ function EditMyProfilePage() {
                       ? auth.currentUser?.displayName
                       : ""
                   }
+                  value={nickName ?? ""} // null인 경우에 대비하여 널 병합 연산자 사용
+                  onChange={handleNickNameChange}
                 />
               </NickNameWrap>
               <MyStackAndPW>
@@ -107,8 +171,14 @@ function EditMyProfilePage() {
                   value={confirmNewPassword}
                   onChange={handleConfirmNewPasswordChange}
                 />
-                {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-                <SaveBottom onClick={changePassword}>저장</SaveBottom>
+                <SaveBottom
+                  onClick={() => {
+                    void changePassword()
+                    void saveProfile()
+                  }}
+                >
+                  저장
+                </SaveBottom>
               </MyStackAndPW>
             </MyDataWrap>
           </ProfileDetail>
@@ -191,6 +261,9 @@ const ProfileImageChange = styled.img`
   width: 30%;
   height: auto;
   cursor: pointer;
+`
+const ProfileImageChangeinput = styled.input`
+  display: none;
 `
 const MyDataWrap = styled.div`
   display: flex;
