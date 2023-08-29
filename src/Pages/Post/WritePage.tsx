@@ -1,5 +1,5 @@
 import React from "react"
-import Write from "../../Components/wirte/Write"
+import Write from "../../Components/write/Write"
 
 function WritePage() {
   return (

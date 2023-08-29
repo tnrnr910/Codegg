@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import { useNavigate } from "react-router"
 import { FcGoogle } from "react-icons/fc"
+
+import { type SubmitHandler, useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+
 import { auth } from "../axios/firebase"
 import {
   createUserWithEmailAndPassword,
@@ -11,6 +16,42 @@ import {
   setPersistence,
   browserSessionPersistence
 } from "firebase/auth"
+
+// interface FormValue {
+//   email: string
+//   displayName: string
+//   password: string
+//   confirmPassword: string
+//   // photo: any
+// }
+
+const schema = yup.object({
+  email: yup
+    .string()
+    .email("이메일 형식을 입력해 주세요")
+    .max(20, "20자 이하로 입력해 주세요")
+    // .matches(
+    //   /^[가-힣a-zA-Z][^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?\s]*$/,
+    //   "닉네임에 특수문자가 포함되면 안되고 숫자로 시작하면 안됩니다!"
+    // )
+    .required("이메일을 입력해 주세요"),
+  displayName: yup
+    .string()
+    .min(2, "2자 이상 입력해 주세요")
+    // .required("닉네임을 입력해 주세요")
+    .max(20, "20자 이하로 입력해 주세요"),
+  password: yup
+    .string()
+    .min(6, "6자 이상 입력해 주세요")
+    .max(16, "16자 이하로 입력해 주세요")
+    .required("비밀번호를 입력해 주세요"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), undefined], "비밀번호가 일치하지 않습니다")
+  // .required("비밀번호를 확인해 주세요")
+})
+
+type FormData = yup.InferType<typeof schema>
 
 function SigninPage() {
   const navigate = useNavigate()
@@ -27,6 +68,17 @@ function SigninPage() {
     setCurrentTab(index)
   }
 
+  // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
+  useEffect(() => {
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => {
+        console.log("Session persistence successfully set!")
+      })
+      .catch((error) => {
+        console.error("Error setting session persistence:", error)
+      })
+  }, [])
+
   // 유저정보 초기값
   const userInitialState = {
     email: "",
@@ -42,71 +94,98 @@ function SigninPage() {
   // 현재 로그인한 유저 가져오기
   const currentUser = auth.currentUser
 
-  // 회원가입 시 로그인된 사용자가 있는 경우에만 실행되는 함수
+  // 회원가입 버튼 클릭 시 실행
+  const onSubmitSignup: SubmitHandler<FormData> = (data, event) => {
+    console.log(errors)
+    signUp(event)
+  }
+
+  // 회원가입 버튼 클릭 시 유효성검사 통과 후 실행
+  const signUp = (event: any) => {
+    event.preventDefault()
+    createUserWithEmailAndPassword(auth, emailWatch, passwordWatch)
+      .then((userCredential: any) => {
+        // Signed in
+        const user = userCredential.user
+        console.log(user)
+        loggedInSignUp()
+        reset()
+      })
+      .catch((error: any) => {
+        const errorCode = error.code
+        const errorMessage = error.message
+        console.log(errorCode, errorMessage)
+        alert("이미 사용중인 이메일입니다.")
+      })
+  }
+
+  // 회원가입 성공 시 실행되는 함수
+  // (회원정보 등록 후 로그아웃)
   const loggedInSignUp = () => {
     if (auth.currentUser != null) {
       void updateProfile(auth.currentUser, {
-        displayName: input.displayName,
+        displayName: displayNameWatch,
         photoURL: input.photo
       })
       selectMenuHandler(0)
-      setInput(userInitialState)
+      // setInput(userInitialState)
       void signOut(auth)
     } else {
       console.log("No user is signed in.") // 사용자가 로그인되어 있지 않은 경우
     }
   }
 
-  // 회원가입 버튼 클릭 시 실행
-  const signUp = (event: any) => {
-    event.preventDefault()
-    if (input.password === input.confirmPassword) {
-      createUserWithEmailAndPassword(auth, input.email, input.password)
-        .then((userCredential: any) => {
-          // Signed in
-          const user = userCredential.user
-          console.log(user)
-
-          loggedInSignUp()
-        })
-        .catch((error: any) => {
-          const errorCode = error.code
-          const errorMessage = error.message
-          console.log(errorCode, errorMessage)
-        })
-    } else {
-      alert("비밀번호를 다시 확인해 주세요")
-    }
+  // 로그인 버튼 클릭 시 실행
+  const onSubmitSignin: SubmitHandler<FormData> = (data, event) => {
+    console.log(errors)
+    void signIn(event)
   }
 
-  // 로그인 버튼 클릭 시 실행
-  const signIn = (event: any) => {
+  // 로그인 버튼 클릭 시 유효성검사 통과 후 실행
+  const signIn = async (event: any) => {
     event.preventDefault()
     try {
-      const userCredential = signInWithEmailAndPassword(
+      const userCredential = await signInWithEmailAndPassword(
         auth,
-        input.email,
-        input.password
+        emailWatch,
+        passwordWatch
       )
       console.log("signIn", userCredential)
-      setInput(userInitialState)
+      // setInput(userInitialState)
+      reset()
       navigate("/")
       alert("정상적으로 로그인 되었습니다.")
     } catch (error) {
-      console.error("sihnInError", error)
+      console.error("signInError", error)
     }
   }
 
-  useEffect(() => {
-    // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
-    setPersistence(auth, browserSessionPersistence)
-      .then(() => {
-        console.log("Session persistence successfully set!")
-      })
-      .catch((error) => {
-        console.error("Error setting session persistence:", error)
-      })
-  }, [])
+  // 유효성 검사
+  const {
+    register,
+    handleSubmit,
+    watch,
+    // getValues, // 리렌더링 없이 접근 가능
+    formState: { errors },
+    reset
+  } = useForm<FormData>({
+    resolver: yupResolver(schema)
+  })
+
+  // TODO: 네트워크창 열고 페이로드에서 잘 들어오는지 확인하기!!!!
+  // const onError = (error: any) => { console.log(error); }
+  // const emailValues = getValues("email")
+  const emailWatch = watch("email")
+  const displayNameWatch = watch("displayName")
+  const passwordWatch = watch("password")
+  const confirmPasswordWatch = watch("confirmPassword")
+  console.log(
+    emailWatch,
+    displayNameWatch,
+    passwordWatch,
+    confirmPasswordWatch,
+    errors.password
+  ) // 추출한 값 콘솔에 출력
 
   return (
     <SigninSignoutContainer>
@@ -134,45 +213,41 @@ function SigninPage() {
                 Sign In with Google
               </SigninButton>
               <p>또는 이메일 로그인</p>
-              {/* <form> */}
-              <SigninInput>
-                <label>이메일</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={input.email}
-                  placeholder="이메일을 입력해 주세요."
-                  onChange={(e) => {
-                    setInput({ ...input, email: e.target.value })
-                    console.log(input.email)
+              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+              <form onSubmit={handleSubmit(onSubmitSignin)}>
+                <SigninInput>
+                  <label>이메일</label>
+                  <input
+                    type="email"
+                    value={emailWatch}
+                    placeholder="이메일을 입력해 주세요."
+                    {...register("email")}
+                  ></input>
+                  {/* {errors.email != null && <span>This field is required</span>} */}
+                  <p>{errors.email?.message}</p>
+                </SigninInput>
+                <SigninInput>
+                  <label>비밀번호</label>
+                  <input
+                    type="password"
+                    // name="password"
+                    value={passwordWatch}
+                    placeholder="비밀번호를 입력해 주세요."
+                    // 레지스터가 리액트 훅 폼이랑 연결해줌
+                    {...register("password")}
+                  ></input>
+                  <p>{errors.password?.message}</p>
+                </SigninInput>
+                <SigninButton
+                  style={{
+                    backgroundColor: "#0C356A",
+                    color: "#fff",
+                    fontSize: "1.25rem"
                   }}
-                  required
-                ></input>
-              </SigninInput>
-              <SigninInput>
-                <label>비밀번호</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={input.password}
-                  placeholder="비밀번호를 입력해 주세요."
-                  onChange={(e) => {
-                    setInput({ ...input, password: e.target.value })
-                  }}
-                  required
-                ></input>
-              </SigninInput>
-              <SigninButton
-                onClick={signIn}
-                style={{
-                  backgroundColor: "#0C356A",
-                  color: "#fff",
-                  fontSize: "1.25rem"
-                }}
-              >
-                로그인
-              </SigninButton>
-              {/* </form> */}
+                >
+                  로그인
+                </SigninButton>
+              </form>
               <OtherTap>
                 <span>아직 회원이 아니신가요?</span>
                 <span
@@ -187,8 +262,6 @@ function SigninPage() {
               <button
                 onClick={() => {
                   if (currentUser != null) {
-                    // User is signed in, see docs for a list of available properties
-                    // https://firebase.google.com/docs/reference/js/auth.user
                     console.log("current user", currentUser)
                   } else {
                     // No user is signed in.
@@ -202,82 +275,77 @@ function SigninPage() {
           ) : (
             // 회원가입 탭 영역
             <TapContents>
-              <SigninInput>
-                <label>이메일</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={input.email}
-                  placeholder="이메일을 입력해 주세요."
-                  onChange={(e) => {
-                    setInput({ ...input, email: e.target.value })
-                  }}
-                  required
-                ></input>
-              </SigninInput>
-              <SigninInput>
-                <label>닉네임</label>
-                <input
-                  type="text"
-                  name="displayName"
-                  value={input.displayName}
-                  placeholder="닉네임을 입력해 주세요."
-                  onChange={(e) => {
-                    setInput({ ...input, displayName: e.target.value })
-                  }}
-                  required
-                ></input>
-              </SigninInput>
-              <SigninInput>
-                <label>비밀번호</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={input.password}
-                  placeholder="비밀번호를 확인해 주세요."
-                  onChange={(e) => {
-                    setInput({ ...input, password: e.target.value })
-                  }}
-                  required
-                ></input>
-              </SigninInput>
-              <SigninInput>
-                <label>비밀번호 확인</label>
+              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+              <form onSubmit={handleSubmit(onSubmitSignup)}>
+                <SigninInput>
+                  <label>이메일</label>
+                  <input
+                    type="email"
+                    value={emailWatch}
+                    placeholder="이메일을 입력해 주세요."
+                    {...register("email")}
+                  ></input>
+                  {/* {errors.email != null && <span>This field is required</span>} */}
+                  <p>{errors.email?.message}</p>
+                </SigninInput>
+                <SigninInput>
+                  <label>닉네임</label>
+                  <input
+                    type="text"
+                    value={displayNameWatch}
+                    placeholder="닉네임을 입력해 주세요."
+                    {...register("displayName")}
+                  ></input>
+                  <p>{errors.displayName?.message}</p>
+                </SigninInput>
+                <SigninInput>
+                  <label>비밀번호</label>
+                  <input
+                    type="password"
+                    // name="password"
+                    value={passwordWatch}
+                    placeholder="비밀번호를 입력해 주세요."
+                    // 레지스터가 리액트 훅 폼이랑 연결해줌
+                    {...register("password")}
+                  ></input>
+                  <p>{errors.password?.message}</p>
+                </SigninInput>
+                <SigninInput>
+                  <label>비밀번호 확인</label>
 
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={input.confirmPassword}
-                  placeholder="비밀번호를 입력해 주세요."
-                  onChange={(e) => {
-                    setInput({ ...input, confirmPassword: e.target.value })
+                  <input
+                    type="password"
+                    // name="confirmPassword"
+                    value={confirmPasswordWatch}
+                    placeholder="비밀번호를 확인해 주세요."
+                    {...register("confirmPassword")}
+                  ></input>
+                  <p>{errors.confirmPassword?.message}</p>
+                </SigninInput>
+                <CheckLabel htmlFor="check">
+                  <input type="checkbox" id="check" />
+                  <p>
+                    I agree with CODEGG’s Terms of Service, Privacy Policy, and
+                    Default Notification Settings.
+                  </p>
+                </CheckLabel>
+                <SigninButton
+                  style={{
+                    backgroundColor: "#0C356A",
+                    color: "#fff",
+                    fontSize: "1.25rem"
                   }}
-                  required
-                ></input>
-              </SigninInput>
-              <CheckLabel htmlFor="check">
-                <input type="checkbox" id="check" />
-                <p>
-                  I agree with CODEGG’s Terms of Service, Privacy Policy, and
-                  Default Notification Settings.
-                </p>
-              </CheckLabel>
-              <SigninButton
-                onClick={signUp}
-                style={{
-                  backgroundColor: "#0C356A",
-                  color: "#fff",
-                  fontSize: "1.25rem"
-                }}
-              >
-                회원가입
-              </SigninButton>
+                >
+                  회원가입
+                </SigninButton>
+              </form>
               <OtherTap>
                 <span>이미 회원이신가요?</span>
                 <span
                   onClick={() => {
                     selectMenuHandler(0)
                     setInput(userInitialState)
+                    // getValues()
                   }}
                 >
                   로그인
@@ -357,10 +425,15 @@ const TapContents = styled.div`
   justify-content: center;
   align-items: center;
   text-align: start;
-  gap: 2rem;
+  gap: 1rem;
   margin: 2rem 0;
 
-  & > div {
+  & > form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
     width: 100%;
   }
 
@@ -401,6 +474,7 @@ const SigninButton = styled.button`
 
 const SigninInput = styled.div`
   font-weight: bold;
+  width: 100%;
 
   & > input {
     width: 96.5%;
@@ -410,6 +484,13 @@ const SigninInput = styled.div`
     margin-top: 10px;
     border: 1px solid #dadada;
     border-radius: 4px;
+  }
+
+  & > p {
+    color: red;
+    font-weight: 500;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
   }
 `
 

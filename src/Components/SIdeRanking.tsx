@@ -1,7 +1,7 @@
-import React from "react";
+import React from "react"
 
-function SIdeRanking() {
-  return <div>SIdeRanking</div>;
+function SideRanking() {
+  return <div>SideRanking</div>
 }
 
-export default SIdeRanking;
+export default SideRanking
