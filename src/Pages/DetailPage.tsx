@@ -42,10 +42,10 @@ function DetailPage() {
             <DetailContentBody>{postInfo.postContent}</DetailContentBody>
           </DetailContent>
         </DetailContainer>
-        <ComentContainer>
-          <ComentHead>댓글</ComentHead>
-          <Comentdoby>댓글컴포넌트</Comentdoby>
-        </ComentContainer>
+        <CommentContainer>
+          <CommentHead>댓글</CommentHead>
+          <Commentdoby>댓글컴포넌트</Commentdoby>
+        </CommentContainer>
         <ButtonBox>
           <ListBtn
             onClick={() => {
@@ -153,16 +153,16 @@ const DetailContentBody = styled.div`
   margin: 17px 0px 0px 17px;
 `
 
-const ComentContainer = styled.div`
+const CommentContainer = styled.div`
   padding-top: 48px;
 `
 
-const ComentHead = styled.div`
+const CommentHead = styled.div`
   width: 7rem;
   height: 2rem;
 `
 
-const Comentdoby = styled.div`
+const Commentdoby = styled.div`
   width: 58rem;
   border: solid #dadada 1px;
 `

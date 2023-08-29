@@ -63,10 +63,10 @@ function Header() {
           >
             포인트 샵
           </Stp>
-          <StserchInput>
+          <SearchInput>
             <InputField />
             <SearchIcon />
-          </StserchInput>
+          </SearchInput>
         </Pagelist>
         <Authcontainer>
           {auth.currentUser == null ? (
@@ -230,7 +230,7 @@ const StLayout = styled.div`
   padding: 0px;
 `
 
-const StserchInput = styled.div`
+const SearchInput = styled.div`
   display: flex;
   align-items: center;
   width: 270px;

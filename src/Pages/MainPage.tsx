@@ -3,6 +3,7 @@ import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../axios/api"
+import SIdeRanking from "../Components/SIdeRanking"
 
 function MainPage() {
   const navigate = useNavigate()
@@ -19,10 +20,7 @@ function MainPage() {
         <div>배너</div>
       </Banner>
       <Container>
-        <RankedBox>
-          <RankedTitle>Top Writers</RankedTitle>
-          <div></div>
-        </RankedBox>
+        <SIdeRanking />
         <PostsContainer>
           <PostBox>
             <Title>
@@ -222,20 +220,6 @@ const Container = styled.div`
   overflow: auto;
 `
 
-const RankedBox = styled.div`
-  width: 16rem;
-  height: 17rem;
-  border: solid #d9d9d9 1px;
-  border-radius: Mixed;
-  margin: 10rem 102px 48px;
-  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
-`
-const RankedTitle = styled.div`
-  border-bottom: solid #d9d9d9 1px;
-  font-size: 15px;
-  font-weight: bold;
-  padding-bottom: 14px;
-`
 const PostsContainer = styled.div`
   width: 72rem;
   height: 51rem;
