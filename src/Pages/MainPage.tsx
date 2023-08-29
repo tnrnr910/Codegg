@@ -3,6 +3,7 @@ import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../axios/api"
+import SIdeRanking from "../Components/SIdeRanking"
 
 function MainPage() {
   const navigate = useNavigate()
@@ -19,7 +20,7 @@ function MainPage() {
         <div>배너</div>
       </Banner>
       <Container>
-        <RankedBox>Top Writers</RankedBox>
+        <SIdeRanking />
         <PostsContainer>
           <PostBox>
             <Title>
@@ -39,19 +40,30 @@ function MainPage() {
                     (item: { postBoard: string }) =>
                       item.postBoard === "질의응답"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
-                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            <ListCategory> {info.postCategory}</ListCategory>
+                            {info.postTitle}
+                          </ListDiv>
                           <ListBox>
                             <div>좋아요</div>
                             <div>댓글수</div>
                           </ListBox>
                         </ListContainer>
-                      </>
-                    )
-                  })}
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -72,19 +84,30 @@ function MainPage() {
                   .filter(
                     (item: { postBoard: string }) => item.postBoard === "모임"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
-                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            <ListCategory> {info.postCategory}</ListCategory>
+                            {info.postTitle}
+                          </ListDiv>
                           <ListBox>
                             <div>좋아요</div>
                             <div>댓글수</div>
                           </ListBox>
                         </ListContainer>
-                      </>
-                    )
-                  })}
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -103,21 +126,33 @@ function MainPage() {
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postBoard: string }) => item.postBoard === "코딩팁"
+                    (item: { postBoard: string; postCategory: string }) =>
+                      item.postBoard === "코딩팁"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
-                          <ListDiv key={info.id}>{info.postTitle}</ListDiv>
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            <ListCategory> {info.postCategory}</ListCategory>
+                            {info.postTitle}
+                          </ListDiv>
                           <ListBox>
                             <div>좋아요</div>
                             <div>댓글수</div>
                           </ListBox>
                         </ListContainer>
-                      </>
-                    )
-                  })}
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -139,26 +174,25 @@ function MainPage() {
                     (item: { postBoard: string }) =>
                       item.postBoard === "공지사항"
                   )
-                  .map((info: { id: string; postTitle: string }) => {
-                    return (
-                      <>
-                        <ListContainer>
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <ListContainer key={info.id}>
                           <ListDiv
-                            key={info.id}
                             onClick={() => {
                               navigate(`/detailPage/${info.id}`)
                             }}
                           >
                             {info.postTitle}
                           </ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
                         </ListContainer>
-                      </>
-                    )
-                  })}
+                      )
+                    }
+                  )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -186,15 +220,6 @@ const Container = styled.div`
   overflow: auto;
 `
 
-const RankedBox = styled.div`
-  width: 16rem;
-  height: 17rem;
-  border: solid #d9d9d9 1px;
-  border-radius: Mixed;
-  margin: 10rem 102px 48px;
-  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
-`
-
 const PostsContainer = styled.div`
   width: 72rem;
   height: 51rem;
@@ -214,16 +239,21 @@ const PostBox = styled.div`
 const Title = styled.div`
   width: 35rem;
   height: 4rem;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 `
 const TitleDiv = styled.div`
   margin-left: 24px;
+  font-weight: bold;
+  font-size: 25px;
 `
 
 const TitleDiv2 = styled.div`
   margin-right: 26px;
+  font-weight: Medium;
+  font-size: 15px;
   cursor: pointer;
 `
 const Body = styled.div`
@@ -235,12 +265,23 @@ const BodyDiv = styled.div`
   margin-left: 24px;
 `
 const ListDiv = styled.div`
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
+`
+
+const ListCategory = styled.div`
+  border: solid #e7e7e7 1px;
+  padding: 3px 3px 3px 3px;
+  color: #9f9f9f;
 `
 
 const ListContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding-top: 27px;
 `
 
