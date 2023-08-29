@@ -3,6 +3,7 @@ import { useNavigate, Outlet } from "react-router"
 import { styled } from "styled-components"
 import { auth } from "../axios/firebase"
 import { onAuthStateChanged, signOut } from "firebase/auth"
+import Swal from "sweetalert2"
 
 function Header() {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ function Header() {
   const logOut = async (event: any) => {
     event.preventDefault()
     await signOut(auth)
-    alert("정상적으로 로그아웃 되었습니다.")
+    void Swal.fire("성공적으로 로그아웃 되었습니다.")
     navigate("/")
   }
 

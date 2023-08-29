@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import { useNavigate } from "react-router"
 import { FcGoogle } from "react-icons/fc"
+import Swal from "sweetalert2"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -16,14 +17,6 @@ import {
   setPersistence,
   browserSessionPersistence
 } from "firebase/auth"
-
-// interface FormValue {
-//   email: string
-//   displayName: string
-//   password: string
-//   confirmPassword: string
-//   // photo: any
-// }
 
 const schema = yup.object({
   email: yup
@@ -79,18 +72,6 @@ function SigninPage() {
       })
   }, [])
 
-  // 유저정보 초기값
-  const userInitialState = {
-    email: "",
-    displayName: "",
-    password: "",
-    confirmPassword: "",
-    photo:
-      "https://pixabay.com/get/g7effabd2f82e664f5fc0b1e95dc0a25bd225980e1ba21c3b50b28cf1b1c10a6605bf50c1143c52da511ba225fbcc86f3_1920.png"
-  }
-
-  const [input, setInput] = useState(userInitialState)
-
   // 현재 로그인한 유저 가져오기
   const currentUser = auth.currentUser
 
@@ -115,20 +96,21 @@ function SigninPage() {
         const errorCode = error.code
         const errorMessage = error.message
         console.log(errorCode, errorMessage)
-        alert("이미 사용중인 이메일입니다.")
+        void Swal.fire("이미 사용중인 이메일입니다.")
       })
   }
 
   // 회원가입 성공 시 실행되는 함수
   // (회원정보 등록 후 로그아웃)
   const loggedInSignUp = () => {
-    if (auth.currentUser != null) {
-      void updateProfile(auth.currentUser, {
+    if (currentUser != null) {
+      void updateProfile(currentUser, {
         displayName: displayNameWatch,
-        photoURL: input.photo
+        photoURL:
+          "https://pixabay.com/get/g7effabd2f82e664f5fc0b1e95dc0a25bd225980e1ba21c3b50b28cf1b1c10a6605bf50c1143c52da511ba225fbcc86f3_1920.png"
       })
       selectMenuHandler(0)
-      // setInput(userInitialState)
+      void Swal.fire("환영합니다!", "성공적으로 회원가입되었습니다.", "success")
       void signOut(auth)
     } else {
       console.log("No user is signed in.") // 사용자가 로그인되어 있지 않은 경우
@@ -154,9 +136,17 @@ function SigninPage() {
       // setInput(userInitialState)
       reset()
       navigate("/")
-      alert("정상적으로 로그인 되었습니다.")
+      void Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "정상적으로 로그인 되었습니다.",
+        text: "잠시 후 홈으로 이동합니다.",
+        showConfirmButton: false,
+        timer: 1500
+      })
     } catch (error) {
       console.error("signInError", error)
+      void Swal.fire("이메일 혹은 비밀번호를 다시 입력해 주세요")
     }
   }
 
@@ -172,7 +162,6 @@ function SigninPage() {
     resolver: yupResolver(schema)
   })
 
-  // TODO: 네트워크창 열고 페이로드에서 잘 들어오는지 확인하기!!!!
   // const onError = (error: any) => { console.log(error); }
   // const emailValues = getValues("email")
   const emailWatch = watch("email")
@@ -197,7 +186,7 @@ function SigninPage() {
               className={index === currentTab ? "submenu focused" : "submenu"}
               onClick={() => {
                 selectMenuHandler(index)
-                setInput(userInitialState)
+                reset()
               }}
             >
               {el.name}
@@ -230,10 +219,9 @@ function SigninPage() {
                   <label>비밀번호</label>
                   <input
                     type="password"
-                    // name="password"
                     value={passwordWatch}
                     placeholder="비밀번호를 입력해 주세요."
-                    // 레지스터가 리액트 훅 폼이랑 연결해줌
+                    // 레지스터가 react-hook-form과 연결해줌
                     {...register("password")}
                   ></input>
                   <p>{errors.password?.message}</p>
@@ -253,13 +241,13 @@ function SigninPage() {
                 <span
                   onClick={() => {
                     selectMenuHandler(1)
-                    setInput(userInitialState)
+                    reset()
                   }}
                 >
                   회원가입
                 </span>
               </OtherTap>
-              <button
+              {/* <button
                 onClick={() => {
                   if (currentUser != null) {
                     console.log("current user", currentUser)
@@ -270,7 +258,7 @@ function SigninPage() {
                 }}
               >
                 현재유저
-              </button>
+              </button> */}
             </TapContents>
           ) : (
             // 회원가입 탭 영역
@@ -302,7 +290,6 @@ function SigninPage() {
                   <label>비밀번호</label>
                   <input
                     type="password"
-                    // name="password"
                     value={passwordWatch}
                     placeholder="비밀번호를 입력해 주세요."
                     // 레지스터가 리액트 훅 폼이랑 연결해줌
@@ -315,7 +302,6 @@ function SigninPage() {
 
                   <input
                     type="password"
-                    // name="confirmPassword"
                     value={confirmPasswordWatch}
                     placeholder="비밀번호를 확인해 주세요."
                     {...register("confirmPassword")}
@@ -344,7 +330,7 @@ function SigninPage() {
                 <span
                   onClick={() => {
                     selectMenuHandler(0)
-                    setInput(userInitialState)
+                    reset()
                     // getValues()
                   }}
                 >
@@ -361,7 +347,7 @@ function SigninPage() {
 
 export default SigninPage
 
-// Styled-Component 라이브러리를 활용해 TabMenu 와 Desc 컴포넌트의 CSS를 구현.
+// Styled-Component 라이브러리를 활용해 CSS를 구현.
 
 const SigninSignoutContainer = styled.div`
   width: 100vw;
