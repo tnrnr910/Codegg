@@ -25,7 +25,7 @@ function Header() {
     if (currentUser != null) {
       // currentUser가 null이 아닌 경우에만 실행
       await signOut(auth)
-      void Swal.fire("성공적으로 로그아웃 되었습니다.")
+      void Swal.fire("정상적으로 로그아웃 되었습니다.")
       navigate("/")
     }
   }
@@ -35,9 +35,26 @@ function Header() {
     event.preventDefault()
     if (currentUser != null) {
       // currentUser가 null이 아닌 경우에만 실행
-      await deleteUser(currentUser)
-      void Swal.fire("성공적으로 탈퇴되었습니다.")
-      navigate("/")
+      await Swal.fire({
+        title: "정말로 탈퇴하시겠습니까?",
+        text: "탈퇴 버튼 선택 시, 계정은 삭제되며 복구되지 않습니다.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "회원 탈퇴",
+        cancelButtonText: "취소"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          void Swal.fire(
+            "탈퇴 완료",
+            "계정이 정상적으로 탈퇴되었습니다.",
+            "success"
+          )
+          void deleteUser(currentUser)
+          navigate("/")
+        }
+      })
     }
   }
 
