@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import { auth, storage } from "../../axios/firebase"
 import { updatePassword, updateProfile } from "firebase/auth"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import MyPageMenuBar from "../../Components/MyPageMenuBar"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
@@ -13,6 +14,7 @@ interface auth {
 
 function EditMyProfilePage() {
   const navigate = useNavigate()
+  const activeMenuItem = "/MyProfilePage"
 
   const [newPassword, setNewPassword] = useState("")
   const [confirmNewPassword, setConfirmNewPassword] = useState("")
@@ -104,10 +106,8 @@ function EditMyProfilePage() {
 
   return (
     <ProfileWrap>
+      <MyPageMenuBar activeMenuItem={activeMenuItem} />
       <ProfileTap>
-        <ProfileMenuBar>
-          <MenuBar>마이페이지</MenuBar>
-        </ProfileMenuBar>
         <ProfileRightSide>
           <ProfileHead>프로필 관리</ProfileHead>
           <ProfileDetail>
@@ -196,18 +196,6 @@ const ProfileTap = styled.div`
   display: flex;
   width: 53.0625rem;
   margin-right: 48.875rem;
-`
-const ProfileMenuBar = styled.div`
-  margin-right: 3.125rem;
-  margin-top: 0.2rem;
-  margin-left: 13.125rem;
-  width: 10.3125rem;
-  font-weight: bold;
-  font-size: 1.2rem;
-`
-const MenuBar = styled.div`
-  width: 10.3125rem;
-  margin-top: 4rem;
 `
 const ProfileHead = styled.div`
   font-size: 1.4rem;

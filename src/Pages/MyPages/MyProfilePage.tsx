@@ -2,6 +2,7 @@ import React from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
+import MyPageMenuBar from "../../Components/MyPageMenuBar"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
@@ -10,14 +11,14 @@ interface auth {
 
 function MyProfilePage() {
   const navigate = useNavigate()
+  const activeMenuItem = "/MyProfilePage"
+
   console.log(auth.currentUser?.photoURL)
   console.log(auth.currentUser)
   return (
     <ProfileWrap>
+      <MyPageMenuBar activeMenuItem={activeMenuItem} />
       <ProfileTap>
-        <ProfileMenuBar>
-          <MenuBar>마이페이지</MenuBar>
-        </ProfileMenuBar>
         <ProfileRightSide>
           <ProfileHead>프로필 관리</ProfileHead>
           <ProfileDetail>
@@ -82,18 +83,7 @@ const ProfileTap = styled.div`
   width: 53.0625rem;
   margin-right: 48.875rem;
 `
-const ProfileMenuBar = styled.div`
-  margin-right: 3.125rem;
-  margin-top: 0.2rem;
-  margin-left: 13.125rem;
-  width: 10.3125rem;
-  font-weight: bold;
-  font-size: 1.2rem;
-`
-const MenuBar = styled.div`
-  width: 10.3125rem;
-  margin-top: 4rem;
-`
+
 const ProfileHead = styled.div`
   font-size: 1.4rem;
   font-weight: bold;
