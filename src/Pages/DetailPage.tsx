@@ -3,6 +3,7 @@ import { styled } from "styled-components"
 import { useQuery } from "react-query"
 import { useParams, useNavigate } from "react-router"
 import { getPosts } from "../axios/api"
+import Comments from "../Components/Comments"
 
 function DetailPage() {
   const { id } = useParams()
@@ -42,10 +43,7 @@ function DetailPage() {
             <DetailContentBody>{postInfo.postContent}</DetailContentBody>
           </DetailContent>
         </DetailContainer>
-        <CommentContainer>
-          <CommentHead>댓글</CommentHead>
-          <Commentdoby>댓글컴포넌트</Commentdoby>
-        </CommentContainer>
+        <Comments />
         <ButtonBox>
           <ListBtn
             onClick={() => {
@@ -153,19 +151,6 @@ const DetailContentBody = styled.div`
   margin: 17px 0px 0px 17px;
 `
 
-const CommentContainer = styled.div`
-  padding-top: 48px;
-`
-
-const CommentHead = styled.div`
-  width: 7rem;
-  height: 2rem;
-`
-
-const Commentdoby = styled.div`
-  width: 58rem;
-  border: solid #dadada 1px;
-`
 const DetailtitleBox = styled.div`
   display: flex;
   align-items: center;

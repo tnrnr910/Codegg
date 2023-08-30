@@ -30,7 +30,7 @@ function MainPage() {
                   navigate("/QnAPage")
                 }}
               >
-                더보기
+                더보기 ＞
               </TitleDiv2>
             </Title>
             <Body>
@@ -38,7 +38,7 @@ function MainPage() {
                 {list
                   .filter(
                     (item: { postBoard: string }) =>
-                      item.postBoard === "질의응답"
+                      item.postBoard === "questions"
                   )
                   .map(
                     (info: {
@@ -75,14 +75,15 @@ function MainPage() {
                   navigate("/TogetherPage")
                 }}
               >
-                더보기
+                더보기 ＞
               </TitleDiv2>
             </Title>
             <Body>
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postBoard: string }) => item.postBoard === "모임"
+                    (item: { postBoard: string }) =>
+                      item.postBoard === "meetups"
                   )
                   .map(
                     (info: {
@@ -119,7 +120,7 @@ function MainPage() {
                   navigate("/TipPage")
                 }}
               >
-                더보기
+                더보기 ＞
               </TitleDiv2>
             </Title>
             <Body>
@@ -127,7 +128,7 @@ function MainPage() {
                 {list
                   .filter(
                     (item: { postBoard: string; postCategory: string }) =>
-                      item.postBoard === "코딩팁"
+                      item.postBoard === "Tip"
                   )
                   .map(
                     (info: {
@@ -164,15 +165,14 @@ function MainPage() {
                   navigate("/NoticePage")
                 }}
               >
-                더보기
+                더보기 ＞
               </TitleDiv2>
             </Title>
             <Body>
               <BodyDiv>
                 {list
                   .filter(
-                    (item: { postBoard: string }) =>
-                      item.postBoard === "공지사항"
+                    (item: { postBoard: string }) => item.postBoard === "Notice"
                   )
                   .map(
                     (info: {

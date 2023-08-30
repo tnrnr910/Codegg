@@ -91,11 +91,11 @@ const MyPostPage: React.FC = () => {
           >
             파이썬
           </StyledCategoryItem>
-          {/* ... Add other categories ... */}
         </StyledCategoryList>
       </StyledCategoryDropdown>
     )
   }
+
   return (
     <StyledContainer>
       <StyledTitle>내가 쓴 글</StyledTitle>
