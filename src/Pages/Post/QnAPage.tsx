@@ -1,5 +1,5 @@
 import React from "react"
-import SIdeRanking from "../../Components/SIdeRanking"
+import SIdeRanking from "../../Components/SideRanking"
 import styled from "styled-components"
 
 function QnAPage() {

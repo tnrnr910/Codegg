@@ -3,7 +3,7 @@ import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../axios/api"
-import SIdeRanking from "../Components/SIdeRanking"
+import SIdeRanking from "../Components/SideRanking"
 
 function MainPage() {
   const navigate = useNavigate()

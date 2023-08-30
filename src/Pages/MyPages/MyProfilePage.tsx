@@ -10,7 +10,8 @@ interface auth {
 
 function MyProfilePage() {
   const navigate = useNavigate()
-
+  console.log(auth.currentUser?.photoURL)
+  console.log(auth.currentUser)
   return (
     <ProfileWrap>
       <ProfileTap>
@@ -22,7 +23,9 @@ function MyProfilePage() {
           <ProfileDetail>
             <ProfileImgs>
               <ProfileImgBox>
-                <ProfileImage src={require("./profile.jpg")} alt="프사" />
+                <ProfileImage
+                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
+                />
               </ProfileImgBox>
               <ProfileLevelAndNickName>
                 <div>

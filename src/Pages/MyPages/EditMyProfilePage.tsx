@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
-import { auth, storageRef } from "../../axios/firebase"
+import { auth, storage } from "../../axios/firebase"
 import { updatePassword, updateProfile } from "firebase/auth"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
@@ -35,7 +35,6 @@ function EditMyProfilePage() {
     try {
       if (auth.currentUser?.uid != null) {
         await updatePassword(auth.currentUser, newPassword)
-        alert("비밀번호가 변경되었습니다.")
         navigate("/MyProfilePage")
       }
     } catch (error) {
@@ -68,12 +67,11 @@ function EditMyProfilePage() {
 
     if (file != null) {
       try {
-        const storageRefPath = ref(
-          storageRef as any,
-          "user_photos/" + file.name
-        )
+        const storageRefPath = ref(storage as any, "user_photos/" + file.name)
+        console.log(storageRefPath)
         await uploadBytes(storageRefPath, file)
         const downloadURL = await getDownloadURL(storageRefPath)
+        console.log(downloadURL)
         setUserPhoto(downloadURL)
       } catch (error) {
         console.error("프로필 사진 변경 오류:", error)
@@ -102,6 +100,8 @@ function EditMyProfilePage() {
 
   console.log(auth.currentUser)
 
+  // 로그인 유지(로컬, 세션스토리지 등) / 비밀번호 틀려도 로그인 됨
+
   return (
     <ProfileWrap>
       <ProfileTap>
@@ -114,10 +114,7 @@ function EditMyProfilePage() {
             <ProfileImgs>
               <ProfileImgBox>
                 <ProfileImage
-                  src={
-                    auth.currentUser?.photoURL != null ||
-                    require("./profile.jpg")
-                  }
+                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
                   alt="프사"
                 />
                 <ProfileImageChange
