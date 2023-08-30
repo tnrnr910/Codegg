@@ -2,7 +2,7 @@ import { getFirestore } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
 // eslint-disable-next-line import/no-duplicates
 import { getAuth } from "firebase/auth"
-import { getStorage } from "firebase/storage"
+import { getStorage, ref as storageRef } from "firebase/storage"
 // eslint-disable-next-line import/no-duplicates
 import { GoogleAuthProvider } from "firebase/auth"
 import { getAnalytics } from "firebase/analytics"
@@ -22,9 +22,9 @@ const firebaseApp = initializeApp(firebaseConfig)
 export const db = getFirestore(firebaseApp)
 export const auth = getAuth(firebaseApp)
 export const storage = getStorage(firebaseApp)
-
 export const app = initializeApp(firebaseConfig)
 export const analytics = getAnalytics(app)
 export const provider = new GoogleAuthProvider()
+export { storageRef }
 
 export default firebaseApp

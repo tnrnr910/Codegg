@@ -1,19 +1,60 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { useNavigate, Outlet } from "react-router"
 import { styled } from "styled-components"
 import { auth } from "../axios/firebase"
-import { signOut } from "firebase/auth"
+import { onAuthStateChanged, signOut, deleteUser } from "firebase/auth"
+import Swal from "sweetalert2"
 import { BiSearch } from "react-icons/bi"
 
 function Header() {
   const navigate = useNavigate()
 
+  const [currentUser, setCurrentUser] = useState(auth.currentUser)
+  useEffect(() => {
+    // 사용자 인증 정보 확인하기
+    onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user)
+      console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
+    })
+    console.log("currentUser", currentUser)
+  }, [])
+
   // 로그아웃 함수
-  const logOut = (event: any) => {
-    const confirmLogout = window.confirm("로그아웃하시겠습니까?")
-    if (confirmLogout) {
-      void signOut(auth)
+  const logOut = async (event: any) => {
+    event.preventDefault()
+    if (currentUser != null) {
+      // currentUser가 null이 아닌 경우에만 실행
+      await signOut(auth)
+      void Swal.fire("정상적으로 로그아웃 되었습니다.")
       navigate("/")
+    }
+  }
+
+  // 회원탈퇴 함수
+  const deleteCurrentUser = async (event: any) => {
+    event.preventDefault()
+    if (currentUser != null) {
+      // currentUser가 null이 아닌 경우에만 실행
+      await Swal.fire({
+        title: "정말로 탈퇴하시겠습니까?",
+        text: "탈퇴 버튼 선택 시, 계정은 삭제되며 복구되지 않습니다.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "회원 탈퇴",
+        cancelButtonText: "취소"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          void Swal.fire(
+            "탈퇴 완료",
+            "계정이 정상적으로 탈퇴되었습니다.",
+            "success"
+          )
+          void deleteUser(currentUser)
+          navigate("/")
+        }
+      })
     }
   }
 
@@ -88,7 +129,16 @@ function Header() {
             </>
           ) : (
             <>
-              <StAuth>{auth.currentUser?.displayName}님.안녕하세요.</StAuth>
+              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+              <StAuth onClick={deleteCurrentUser}>회원탈퇴</StAuth>
+              <StAuth
+                onClick={() => {
+                  navigate("/MyProfilePage")
+                }}
+              >
+                {auth.currentUser?.displayName}님.안녕하세요.
+              </StAuth>
+              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
               <StAuth onClick={logOut}>프로필</StAuth>
             </>
           )}
