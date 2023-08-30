@@ -1,4 +1,7 @@
-import React, { useState } from "react"
+import { query, collection, where, getDocs } from "firebase/firestore"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { db } from "../../axios/firebase"
+import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 
 interface Post {
@@ -17,13 +20,50 @@ interface TabOption {
 }
 
 const MyPostPage: React.FC = () => {
+  const auth = getAuth()
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("모든 카테고리")
+  const [userId, setUserId] = useState<string | null>("")
+  const [posts, setPosts] = useState<Post[]>([])
 
-  const [posts] = useState<Post[]>([
-    // ... your post data ...
-  ])
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user !== null) {
+        console.log(user.email)
+        setUserId(user.email)
+        void GetPostData(activeTab)
+      }
+    })
+  }, [])
+
+  const GetPostData = async (postBoard: string) => {
+    setPosts([])
+    console.log(postBoard)
+    const dbPosts = query(
+      collection(db, "posts"),
+      where("postUserEmail", "==", userId),
+      where("postBoard", "==", postBoard)
+    )
+    const userSnapshot = await getDocs(dbPosts)
+    userSnapshot.forEach((doc: any) => {
+      if (doc != null) {
+        console.log(doc.data())
+        const newPost: Post = {
+          id: doc.id,
+          category: doc.data().postCategory,
+          title: doc.data().postTitle,
+          date: String(doc.data().postTime.toDate()),
+          content: doc.data().postContent,
+          likes: 0,
+          comments: 0
+        }
+        setPosts([...posts, newPost])
+      }
+      console.log(posts)
+    })
+  }
+
   // 탭탭탭
   const tabOptions: TabOption[] = [
     { value: "questions", label: "질의응답" },
@@ -34,6 +74,7 @@ const MyPostPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState("")
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const filteredPosts = posts.filter((post) => {
     return (
       (post.category === activeTab || activeTab === "all") &&
@@ -96,6 +137,7 @@ const MyPostPage: React.FC = () => {
       </StyledCategoryDropdown>
     )
   }
+
   return (
     <StyledContainer>
       <StyledTitle>내가 쓴 글</StyledTitle>
@@ -109,6 +151,7 @@ const MyPostPage: React.FC = () => {
               setActiveTab(tab.value)
               setCategoryOpen(false)
               setCategorySelected("")
+              void GetPostData(tab.value)
             }}
           >
             {tab.label}
@@ -117,8 +160,8 @@ const MyPostPage: React.FC = () => {
       </StyledTabButtons>
       <NumberAndSearchBox>
         <NumberBox>
-          전체<StyledNumberBlue> {7}</StyledNumberBlue>개 &nbsp;&nbsp;&nbsp; 글
-          <StyledNumberBlue> {1}</StyledNumberBlue>개
+          전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
+          &nbsp;&nbsp;&nbsp; 글<StyledNumberBlue> {1}</StyledNumberBlue>개
         </NumberBox>
 
         <SelectAndSearchBox>
@@ -156,17 +199,15 @@ const MyPostPage: React.FC = () => {
         <StyledPostTitlePostCommentNum>댓글 수 </StyledPostTitlePostCommentNum>
       </StyledPostTitleBox>
       <StyledPostContainer>
-        {filteredPosts.length === 0 ? (
+        {posts.length === 0 ? (
           <p>작성된 게시글이 없습니다.</p>
         ) : (
           <StyledPostList>
-            {filteredPosts.map((post) => (
+            {posts.map((post) => (
               <StyledPost key={post.id}>
                 <StyledPostCategory>{post.category}</StyledPostCategory>
                 <h3>{post.title}</h3>
                 <p>작성 일자: {post.date}</p>
-                <p>좋아요: {post.likes}</p>
-                <p>댓글: {post.comments}</p>
               </StyledPost>
             ))}
           </StyledPostList>
@@ -219,9 +260,14 @@ const StyledCategoryList = styled.ul`
 
 const StyledCategoryItem = styled.li<{ selected: boolean }>`
   padding: 0.1875rem 2.5rem;
-  margin: 0.125rem 0.625rem;
+  margin: 0rem 0.4rem 0rem 0.5rem;
   cursor: pointer;
-  background-color: ${(props) => (props.selected ? "#f0f0f0" : "transparent")};
+  background-color: ${(props) => (props.selected ? "#0C356A" : "0C356A")};
+  color: ${(props) => (props.selected ? "#ffffff" : "#000000")};
+
+  &:hover {
+    background-color: ${(props) => (props.selected ? "#0C356A" : "#e0e0e0")};
+  }
 `
 
 const StyledSearchInput = styled.input`
