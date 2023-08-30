@@ -1,48 +1,97 @@
 import React, { useState } from "react"
+import ReactMarkdown from "react-markdown"
+import "easymde/dist/easymde.min.css"
+import { storage, db } from "../../axios/firebase"
+import { doc, setDoc } from "firebase/firestore"
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import {
   StyledForm,
   StyledLabel,
   StyledInput,
   StyledSelect,
+  StyledSimpleMDE,
+  UploadIcon,
+  StyledInputFile,
   CancelButton,
   SubmitButton
 } from "./WriteCSS"
-import * as marked from "marked"
-import SimpleMDE from "react-simplemde-editor"
-import "easymde/dist/easymde.min.css"
 
 const Write: React.FC = () => {
-  const [category, setCategory] = useState("")
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [image, setImage] = useState<File | null>(null)
+  const [category, setCategory] = useState<string>("")
+  const [title, setTitle] = useState<string>("")
+  const [content, setContent] = useState<string>("")
+  const [imageFile, setImageFile] = useState<File | null>(null)
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCategory(e.target.value)
   }
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value)
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files !== null && e.target.files.length > 0) {
-      setImage(e.target.files[0])
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file !== undefined) {
+      setImageFile(file) // 파일 선택 시 상태에 저장
     }
   }
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const processedContent = marked.marked(content)
-    console.log({ category, title, content: processedContent, image })
+
+  const handleSubmitPost = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault() // 페이지 리프레쉬 방지
+
+    if (imageFile !== null) {
+      // 이미지 파일이 선택된 경우
+      const fileRef = ref(storage, imageFile.name)
+
+      uploadBytesResumable(fileRef, imageFile)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((downloadURL) => {
+              savePost(downloadURL) // 사진 업로드 후 포스트 저장
+            })
+            .catch((e) => {
+              console.log("error")
+            })
+        })
+        .catch((error) => {
+          console.error("Upload failed:", error)
+        })
+    } else {
+      savePost(null) // 사진 없이 포스트 저장
+    }
+  }
+
+  function savePost(imageUrl: string | null) {
+    setDoc(doc(db, "posts", new Date().getTime().toString()), {
+      postCategory: category,
+      postTitle: title,
+      postContent: content,
+      postImgUrl: imageUrl ?? null,
+      postBoard: "",
+      postTime: new Date(),
+      postUserEmail: "",
+      postDisplayName: ""
+    })
+      .then(() => {
+        alert("Document successfully written!")
+      })
+      .catch((e) => {
+        console.error("Error adding document:", e)
+      })
   }
 
   return (
     <>
-      <StyledForm onSubmit={handleSubmit}>
+      <StyledForm onSubmit={handleSubmitPost}>
         <StyledLabel>
           <StyledSelect value={category} onChange={handleCategoryChange}>
-            <option value="">--Please choose an option--</option>
-            <option value="news">News</option>
-            <option value="updates">Updates</option>
+            <option value="">카테고리를 선택하세요</option>
+            <option value="Vanilla JS">Vanilla JS</option>
+            <option value="React">React.js</option>
+            <option value="Node">Node.js</option>
+            <option value="Next">Next.js</option>
+            <option value="Python">Python</option>
           </StyledSelect>
         </StyledLabel>
 
@@ -56,7 +105,7 @@ const Write: React.FC = () => {
         </StyledLabel>
 
         <StyledLabel>
-          <SimpleMDE
+          <StyledSimpleMDE
             value={content}
             onChange={(value) => {
               setContent(value)
@@ -64,11 +113,22 @@ const Write: React.FC = () => {
             placeholder="내용을 입력해주세요."
           />
         </StyledLabel>
+        <ReactMarkdown>{content}</ReactMarkdown>
 
-        <input type="file" accept="image/*" onChange={handleImageChange} />
+        <UploadIcon
+          onClick={() => {
+            document.getElementById("file-upload")?.click()
+          }}
+        />
+        <StyledInputFile
+          id="file-upload"
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+        />
+        <CancelButton type="button">Cancel</CancelButton>
+        <SubmitButton type="submit">Submit</SubmitButton>
       </StyledForm>
-      <CancelButton type="button">Cancel</CancelButton>
-      <SubmitButton type="submit">Submit</SubmitButton>
     </>
   )
 }
