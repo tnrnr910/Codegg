@@ -1,7 +1,7 @@
 import React from "react"
 import styled from "styled-components"
 
-function SIdeRanking() {
+function SideRanking() {
   return (
     <>
       <RankedBox>
@@ -28,4 +28,4 @@ const RankedTitle = styled.div`
   padding-bottom: 14px;
 `
 
-export default SIdeRanking
+export default SideRanking

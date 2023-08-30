@@ -18,6 +18,18 @@ interface Post {
   postUserEmail: string
 }
 
+interface Comment {
+  id: string
+  commentContent: string
+  commentTime: Timestamp
+  commentUserEmail: string
+  commentUserdisplayName: string
+  isSecret: boolean
+  postId: string
+  postUserEmail: string
+  postUserdisplayName: string
+}
+
 const getPosts = async (): Promise<Post[]> => {
   const q = query(collection(db, "posts"))
   const querySnapshot = await getDocs(q)
@@ -35,4 +47,21 @@ const getPosts = async (): Promise<Post[]> => {
   return posts
 }
 
-export { getPosts }
+const getComments = async (): Promise<Comment[]> => {
+  const q = query(collection(db, "comments"))
+  const querySnapshot = await getDocs(q)
+
+  const comments: Comment[] = []
+
+  querySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    comments.push(data as Comment) // 형 변환을 통해 타입 일치화
+  })
+
+  return comments
+}
+
+export { getPosts, getComments }
