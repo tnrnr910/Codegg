@@ -18,6 +18,7 @@ import {
   browserSessionPersistence
 } from "firebase/auth"
 
+// 유효성검사 스키마
 const schema = yup.object({
   email: yup
     .string()
@@ -55,11 +56,23 @@ function SigninPage() {
   // Tab Menu 이름
   const menuArr = [{ name: "로그인" }, { name: "회원가입" }]
 
-  // 현재 선택된 Tab Menu 가 갱신되는 함수
+  // 현재 선택된 Tab Menu 가 갱신되는 함수()
   const selectMenuHandler = (index: any) => {
     // parameter로 현재 선택한 인덱스 값을 전달해야 하며, 이벤트 객체(event)는 쓰지 않는다
     setCurrentTab(index)
   }
+
+  // 유효성 검사
+  const {
+    register,
+    handleSubmit,
+    watch,
+    // getValues, // 리렌더링 없이 접근 가능
+    formState: { errors },
+    reset
+  } = useForm<FormData>({
+    resolver: yupResolver(schema)
+  })
 
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
@@ -72,25 +85,21 @@ function SigninPage() {
       })
   }, [])
 
-  // 현재 로그인한 유저 가져오기
-  const currentUser = auth.currentUser
-
   // 회원가입 버튼 클릭 시 실행
-  const onSubmitSignup: SubmitHandler<FormData> = (data, event) => {
+  const onSubmitSignup: SubmitHandler<FormData> = () => {
+    // event?.preventDefault()
     console.log(errors)
-    signUp(event)
+    signUp()
   }
 
   // 회원가입 버튼 클릭 시 유효성검사 통과 후 실행
-  const signUp = (event: any) => {
-    event.preventDefault()
+  const signUp = () => {
     createUserWithEmailAndPassword(auth, emailWatch, passwordWatch)
-      .then((userCredential: any) => {
+      .then(async (userCredential: any) => {
         // Signed in
         const user = userCredential.user
         console.log(user)
-        loggedInSignUp()
-        reset()
+        await loggedInSignUp()
       })
       .catch((error: any) => {
         const errorCode = error.code
@@ -101,24 +110,31 @@ function SigninPage() {
   }
 
   // 회원가입 성공 시 실행되는 함수
-  // (회원정보 등록 후 로그아웃)
-  const loggedInSignUp = () => {
-    if (currentUser != null) {
-      void updateProfile(currentUser, {
+  // (회원정보 등록 후 로그아웃 등)
+  const loggedInSignUp = async () => {
+    if (auth.currentUser != null) {
+      // awit : 프로미스가 품고있는 값을 바깥으로 끄집어냄 + 프로미스가 리졸빙 될 때까지 기다림
+      await updateProfile(auth.currentUser, {
         displayName: displayNameWatch,
         photoURL:
           "https://pixabay.com/get/g7effabd2f82e664f5fc0b1e95dc0a25bd225980e1ba21c3b50b28cf1b1c10a6605bf50c1143c52da511ba225fbcc86f3_1920.png"
       })
+      await Swal.fire(
+        "환영합니다!",
+        "성공적으로 회원가입되었습니다.",
+        "success"
+      )
+      await signOut(auth)
+      // await 뒤에는 프로미스만 올 수 있음
+      reset()
       selectMenuHandler(0)
-      void Swal.fire("환영합니다!", "성공적으로 회원가입되었습니다.", "success")
-      void signOut(auth)
     } else {
       console.log("No user is signed in.") // 사용자가 로그인되어 있지 않은 경우
     }
   }
 
   // 로그인 버튼 클릭 시 실행
-  const onSubmitSignin: SubmitHandler<FormData> = (data, event) => {
+  const onSubmitSignin: SubmitHandler<FormData> = () => {
     console.log(errors)
     void signIn(event)
   }
@@ -133,7 +149,6 @@ function SigninPage() {
         passwordWatch
       )
       console.log("signIn", userCredential)
-      // setInput(userInitialState)
       reset()
       navigate("/")
       void Swal.fire({
@@ -150,31 +165,21 @@ function SigninPage() {
     }
   }
 
-  // 유효성 검사
-  const {
-    register,
-    handleSubmit,
-    watch,
-    // getValues, // 리렌더링 없이 접근 가능
-    formState: { errors },
-    reset
-  } = useForm<FormData>({
-    resolver: yupResolver(schema)
-  })
-
   // const onError = (error: any) => { console.log(error); }
   // const emailValues = getValues("email")
   const emailWatch = watch("email")
   const displayNameWatch = watch("displayName")
   const passwordWatch = watch("password")
   const confirmPasswordWatch = watch("confirmPassword")
-  console.log(
-    emailWatch,
-    displayNameWatch,
-    passwordWatch,
-    confirmPasswordWatch,
-    errors.password
-  ) // 추출한 값 콘솔에 출력
+
+  // 추출한 값 콘솔에 출력
+  // console.log(
+  //   emailWatch,
+  //   displayNameWatch,
+  //   passwordWatch,
+  //   confirmPasswordWatch,
+  //   errors.password
+  // )
 
   return (
     <SigninSignoutContainer>
@@ -292,7 +297,7 @@ function SigninPage() {
                     type="password"
                     value={passwordWatch}
                     placeholder="비밀번호를 입력해 주세요."
-                    // 레지스터가 리액트 훅 폼이랑 연결해줌
+                    // 레지스터가 react-hook-form과 연결해줌
                     {...register("password")}
                   ></input>
                   <p>{errors.password?.message}</p>
