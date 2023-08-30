@@ -1,10 +1,17 @@
 import React from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
+import { auth } from "../../axios/firebase"
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+interface auth {
+  currentUser: string
+}
 
 function MyProfilePage() {
   const navigate = useNavigate()
-
+  console.log(auth.currentUser?.photoURL)
+  console.log(auth.currentUser)
   return (
     <ProfileWrap>
       <ProfileTap>
@@ -16,7 +23,9 @@ function MyProfilePage() {
           <ProfileDetail>
             <ProfileImgs>
               <ProfileImgBox>
-                <ProfileImage src={require("./profile.jpg")} alt="프사" />
+                <ProfileImage
+                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
+                />
               </ProfileImgBox>
               <ProfileLevelAndNickName>
                 <div>
@@ -25,7 +34,7 @@ function MyProfilePage() {
                     <div>입문자</div>
                   </BadgeWrap>
                 </div>
-                <NickName>에그마요</NickName>
+                <NickName>{auth.currentUser?.displayName}</NickName>
               </ProfileLevelAndNickName>
             </ProfileImgs>
             <MyDataWrap>
@@ -37,7 +46,7 @@ function MyProfilePage() {
               <MyPoint>보유 포인트</MyPoint>
               <PointScore>10,000p</PointScore>
               <MyEmail>이메일</MyEmail>
-              <EmailAd>123@123.123</EmailAd>
+              <EmailAd>{auth.currentUser?.email}</EmailAd>
               <MyStackAndPW>
                 <StackNotice>관심 있는 기술 태그</StackNotice>
                 <Stacks>React / Node / Spring</Stacks>

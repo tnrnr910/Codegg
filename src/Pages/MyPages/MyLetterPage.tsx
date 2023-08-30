@@ -1,7 +1,7 @@
-import React from "react";
+import React from "react"
 
 function MyLetterPage() {
-  return <div>MyLetterPage</div>;
+  return <div>MyLetterPage</div>
 }
 
-export default MyLetterPage;
+export default MyLetterPage
