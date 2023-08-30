@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import SIdeRanking from "../../Components/SideRanking"
+import SideRanking from "../../Components/SideRanking"
 import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
@@ -82,7 +82,7 @@ function QnAPage() {
   return (
     <>
       <StyledContainer>
-        <SIdeRanking />
+        <SideRanking />
         <StyledBox>
           <StyledTitle>질의응답</StyledTitle>
           <StyledHead>
