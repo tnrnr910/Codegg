@@ -132,7 +132,6 @@ const MyPostPage: React.FC = () => {
           >
             파이썬
           </StyledCategoryItem>
-          {/* ... Add other categories ... */}
         </StyledCategoryList>
       </StyledCategoryDropdown>
     )
