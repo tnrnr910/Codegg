@@ -1,13 +1,106 @@
-import React from "react"
+import React, { useState, useRef } from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
+import { auth, storage } from "../../axios/firebase"
+import { updatePassword, updateProfile } from "firebase/auth"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+interface auth {
+  currentUser: string
+  updateProfile: string
+}
 
 function EditMyProfilePage() {
   const navigate = useNavigate()
 
-  const handleImageChange = () => {
-    console.log("프로필 변경")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmNewPassword, setConfirmNewPassword] = useState("")
+
+  const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPassword(e.target.value)
   }
+
+  const handleConfirmNewPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmNewPassword(e.target.value)
+  }
+
+  const changePassword = async () => {
+    if (newPassword !== confirmNewPassword) {
+      alert("비밀번호가 일치하지 않습니다.")
+      return
+    }
+    try {
+      if (auth.currentUser?.uid != null) {
+        await updatePassword(auth.currentUser, newPassword)
+        navigate("/MyProfilePage")
+      }
+    } catch (error) {
+      console.error("비밀번호 변경 오류:", error)
+      alert("비밀번호 변경 중 오류가 발생했습니다.")
+    }
+  }
+
+  const [nickName, setNickName] = useState<string | null>(
+    auth.currentUser?.displayName ?? null
+  )
+  const handleNickNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickName(e.target.value)
+  }
+
+  const [userPhoto, setUserPhoto] = useState<string | null>(
+    auth.currentUser?.displayName ?? null
+  )
+
+  const fileRef = useRef<HTMLInputElement | null>(null)
+
+  const handleImageChange = () => {
+    fileRef.current?.click()
+  }
+
+  const handleUserPhotoChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0]
+
+    if (file != null) {
+      try {
+        const storageRefPath = ref(storage as any, "user_photos/" + file.name)
+        console.log(storageRefPath)
+        await uploadBytes(storageRefPath, file)
+        const downloadURL = await getDownloadURL(storageRefPath)
+        console.log(downloadURL)
+        setUserPhoto(downloadURL)
+      } catch (error) {
+        console.error("프로필 사진 변경 오류:", error)
+        alert("프로필 사진 변경 중 오류가 발생했습니다.")
+      }
+    }
+  }
+
+  const saveProfile = async () => {
+    try {
+      const currentUser = auth.currentUser
+      if (currentUser != null && nickName !== null && userPhoto !== null) {
+        await updateProfile(currentUser, {
+          displayName: nickName,
+          photoURL: userPhoto
+        })
+        alert("프로필 정보가 변경되었습니다.")
+      } else {
+        alert("사용자가 로그인하지 않았거나 닉네임이 비어있습니다.")
+      }
+    } catch (error) {
+      console.error("프로필 변경 오류:", error)
+      alert("프로필 변경 중 오류가 발생했습니다.")
+    }
+  }
+
+  console.log(auth.currentUser)
+
+  // 로그인 유지(로컬, 세션스토리지 등) / 비밀번호 틀려도 로그인 됨
 
   return (
     <ProfileWrap>
@@ -20,20 +113,40 @@ function EditMyProfilePage() {
           <ProfileDetail>
             <ProfileImgs>
               <ProfileImgBox>
-                <ProfileImage src={require("./profile.jpg")} alt="프사" />
+                <ProfileImage
+                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
+                  alt="프사"
+                />
                 <ProfileImageChange
                   src={require("./ProfileChange.png")}
                   alt="변경"
                   onClick={handleImageChange}
                 />
+                <ProfileImageChangeinput
+                  src={require("./ProfileChange.png")}
+                  type="file"
+                  accept="image/*"
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                  onChange={handleUserPhotoChange}
+                  ref={fileRef}
+                />
               </ProfileImgBox>
             </ProfileImgs>
             <MyDataWrap>
               <MyEmail>이메일</MyEmail>
-              <EmailAd>123@123.123</EmailAd>
+              <EmailAd>{auth.currentUser?.email}</EmailAd>
               <NickNameWrap>
                 <NickName>닉네임</NickName>
-                <NickNameInput type="text" placeholder="에그마요" />
+                <NickNameInput
+                  type="text"
+                  placeholder={
+                    auth.currentUser?.displayName !== null
+                      ? auth.currentUser?.displayName
+                      : ""
+                  }
+                  value={nickName ?? ""} // null인 경우에 대비하여 널 병합 연산자 사용
+                  onChange={handleNickNameChange}
+                />
               </NickNameWrap>
               <MyStackAndPW>
                 <StackArea>관심 있는 기술 태그</StackArea>
@@ -43,17 +156,22 @@ function EditMyProfilePage() {
                 <Stacks>React / Node / Spring</Stacks>
                 <PassWordChange>비밀번호 변경</PassWordChange>
                 <PassWordChangeInPut
-                  type="text"
-                  placeholder="비밀번호를 입력해주세요"
+                  type="password"
+                  placeholder="새로운 비밀번호를 입력해주세요."
+                  value={newPassword}
+                  onChange={handleNewPasswordChange}
                 />
                 <PassWordCheck>비밀번호 확인</PassWordCheck>
                 <PassWordConfirmInPut
-                  type="text"
-                  placeholder="입력한 비밀번호를 다시 한 번 입력해주세요."
+                  type="password"
+                  placeholder="새로운 비밀번호를 다시 한 번 입력해주세요."
+                  value={confirmNewPassword}
+                  onChange={handleConfirmNewPasswordChange}
                 />
                 <SaveBottom
                   onClick={() => {
-                    navigate("/MyProfilePage")
+                    void changePassword()
+                    void saveProfile()
                   }}
                 >
                   저장
@@ -131,6 +249,7 @@ const ProfileImage = styled.img`
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  src: ${auth.currentUser?.photoURL};
 `
 const ProfileImageChange = styled.img`
   position: absolute;
@@ -139,6 +258,9 @@ const ProfileImageChange = styled.img`
   width: 30%;
   height: auto;
   cursor: pointer;
+`
+const ProfileImageChangeinput = styled.input`
+  display: none;
 `
 const MyDataWrap = styled.div`
   display: flex;

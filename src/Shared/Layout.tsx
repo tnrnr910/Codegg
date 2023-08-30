@@ -131,7 +131,13 @@ function Header() {
             <>
               {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
               <StAuth onClick={deleteCurrentUser}>회원탈퇴</StAuth>
-              <StAuth>{auth.currentUser?.displayName}님.안녕하세요.</StAuth>
+              <StAuth
+                onClick={() => {
+                  navigate("/MyProfilePage")
+                }}
+              >
+                {auth.currentUser?.displayName}님.안녕하세요.
+              </StAuth>
               {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
               <StAuth onClick={logOut}>프로필</StAuth>
             </>
