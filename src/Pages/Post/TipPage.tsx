@@ -88,7 +88,7 @@ function TipPage() {
           <StyledHead>
             {list
               .filter(
-                (item: { postBoard: string }) => item.postBoard === "공지사항"
+                (item: { postBoard: string }) => item.postBoard === "Notice"
               )
               .map(
                 (info: {
@@ -142,8 +142,7 @@ function TipPage() {
                 <>
                   {list
                     .filter(
-                      (item: { postBoard: string }) =>
-                        item.postBoard === "코딩팁"
+                      (item: { postBoard: string }) => item.postBoard === "tips"
                     )
                     .map(
                       (info: {
@@ -174,8 +173,7 @@ function TipPage() {
                 <>
                   {list
                     .filter(
-                      (item: { postBoard: string }) =>
-                        item.postBoard === "코딩팁"
+                      (item: { postBoard: string }) => item.postBoard === "tips"
                     )
                     .filter(
                       (item: { postCategory: string }) =>
@@ -213,7 +211,7 @@ function TipPage() {
           <WtiteBtnBox>
             <WriteBtn
               onClick={() => {
-                navigate("/WritePage")
+                navigate("/WritePage/tips")
               }}
             >
               글쓰기

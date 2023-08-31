@@ -213,7 +213,7 @@ function QnAPage() {
           <WtiteBtnBox>
             <WriteBtn
               onClick={() => {
-                navigate("/WritePage")
+                navigate("/WritePage/questions")
               }}
             >
               글쓰기
