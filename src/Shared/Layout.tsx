@@ -279,6 +279,7 @@ const StLayout = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 90vh;
+  height: auto;
   padding: 0px;
 `
 

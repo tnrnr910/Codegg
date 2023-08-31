@@ -2,6 +2,7 @@ import {
   collection,
   getDocs,
   query,
+  where,
   type DocumentSnapshot,
   type Timestamp
 } from "firebase/firestore"
@@ -64,4 +65,28 @@ const getComments = async (): Promise<Comment[]> => {
   return comments
 }
 
-export { getPosts, getComments }
+const getPostData: any = async (
+  postBoard: string,
+  userId: string
+): Promise<Post[]> => {
+  const posts: Post[] = []
+  const dbPosts = query(
+    collection(db, "posts"),
+    where("postUserEmail", "==", userId),
+    where("postBoard", "==", postBoard)
+  )
+  const userSnapshot = await getDocs(dbPosts)
+  userSnapshot.forEach((doc: DocumentSnapshot) => {
+    if (doc != null) {
+      const newPost = {
+        id: doc.id,
+        ...doc.data()
+      }
+      posts.push(newPost as Post)
+    }
+  })
+
+  return posts
+}
+
+export { getPosts, getComments, getPostData }
