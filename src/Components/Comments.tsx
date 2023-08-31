@@ -1,7 +1,7 @@
 import React from "react"
 import { styled } from "styled-components"
 import ProfilePicture from "../Components/ProfilePicture"
-import { PiSiren } from "react-icons/pi"
+import { PiSiren, PiArrowBendDownRightBold } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
 
@@ -42,6 +42,42 @@ function Comments() {
             </CommentButtons>
           </CommentRight>
         </Comment>
+        <ReplyComment>
+          <CommentLeft style={{ width: "55%", marginLeft: "1rem" }}>
+            <PiArrowBendDownRightBold
+              style={{ color: "#787878" }}
+              size="1.5rem"
+            />
+            <ProfilePicture style={{ width: "2rem", height: "2rem" }} />
+            <CommentContents>
+              <div>
+                <CommentWriter>작성자</CommentWriter>
+                <CommentTime>00분 전</CommentTime>
+              </div>
+              <CommentText>댓글 내용</CommentText>
+            </CommentContents>
+          </CommentLeft>
+          <CommentRight>
+            <CommentEdit>
+              <button>수정</button>
+              <button>삭제</button>
+            </CommentEdit>
+            <CommentButtons>
+              <button>
+                <PiSiren size="20px" />
+                신고
+              </button>
+              <button>
+                <AiOutlineLike size="20px" />
+                좋아요
+              </button>
+              <button>
+                <FaRegComment size="18px" />
+                답글
+              </button>
+            </CommentButtons>
+          </CommentRight>
+        </ReplyComment>
       </CommentLists>
       <CommentWrite>
         <ProfilePicture style={{ width: "2rem", height: "2rem" }} />
@@ -78,11 +114,19 @@ const Comment = styled.div`
   align-items: center;
 `
 
+const ReplyComment = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+`
+
 const CommentLeft = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   gap: 0.8rem;
+  width: 60%;
 `
 
 const CommentContents = styled.div`
@@ -138,6 +182,7 @@ const CommentButtons = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 1px;
   }
 `
 
