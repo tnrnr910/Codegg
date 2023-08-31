@@ -2,17 +2,31 @@ import React from "react"
 import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 import { useQuery } from "react-query"
-import { getPosts } from "../axios/api"
+import { getPosts, getBoardPosts } from "../axios/api"
 import SideRanking from "../Components/SideRanking"
 
 function MainPage() {
   const navigate = useNavigate()
   const { isLoading, data } = useQuery("posts", getPosts)
-  const list: any = data
 
+  // const dataMeetups = useQuery("postsMeetups", getBoardPosts("meetups", 3))
+  // const dataTips = useQuery("postsTips", getBoardPosts("tips", 8))
+  // const dataNotice = useQuery("postsNotice", getBoardPosts("Notice", 8))
+
+  const list: any = data
   if (isLoading) {
     return <div>로딩중입니다..</div>
   }
+
+  const getData = () => {
+    list.then((dummyData: any) => {
+      // setPosts(dummyData)
+    })
+  }
+  getData()
+
+  const dataQuestions = getBoardPosts("Notice", 8)
+  console.log(dataQuestions)
 
   return (
     <>
@@ -35,35 +49,30 @@ function MainPage() {
             </Title>
             <Body>
               <BodyDiv>
-                {list
-                  .filter(
-                    (item: { postBoard: string }) =>
-                      item.postBoard === "questions"
-                  )
-                  .map(
-                    (info: {
-                      id: string
-                      postTitle: string
-                      postCategory: string
-                    }) => {
-                      return (
-                        <ListContainer key={info.id}>
-                          <ListDiv
-                            onClick={() => {
-                              navigate(`/detailPage/${info.id}`)
-                            }}
-                          >
-                            <ListCategory> {info.postCategory}</ListCategory>
-                            {info.postTitle}
-                          </ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
-                        </ListContainer>
-                      )
-                    }
-                  )}
+                {dataQuestions.map(
+                  (info: {
+                    id: string
+                    postTitle: string
+                    postCategory: string
+                  }) => {
+                    return (
+                      <ListContainer key={info.id}>
+                        <ListDiv
+                          onClick={() => {
+                            navigate(`/detailPage/${info.id}`)
+                          }}
+                        >
+                          <ListCategory> {info.postCategory}</ListCategory>
+                          {info.postTitle}
+                        </ListDiv>
+                        <ListBox>
+                          <div>좋아요</div>
+                          <div>댓글수</div>
+                        </ListBox>
+                      </ListContainer>
+                    )
+                  }
+                )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -263,6 +272,8 @@ const Body = styled.div`
 
 const BodyDiv = styled.div`
   margin-left: 24px;
+  margin-right: 24px;
+  height: 330px;
 `
 const ListDiv = styled.div`
   font-size: 13px;
@@ -282,7 +293,7 @@ const ListContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 27px;
+  padding-top: 19px;
 `
 
 const ListBox = styled.div`

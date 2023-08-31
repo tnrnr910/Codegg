@@ -359,6 +359,8 @@ const BodyDiv = styled.div`
 const ListContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  height: 25px;
+  border-bottom: 1px solid #dadada;
   align-items: center;
   padding-top: 0px;
 `
