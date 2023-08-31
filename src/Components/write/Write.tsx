@@ -91,11 +91,11 @@ const Write: React.FC = () => {
       postDisplayName: ""
     })
       .then(() => {
-        alert("Document successfully written!")
+        alert("글 작성이 완료되었습니다.")
         navigate("/")
       })
       .catch((e) => {
-        console.error("Error adding document:", e)
+        console.error("글 작성에 실패했습니다.:", e)
       })
   }
 
