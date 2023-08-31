@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import "easymde/dist/easymde.min.css"
 import { storage, db } from "../../axios/firebase"
@@ -15,12 +15,29 @@ import {
   CancelButton,
   SubmitButton
 } from "./WriteCSS"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { useNavigate, useParams } from "react-router"
 
 const Write: React.FC = () => {
+  const { board } = useParams()
+  const auth = getAuth()
+  const navigate = useNavigate()
   const [category, setCategory] = useState<string>("")
   const [title, setTitle] = useState<string>("")
   const [content, setContent] = useState<string>("")
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>("")
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user !== null) {
+        console.log(user.email)
+        setUserEmail(user.email)
+      } else {
+        navigate("/")
+      }
+    })
+  }, [])
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCategory(e.target.value)
@@ -68,13 +85,14 @@ const Write: React.FC = () => {
       postTitle: title,
       postContent: content,
       postImgUrl: imageUrl ?? null,
-      postBoard: "",
+      postBoard: board,
       postTime: new Date(),
-      postUserEmail: "",
+      postUserEmail: userEmail,
       postDisplayName: ""
     })
       .then(() => {
         alert("Document successfully written!")
+        navigate("/")
       })
       .catch((e) => {
         console.error("Error adding document:", e)
