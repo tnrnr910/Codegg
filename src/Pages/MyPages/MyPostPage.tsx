@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
+import MyPageMenuBar from "../../Components/MyPageMenuBar"
 
 interface Post {
   id: string
@@ -26,6 +27,7 @@ const MyPostPage: React.FC = () => {
   const [categorySelected, setCategorySelected] = useState("모든 카테고리")
   const [userId, setUserId] = useState<string | null>("")
   const [posts, setPosts] = useState<Post[]>([])
+  const activeMenuItem = "/MyProfilePage"
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -139,6 +141,7 @@ const MyPostPage: React.FC = () => {
 
   return (
     <StyledContainer>
+      <MyPageMenuBar activeMenuItem={activeMenuItem} />
       <StyledTitle>내가 쓴 글</StyledTitle>
 
       <StyledTabButtons>
