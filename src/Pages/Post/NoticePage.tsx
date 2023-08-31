@@ -173,7 +173,7 @@ function NoticePage() {
               )}
             </BodyDiv>
           </Body>
-          <WtiteBtnBox>
+          <WriteBtnBox>
             <WriteBtn
               onClick={() => {
                 navigate("/WritePage")
@@ -181,7 +181,7 @@ function NoticePage() {
             >
               글쓰기
             </WriteBtn>
-          </WtiteBtnBox>
+          </WriteBtnBox>
           <div> 페이지 네이션</div>
         </StyledBox>
       </StyledContainer>
@@ -332,7 +332,7 @@ const ListCategory = styled.div`
   padding: 3px 3px 3px 3px;
   color: #9f9f9f;
 `
-const WtiteBtnBox = styled.div`
+const WriteBtnBox = styled.div`
   display: flex;
   justify-content: flex-end;
 `
