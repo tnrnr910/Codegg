@@ -176,7 +176,7 @@ function NoticePage() {
           <WtiteBtnBox>
             <WriteBtn
               onClick={() => {
-                navigate("/WritePage")
+                navigate("/WritePage/Notice")
               }}
             >
               글쓰기

@@ -128,7 +128,7 @@ function MainPage() {
                 {list
                   .filter(
                     (item: { postBoard: string; postCategory: string }) =>
-                      item.postBoard === "Tip"
+                      item.postBoard === "tips"
                   )
                   .map(
                     (info: {

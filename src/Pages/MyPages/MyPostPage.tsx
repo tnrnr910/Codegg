@@ -3,6 +3,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
+import { useNavigate } from "react-router"
+import { BiSearch } from "react-icons/bi"
 
 interface Post {
   id: string
@@ -21,25 +23,34 @@ interface TabOption {
 
 const MyPostPage: React.FC = () => {
   const auth = getAuth()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("모든 카테고리")
   const [userId, setUserId] = useState<string | null>("")
   const [posts, setPosts] = useState<Post[]>([])
 
+  // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         console.log(user.email)
         setUserId(user.email)
-        void GetPostData(activeTab)
+        setCategorySelected("모든 카테고리")
+        const list = GetPostData(activeTab)
+        const getData = () => {
+          list.then((dummyData: any) => {
+            setPosts(dummyData)
+          })
+        }
+        getData()
       }
     })
-  }, [])
+  }, [userId])
 
-  const GetPostData = async (postBoard: string) => {
-    setPosts([])
-    console.log(postBoard)
+  // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
+  const GetPostData: any = async (postBoard: string) => {
+    const postsTemp: Post[] = []
     const dbPosts = query(
       collection(db, "posts"),
       where("postUserEmail", "==", userId),
@@ -48,7 +59,6 @@ const MyPostPage: React.FC = () => {
     const userSnapshot = await getDocs(dbPosts)
     userSnapshot.forEach((doc: any) => {
       if (doc != null) {
-        console.log(doc.data())
         const newPost: Post = {
           id: doc.id,
           category: doc.data().postCategory,
@@ -58,10 +68,31 @@ const MyPostPage: React.FC = () => {
           likes: 0,
           comments: 0
         }
-        setPosts([...posts, newPost])
+        // setPosts([...posts, newPost])
+
+        postsTemp.push(newPost)
       }
-      console.log(posts)
     })
+    console.log(postsTemp)
+    return postsTemp
+  }
+
+  // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
+  const GoToDetailPage: any = (id: string) => {
+    navigate(`/DetailPage/${id}`)
+  }
+
+  // 돋보기 버튼 클릭시 작동하는 이벤트 함수
+  const SearchIncludeWord: any = () => {
+    console.log("sksksksksk")
+  }
+
+  // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
+  const handleOnKeyPress = (e: any) => {
+    if (e.key === "Enter") {
+      // Enter 입
+      console.log("dididididi")
+    }
   }
 
   // 탭탭탭
@@ -74,14 +105,14 @@ const MyPostPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState("")
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const filteredPosts = posts.filter((post) => {
-    return (
-      (post.category === activeTab || activeTab === "all") &&
-      (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-  })
+  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const filteredPosts = posts.filter((post) => {
+  //   return (
+  //     (post.category === activeTab || activeTab === "all") &&
+  //     (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       post.content.toLowerCase().includes(searchTerm.toLowerCase()))
+  //   )
+  // })
 
   function DropDown() {
     return (
@@ -150,7 +181,14 @@ const MyPostPage: React.FC = () => {
               setActiveTab(tab.value)
               setCategoryOpen(false)
               setCategorySelected("")
-              void GetPostData(tab.value)
+              const list = GetPostData(tab.value)
+
+              const getData = () => {
+                list.then((dummyData: any) => {
+                  setPosts(dummyData)
+                })
+              }
+              getData()
             }}
           >
             {tab.label}
@@ -160,7 +198,6 @@ const MyPostPage: React.FC = () => {
       <NumberAndSearchBox>
         <NumberBox>
           전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
-          &nbsp;&nbsp;&nbsp; 글<StyledNumberBlue> {1}</StyledNumberBlue>개
         </NumberBox>
 
         <SelectAndSearchBox>
@@ -179,7 +216,7 @@ const MyPostPage: React.FC = () => {
               </StyledSearchContainer>
             </SelectPages>
           </SelectPageBox>
-
+          <SearchButton type="button" onClick={SearchIncludeWord} />
           <StyledSearchInput
             type="text"
             placeholder="어떤게 궁금하신가요?"
@@ -187,6 +224,7 @@ const MyPostPage: React.FC = () => {
             onChange={(e) => {
               setSearchTerm(e.target.value)
             }}
+            onKeyPress={handleOnKeyPress}
           />
         </SelectAndSearchBox>
       </NumberAndSearchBox>
@@ -203,7 +241,12 @@ const MyPostPage: React.FC = () => {
         ) : (
           <StyledPostList>
             {posts.map((post) => (
-              <StyledPost key={post.id}>
+              <StyledPost
+                key={post.id}
+                onClick={() => {
+                  GoToDetailPage(post.id)
+                }}
+              >
                 <StyledPostCategory>{post.category}</StyledPostCategory>
                 <h3>{post.title}</h3>
                 <p>작성 일자: {post.date}</p>
@@ -237,6 +280,8 @@ const StyledCategoryButton = styled.button`
   border: none;
   cursor: pointer;
   float: right;
+  padding: 0px;
+  padding-right: 10px;
   font-size: 0.875rem;
   background-color: white;
   width: auto;
@@ -271,12 +316,22 @@ const StyledCategoryItem = styled.li<{ selected: boolean }>`
 
 const StyledSearchInput = styled.input`
   padding: 0.625rem;
-  width: 22.5rem;
+  width: 20rem;
   height: 1rem;
   background-color: var(--color-line-gray-200);
   float: right;
   border-radius: 0.3125rem;
   border: 0.0625rem solid #dadada;
+`
+
+const SearchButton = styled(BiSearch)`
+  margin: 5px;
+  float: right;
+  background: styled(BiSearch);
+  width: 30px;
+  height: 30px;
+  border: 0 solid white;
+  color: #63717f;
 `
 
 const StyledTabButtons = styled.div`
