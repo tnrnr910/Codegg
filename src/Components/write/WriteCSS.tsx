@@ -16,12 +16,6 @@ const StyledForm = styled.form`
   background-color: #f4f4f4;
   border: 1px solid #dadada;
   border-radius: 16px;
-
-  @media screen and (min-width: 926px) {
-    position: fixed; // position 값을 fixed로 변경
-
-    left: calc(50% - (926 / 2));
-  }
 `
 
 const StyledLabel = styled.label`
@@ -78,6 +72,7 @@ const StyledInputFile = styled.input`
 `
 
 const UploadIcon = styled.label`
+  margin-top: 100px;
   width: 834px;
   height: 50px;
   background: #ffffff url("/WritePictureIcon.png") no-repeat center;

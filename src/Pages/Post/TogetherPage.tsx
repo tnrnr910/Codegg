@@ -213,7 +213,7 @@ function TogetherPage() {
           <WtiteBtnBox>
             <WriteBtn
               onClick={() => {
-                navigate("/WritePage")
+                navigate("/WritePage/meetups")
               }}
             >
               글쓰기

@@ -139,7 +139,13 @@ function Header() {
                 {auth.currentUser?.displayName}님.안녕하세요.
               </StAuth>
               {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-              <StAuth onClick={logOut}>프로필</StAuth>
+              <StAuth onClick={logOut}>로그아웃</StAuth>
+              <ProfileImage
+                src={
+                  auth.currentUser?.photoURL ??
+                  require("../Pages/MyPages/profile.jpg")
+                }
+              />
             </>
           )}
         </Authcontainer>
@@ -277,6 +283,7 @@ const StLayout = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 90vh;
+  height: auto;
   padding: 0px;
 `
 
@@ -304,4 +311,10 @@ const InputField = styled.input`
 
 const SearchIcon = styled(BiSearch)`
   color: #63717f;
+`
+const ProfileImage = styled.img`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  object-fit: cover;
 `

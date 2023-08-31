@@ -1,7 +1,7 @@
-import React from "react";
+import React from "react"
 
 function SearchResultPage() {
-  return <div>SearchResultPage</div>;
+  return <div>SearchResultPage</div>
 }
 
-export default SearchResultPage;
+export default SearchResultPage

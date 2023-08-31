@@ -116,8 +116,7 @@ function SigninPage() {
       // awit : 프로미스가 품고있는 값을 바깥으로 끄집어냄 + 프로미스가 리졸빙 될 때까지 기다림
       await updateProfile(auth.currentUser, {
         displayName: displayNameWatch,
-        photoURL:
-          "https://pixabay.com/get/g7effabd2f82e664f5fc0b1e95dc0a25bd225980e1ba21c3b50b28cf1b1c10a6605bf50c1143c52da511ba225fbcc86f3_1920.png"
+        photoURL: "https://i.ibb.co/K5B1hKZ/blank-profile.png"
       })
       await Swal.fire(
         "환영합니다!",

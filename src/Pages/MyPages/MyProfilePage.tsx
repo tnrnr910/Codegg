@@ -2,6 +2,7 @@ import React from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
+import MyPageMenuBar from "../../Components/MyPageMenuBar"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
@@ -10,14 +11,14 @@ interface auth {
 
 function MyProfilePage() {
   const navigate = useNavigate()
+  const activeMenuItem = "/MyProfilePage"
+
   console.log(auth.currentUser?.photoURL)
   console.log(auth.currentUser)
   return (
     <ProfileWrap>
+      <MyPageMenuBar activeMenuItem={activeMenuItem} />
       <ProfileTap>
-        <ProfileMenuBar>
-          <MenuBar>마이페이지</MenuBar>
-        </ProfileMenuBar>
         <ProfileRightSide>
           <ProfileHead>프로필 관리</ProfileHead>
           <ProfileDetail>
@@ -74,31 +75,19 @@ export default MyProfilePage
 
 const ProfileWrap = styled.div`
   display: flex;
-  margin-top: 4.875rem;
-  height: 47.66rem;
+  margin-top: 6.875rem;
+  justify-content: center;
 `
 const ProfileTap = styled.div`
   display: flex;
-  width: 53.0625rem;
-  margin-right: 48.875rem;
-`
-const ProfileMenuBar = styled.div`
-  margin-right: 3.125rem;
-  margin-top: 0.2rem;
-  margin-left: 13.125rem;
-  width: 10.3125rem;
-  font-weight: bold;
-  font-size: 1.2rem;
-`
-const MenuBar = styled.div`
-  width: 10.3125rem;
-  margin-top: 4rem;
+  width: 66rem;
+  margin-left: 2.5rem;
+  flex-direction: column;
 `
 const ProfileHead = styled.div`
-  font-size: 1.4rem;
+  font-size: 1.5625rem;
   font-weight: bold;
-  margin-left: 2.5rem;
-  width: 7.625rem;
+  text-align: start;
 `
 const ProfileRightSide = styled.div`
   display: flex;
@@ -106,12 +95,14 @@ const ProfileRightSide = styled.div`
   width: 40.125rem;
   height: 46.4375rem;
   flex-direction: column;
-  border-left: solid 1px #dadada;
 `
 const ProfileDetail = styled.div`
   margin-top: 1.875rem;
-  width: 23.25rem;
-  margin-left: 20.4375rem;
+  width: 66rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: -3rem;
 `
 const ProfileImgs = styled.div`
   display: flex;

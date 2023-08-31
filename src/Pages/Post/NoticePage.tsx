@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import SIdeRanking from "../../Components/SideRanking"
+import SideRanking from "../../Components/SideRanking"
 import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
@@ -82,7 +82,7 @@ function NoticePage() {
   return (
     <>
       <StyledContainer>
-        <SIdeRanking />
+        <SideRanking />
         <StyledBox>
           <StyledTitle>공지사항</StyledTitle>
           <StyledPostTitleBox>
@@ -176,7 +176,7 @@ function NoticePage() {
           <WriteBtnBox>
             <WriteBtn
               onClick={() => {
-                navigate("/WritePage")
+                navigate("/WritePage/Notice")
               }}
             >
               글쓰기
