@@ -3,7 +3,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
-
+import MyPageMenuBar from "../../Components/MyPageMenuBar"
+import { BiSearch } from "react-icons/bi"
 interface Post {
   id: string
   title: string
@@ -26,6 +27,7 @@ const MyLikePage: React.FC = () => {
   const [categorySelected, setCategorySelected] = useState("모든 카테고리")
   const [userId, setUserId] = useState<string | null>("")
   const [posts, setPosts] = useState<Post[]>([])
+  const activeMenuItem = "/MyLikePage"
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -71,7 +73,9 @@ const MyLikePage: React.FC = () => {
     { value: "meetups", label: "모임" },
     { value: "comments", label: "댓글" }
   ]
-
+  const SearchIncludeWord: any = () => {
+    console.log("sksksksksk")
+  }
   const [searchTerm, setSearchTerm] = useState("")
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -139,91 +143,99 @@ const MyLikePage: React.FC = () => {
   }
 
   return (
-    <StyledContainer>
-      <StyledTitle>좋아요 한 글</StyledTitle>
+    <MyPostWrap>
+      <MyPageMenuBar activeMenuItem={activeMenuItem} />
+      <StyledContainer>
+        <StyledTitle>좋아요 한 글</StyledTitle>
 
-      <StyledTabButtons>
-        {tabOptions.map((tab) => (
-          <StyledButton
-            key={tab.value}
-            className={activeTab === tab.value ? "active" : ""}
-            onClick={() => {
-              setActiveTab(tab.value)
-              setCategoryOpen(false)
-              setCategorySelected("")
-              void GetPostData(tab.value)
-            }}
-          >
-            {tab.label}
-          </StyledButton>
-        ))}
-      </StyledTabButtons>
-      <NumberAndSearchBox>
-        <NumberBox>
-          전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
-          &nbsp;&nbsp;&nbsp; 글<StyledNumberBlue> {1}</StyledNumberBlue>개
-        </NumberBox>
+        <StyledTabButtons>
+          {tabOptions.map((tab) => (
+            <StyledButton
+              key={tab.value}
+              className={activeTab === tab.value ? "active" : ""}
+              onClick={() => {
+                setActiveTab(tab.value)
+                setCategoryOpen(false)
+                setCategorySelected("")
+                void GetPostData(tab.value)
+              }}
+            >
+              {tab.label}
+            </StyledButton>
+          ))}
+        </StyledTabButtons>
+        <NumberAndSearchBox>
+          <NumberBox>
+            전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
+            &nbsp;&nbsp;&nbsp; 글<StyledNumberBlue> {1}</StyledNumberBlue>개
+          </NumberBox>
 
-        <SelectAndSearchBox>
-          <SearchWord>검색 &nbsp;</SearchWord>
-          <SelectPageBox>
-            <SelectPages>
-              <StyledSearchContainer>
-                <StyledCategoryButton
-                  onClick={() => {
-                    setCategoryOpen(!categoryOpen)
-                  }}
-                >
-                  {categorySelected} {categoryOpen ? "▲" : "▼"}
-                </StyledCategoryButton>
-                {categoryOpen && <DropDown />}
-              </StyledSearchContainer>
-            </SelectPages>
-          </SelectPageBox>
-
-          <StyledSearchInput
-            type="text"
-            placeholder="어떤게 궁금하신가요?"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value)
-            }}
-          />
-        </SelectAndSearchBox>
-      </NumberAndSearchBox>
-      <StyledPostTitleBox>
-        <StyledPostTitleCategory>카테고리</StyledPostTitleCategory>
-        <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
-        <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
-        <StyledPostTitlePostLikes>좋아요 수 </StyledPostTitlePostLikes>
-        <StyledPostTitlePostCommentNum>댓글 수 </StyledPostTitlePostCommentNum>
-      </StyledPostTitleBox>
-      <StyledPostContainer>
-        {posts.length === 0 ? (
-          <p>작성된 게시글이 없습니다.</p>
-        ) : (
-          <StyledPostList>
-            {posts.map((post) => (
-              <StyledPost key={post.id}>
-                <StyledPostCategory>{post.category}</StyledPostCategory>
-                <h3>{post.title}</h3>
-                <p>작성 일자: {post.date}</p>
-              </StyledPost>
-            ))}
-          </StyledPostList>
-        )}
-      </StyledPostContainer>
-    </StyledContainer>
+          <SelectAndSearchBox>
+            <SearchWord>검색 &nbsp;</SearchWord>
+            <SelectPageBox>
+              <SelectPages>
+                <StyledSearchContainer>
+                  <StyledCategoryButton
+                    onClick={() => {
+                      setCategoryOpen(!categoryOpen)
+                    }}
+                  >
+                    {categorySelected} {categoryOpen ? "▲" : "▼"}
+                  </StyledCategoryButton>
+                  {categoryOpen && <DropDown />}
+                </StyledSearchContainer>
+              </SelectPages>
+            </SelectPageBox>
+            <SearchButton type="button" onClick={SearchIncludeWord} />
+            <StyledSearchInput
+              type="text"
+              placeholder="어떤게 궁금하신가요?"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+              }}
+            />
+          </SelectAndSearchBox>
+        </NumberAndSearchBox>
+        <StyledPostTitleBox>
+          <StyledPostTitleCategory>카테고리</StyledPostTitleCategory>
+          <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
+          <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
+          <StyledPostTitlePostLikes>좋아요 수 </StyledPostTitlePostLikes>
+          <StyledPostTitlePostCommentNum>
+            댓글 수{" "}
+          </StyledPostTitlePostCommentNum>
+        </StyledPostTitleBox>
+        <StyledPostContainer>
+          {posts.length === 0 ? (
+            <p>작성된 게시글이 없습니다.</p>
+          ) : (
+            <StyledPostList>
+              {posts.map((post) => (
+                <StyledPost key={post.id}>
+                  <StyledPostCategory>{post.category}</StyledPostCategory>
+                  <h3>{post.title}</h3>
+                  <p>작성 일자: {post.date}</p>
+                </StyledPost>
+              ))}
+            </StyledPostList>
+          )}
+        </StyledPostContainer>
+      </StyledContainer>
+    </MyPostWrap>
   )
 }
+const MyPostWrap = styled.div`
+  display: flex;
+  margin-top: 6.875rem;
+  justify-content: center;
+`
 const StyledContainer = styled.div`
   padding: 1.25rem;
-  width: 62.5rem;
-  margin: auto, 0;
+  width: 66rem;
 `
 
 const StyledTitle = styled.div`
-  margin-top: 4.875rem;
   margin-bottom: 3.125rem;
   font-size: 1.5625rem;
   font-weight: bold;
@@ -238,6 +250,8 @@ const StyledCategoryButton = styled.button`
   border: none;
   cursor: pointer;
   float: right;
+  padding: 0px;
+  padding-right: 10px;
   font-size: 0.875rem;
   background-color: white;
   width: auto;
@@ -272,12 +286,22 @@ const StyledCategoryItem = styled.li<{ selected: boolean }>`
 
 const StyledSearchInput = styled.input`
   padding: 0.625rem;
-  width: 22.5rem;
+  width: 20rem;
   height: 1rem;
   background-color: var(--color-line-gray-200);
   float: right;
   border-radius: 0.3125rem;
   border: 0.0625rem solid #dadada;
+`
+
+const SearchButton = styled(BiSearch)`
+  margin: 5px;
+  float: right;
+  background: styled(BiSearch);
+  width: 30px;
+  height: 30px;
+  border: 0 solid white;
+  color: #63717f;
 `
 
 const StyledTabButtons = styled.div`

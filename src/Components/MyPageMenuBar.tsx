@@ -13,7 +13,7 @@ interface MyPageMenuBarProps {
 
 function MyPageMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
   const navigate = useNavigate()
-
+  console.log(activeMenuItem)
   const handleMenuItemClick = (path: string) => {
     navigate(path)
   }
@@ -74,19 +74,21 @@ const MenuBarWrap = styled.div`
   margin-right: 0.4rem;
   margin-top: 1.875rem;
   width: 9.8125rem;
+  border-right: solid 1px #dadada;
 `
 const MyPageHead = styled.div`
   font-weight: bold;
   font-size: 1.2rem;
   margin-bottom: 2.625rem;
   width: 100%;
+  margin-top: 3.5625rem;
 `
 const MenuItem = styled.div<MenuItemProps>`
   display: flex;
   align-items: center;
   cursor: pointer;
   font-size: 1rem;
-  width: 100%;
+  width: 95.4%;
   height: 2.125rem;
   margin-bottom: 1.5rem;
   background-color: ${(props) => (props.active ? "#0C356A" : "transparent")};

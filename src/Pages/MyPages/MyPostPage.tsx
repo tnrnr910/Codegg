@@ -30,7 +30,7 @@ const MyPostPage: React.FC = () => {
   const [categorySelected, setCategorySelected] = useState("모든 카테고리")
   const [userId, setUserId] = useState<string | null>("")
   const [posts, setPosts] = useState<Post[]>([])
-  const activeMenuItem = "/MyProfilePage"
+  const activeMenuItem = "/MyPostPage"
 
   // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
@@ -171,104 +171,112 @@ const MyPostPage: React.FC = () => {
   }
 
   return (
-    <StyledContainer>
+    <MyPostWrap>
       <MyPageMenuBar activeMenuItem={activeMenuItem} />
-      <StyledTitle>내가 쓴 글</StyledTitle>
+      <StyledContainer>
+        <StyledTitle>내가 쓴 글</StyledTitle>
 
-      <StyledTabButtons>
-        {tabOptions.map((tab) => (
-          <StyledButton
-            key={tab.value}
-            className={activeTab === tab.value ? "active" : ""}
-            onClick={() => {
-              setActiveTab(tab.value)
-              setCategoryOpen(false)
-              setCategorySelected("")
-              const list = GetPostData(tab.value)
+        <StyledTabButtons>
+          {tabOptions.map((tab) => (
+            <StyledButton
+              key={tab.value}
+              className={activeTab === tab.value ? "active" : ""}
+              onClick={() => {
+                setActiveTab(tab.value)
+                setCategoryOpen(false)
+                setCategorySelected("")
+                const list = GetPostData(tab.value)
 
-              const getData = () => {
-                list.then((dummyData: any) => {
-                  setPosts(dummyData)
-                })
-              }
-              getData()
-            }}
-          >
-            {tab.label}
-          </StyledButton>
-        ))}
-      </StyledTabButtons>
-      <NumberAndSearchBox>
-        <NumberBox>
-          전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
-        </NumberBox>
+                const getData = () => {
+                  list.then((dummyData: any) => {
+                    setPosts(dummyData)
+                  })
+                }
+                getData()
+              }}
+            >
+              {tab.label}
+            </StyledButton>
+          ))}
+        </StyledTabButtons>
+        <NumberAndSearchBox>
+          <NumberBox>
+            전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
+          </NumberBox>
 
-        <SelectAndSearchBox>
-          <SearchWord>검색 &nbsp;</SearchWord>
-          <SelectPageBox>
-            <SelectPages>
-              <StyledSearchContainer>
-                <StyledCategoryButton
+          <SelectAndSearchBox>
+            <SearchWord>검색 &nbsp;</SearchWord>
+            <SelectPageBox>
+              <SelectPages>
+                <StyledSearchContainer>
+                  <StyledCategoryButton
+                    onClick={() => {
+                      setCategoryOpen(!categoryOpen)
+                    }}
+                  >
+                    {categorySelected} {categoryOpen ? "▲" : "▼"}
+                  </StyledCategoryButton>
+                  {categoryOpen && <DropDown />}
+                </StyledSearchContainer>
+              </SelectPages>
+            </SelectPageBox>
+            <SearchButton type="button" onClick={SearchIncludeWord} />
+            <StyledSearchInput
+              type="text"
+              placeholder="어떤게 궁금하신가요?"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+              }}
+              onKeyPress={handleOnKeyPress}
+            />
+          </SelectAndSearchBox>
+        </NumberAndSearchBox>
+        <StyledPostTitleBox>
+          <StyledPostTitleCategory>카테고리</StyledPostTitleCategory>
+          <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
+          <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
+          <StyledPostTitlePostLikes>좋아요 수 </StyledPostTitlePostLikes>
+          <StyledPostTitlePostCommentNum>
+            댓글 수{" "}
+          </StyledPostTitlePostCommentNum>
+        </StyledPostTitleBox>
+        <StyledPostContainer>
+          {posts.length === 0 ? (
+            <p>작성된 게시글이 없습니다.</p>
+          ) : (
+            <StyledPostList>
+              {posts.map((post) => (
+                <StyledPost
+                  key={post.id}
                   onClick={() => {
-                    setCategoryOpen(!categoryOpen)
+                    GoToDetailPage(post.id)
                   }}
                 >
-                  {categorySelected} {categoryOpen ? "▲" : "▼"}
-                </StyledCategoryButton>
-                {categoryOpen && <DropDown />}
-              </StyledSearchContainer>
-            </SelectPages>
-          </SelectPageBox>
-          <SearchButton type="button" onClick={SearchIncludeWord} />
-          <StyledSearchInput
-            type="text"
-            placeholder="어떤게 궁금하신가요?"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value)
-            }}
-            onKeyPress={handleOnKeyPress}
-          />
-        </SelectAndSearchBox>
-      </NumberAndSearchBox>
-      <StyledPostTitleBox>
-        <StyledPostTitleCategory>카테고리</StyledPostTitleCategory>
-        <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
-        <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
-        <StyledPostTitlePostLikes>좋아요 수 </StyledPostTitlePostLikes>
-        <StyledPostTitlePostCommentNum>댓글 수 </StyledPostTitlePostCommentNum>
-      </StyledPostTitleBox>
-      <StyledPostContainer>
-        {posts.length === 0 ? (
-          <p>작성된 게시글이 없습니다.</p>
-        ) : (
-          <StyledPostList>
-            {posts.map((post) => (
-              <StyledPost
-                key={post.id}
-                onClick={() => {
-                  GoToDetailPage(post.id)
-                }}
-              >
-                <StyledPostCategory>{post.category}</StyledPostCategory>
-                <h3>{post.title}</h3>
-                <p>작성 일자: {post.date}</p>
-              </StyledPost>
-            ))}
-          </StyledPostList>
-        )}
-      </StyledPostContainer>
-    </StyledContainer>
+                  <StyledPostCategory>{post.category}</StyledPostCategory>
+                  <h3>{post.title}</h3>
+                  <p>작성 일자: {post.date}</p>
+                </StyledPost>
+              ))}
+            </StyledPostList>
+          )}
+        </StyledPostContainer>
+      </StyledContainer>
+    </MyPostWrap>
   )
 }
+
+const MyPostWrap = styled.div`
+  display: flex;
+  margin-top: 6.875rem;
+  justify-content: center;
+`
 const StyledContainer = styled.div`
   padding: 1.25rem;
-  width: 62.5rem;
-  margin: auto, 0;
+  width: 66rem;
 `
 
 const StyledTitle = styled.div`
-  margin-top: 4.875rem;
   margin-bottom: 3.125rem;
   font-size: 1.5625rem;
   font-weight: bold;
