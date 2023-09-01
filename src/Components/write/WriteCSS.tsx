@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import SimpleMDE from "react-simplemde-editor"
 
 const StyledForm = styled.form`
   display: flex;
@@ -7,11 +8,11 @@ const StyledForm = styled.form`
   box-sizing: border-box;
 
   width: 926px; // 주어진 너비를 적용
-  height: 633px; // 주어진 높이를 적용
+  height: 683px; // 주어진 높이를 적용
 
   position: absolute;
   left: calc(50% -(926 / 2) +2);
-  top: calc(20% + 0px); // 50px 아래로 이동
+  top: calc(10% + 0px); // 50px 아래로 이동
   background-color: #f4f4f4;
   border: 1px solid #dadada;
   border-radius: 16px;
@@ -37,7 +38,7 @@ const StyledInput = styled.input`
 `
 
 const StyledSelect = styled.select`
-  margin-top: 30px;
+  margin-top: 20px;
   margin-bottom: 20px;
   padding: 5px;
   width: 834px;
@@ -47,17 +48,19 @@ const StyledSelect = styled.select`
   border: 1px solid #dadada;
   border-radius: 7px;
 `
-const StyledTextArea = styled.textarea`
+const StyledSimpleMDE = styled(SimpleMDE)`
   width: 834px;
   height: 298px;
 
-  padding: 10px;
-
-  box-sizing: border-box;
-
-  background-color: #ffffff;
-  border: 1px solid #dadada;
-  border-radius: 7px;
+  .easymde-container .CodeMirror {
+    height: auto;
+    min-height: 298px;
+    border: none;
+    border-radius: 7px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border: 1px solid #dadada;
+  }
 `
 
 const StyledButton = styled.button`
@@ -65,16 +68,14 @@ const StyledButton = styled.button`
 `
 
 const StyledInputFile = styled.input`
-  display: none;
+  /* display: none; */
 `
 
 const UploadIcon = styled.label`
-  margin-top: 40px;
+  margin-top: 100px;
   width: 834px;
   height: 50px;
-  background: #ffffff url(${process.env.PUBLIC_URL + "/WritePictureIcon.png"})
-    no-repeat center;
-
+  background: #ffffff url("/WritePictureIcon.png") no-repeat center;
   border: 1px solid #dadada;
   border-radius: 7px;
 `
@@ -85,9 +86,9 @@ const CancelButton = styled(StyledButton)`
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 5px;
-  margin-bottom: 10 px;
-  box-sizing: bo rder-box;
-  position: abs olute;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  position: absolute;
   width: 197px;
   height: 46px;
   left: 520px;
@@ -115,7 +116,7 @@ export {
   StyledForm,
   StyledLabel,
   StyledInput,
-  StyledTextArea,
+  StyledSimpleMDE,
   StyledSelect,
   UploadIcon,
   StyledInputFile,
