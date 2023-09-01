@@ -47,7 +47,7 @@ function DetailPage() {
         <ButtonBox>
           <ListBtn
             onClick={() => {
-              navigate("/")
+              navigate(-1)
             }}
           >
             목록

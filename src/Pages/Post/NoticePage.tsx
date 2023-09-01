@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import SideRanking from "../../Components/SideRanking"
 import { useNavigate } from "react-router"
 import styled from "styled-components"
@@ -7,77 +7,12 @@ import { getPosts } from "../../axios/api"
 
 function NoticePage() {
   const navigate = useNavigate()
-  const [categoryOpen, setCategoryOpen] = useState(false)
-  const [categorySelected, setCategorySelected] = useState("카테고리")
   const { isLoading, data } = useQuery("posts", getPosts)
 
   const list: any = data
 
   if (isLoading) {
     return <div>로딩중입니다..</div>
-  }
-
-  function DropDown() {
-    return (
-      <StyledCategoryDropdown open={categoryOpen}>
-        <StyledCategoryList>
-          <StyledCategoryItem
-            onClick={() => {
-              setCategorySelected("카테고리")
-              setCategoryOpen(false)
-            }}
-            selected={categorySelected === "카테고리"}
-          >
-            카테고리
-          </StyledCategoryItem>
-          <StyledCategoryItem
-            onClick={() => {
-              setCategorySelected("JS")
-              setCategoryOpen(false)
-            }}
-            selected={categorySelected === "JS"}
-          >
-            JS
-          </StyledCategoryItem>
-          <StyledCategoryItem
-            onClick={() => {
-              setCategorySelected("React")
-              setCategoryOpen(false)
-            }}
-            selected={categorySelected === "React"}
-          >
-            React
-          </StyledCategoryItem>
-          <StyledCategoryItem
-            onClick={() => {
-              setCategorySelected("Node")
-              setCategoryOpen(false)
-            }}
-            selected={categorySelected === "Node"}
-          >
-            Node
-          </StyledCategoryItem>
-          <StyledCategoryItem
-            onClick={() => {
-              setCategorySelected("Next")
-              setCategoryOpen(false)
-            }}
-            selected={categorySelected === "Next"}
-          >
-            Next
-          </StyledCategoryItem>
-          <StyledCategoryItem
-            onClick={() => {
-              setCategorySelected("파이썬")
-              setCategoryOpen(false)
-            }}
-            selected={categorySelected === "파이썬"}
-          >
-            파이썬
-          </StyledCategoryItem>
-        </StyledCategoryList>
-      </StyledCategoryDropdown>
-    )
   }
   return (
     <>
@@ -88,16 +23,7 @@ function NoticePage() {
           <StyledPostTitleBox>
             <StyledPostTitleCategory>
               <SelectPages>
-                <StyledSearchContainer>
-                  <StyledCategoryButton
-                    onClick={() => {
-                      setCategoryOpen(!categoryOpen)
-                    }}
-                  >
-                    {categorySelected} {categoryOpen ? "∧" : "∨"}
-                  </StyledCategoryButton>
-                  {categoryOpen && <DropDown />}
-                </StyledSearchContainer>
+                <StyledSearchContainer></StyledSearchContainer>
               </SelectPages>
             </StyledPostTitleCategory>
             <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
@@ -109,71 +35,35 @@ function NoticePage() {
           </StyledPostTitleBox>
           <Body>
             <BodyDiv>
-              {categorySelected === "카테고리" ? (
-                <>
-                  {list
-                    .filter(
-                      (item: { postBoard: string }) =>
-                        item.postBoard === "Notice"
-                    )
-                    .map(
-                      (info: {
-                        id: string
-                        postTitle: string
-                        postCategory: string
-                      }) => {
-                        return (
-                          <ListContainer key={info.id}>
-                            <ListDiv
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              <ListCategory> {info.postCategory}</ListCategory>
-                              {info.postTitle}
-                            </ListDiv>
-                          </ListContainer>
-                        )
-                      }
-                    )}
-                </>
-              ) : (
-                <>
-                  {list
-                    .filter(
-                      (item: { postBoard: string }) =>
-                        item.postBoard === "Notice"
-                    )
-                    .filter(
-                      (item: { postCategory: string }) =>
-                        categorySelected !== "카테고리" &&
-                        item.postCategory === categorySelected
-                    )
-                    .map(
-                      (info: {
-                        id: string
-                        postTitle: string
-                        postCategory: string
-                      }) => {
-                        return (
-                          <ListContainer key={info.id}>
-                            <ListDiv
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              <ListCategory> {info.postCategory}</ListCategory>
-                              {info.postTitle}
-                            </ListDiv>
-                          </ListContainer>
-                        )
-                      }
-                    )}
-                </>
-              )}
+              <>
+                {list
+                  .filter(
+                    (item: { postBoard: string }) => item.postBoard === "Notice"
+                  )
+                  .map(
+                    (info: {
+                      id: string
+                      postTitle: string
+                      postCategory: string
+                    }) => {
+                      return (
+                        <ListContainer key={info.id}>
+                          <ListDiv
+                            onClick={() => {
+                              navigate(`/detailPage/${info.id}`)
+                            }}
+                          >
+                            <ListCategory> {info.postCategory}</ListCategory>
+                            {info.postTitle}
+                          </ListDiv>
+                        </ListContainer>
+                      )
+                    }
+                  )}
+              </>
             </BodyDiv>
           </Body>
-          <WtiteBtnBox>
+          <WriteBtnBox>
             <WriteBtn
               onClick={() => {
                 navigate("/WritePage/Notice")
@@ -181,7 +71,7 @@ function NoticePage() {
             >
               글쓰기
             </WriteBtn>
-          </WtiteBtnBox>
+          </WriteBtnBox>
           <div> 페이지 네이션</div>
         </StyledBox>
       </StyledContainer>
@@ -251,37 +141,6 @@ const StyledPostTitlePostCommentNum = styled.span`
   font-size: 0.875rem;
 `
 
-const StyledCategoryDropdown = styled.div<{ open: boolean }>`
-  position: absolute;
-  top: ${({ open }) => (open ? "33%" : "-12.5rem")};
-  transition: top 0.3s ease;
-  z-index: 1;
-  width: 5%;
-`
-
-const StyledCategoryList = styled.ul`
-  list-style: none;
-  margin: 0; /* 수정 */
-  padding: 0; /* 추가 */
-  background-color: #ffffff;
-  border: 1px solid #e7e7e7; /* 추가 */
-`
-
-const StyledCategoryItem = styled.li<{ selected: boolean }>`
-  cursor: pointer;
-  border: none;
-  border-top: 1px solid #e7e7e7; /* 추가 */
-  padding: 8px 12px; /* 수정 */
-  background-color: ${(props) => (props.selected ? "#f0f0f0" : "transparent")};
-  transition: background-color 0.3s ease; /* 추가 */
-  &:first-child {
-    border-top: none; /* 추가 */
-  }
-  &:hover {
-    background-color: #f0f0f0; /* 추가 */
-  }
-`
-
 const SelectPages = styled.span`
   display: inline;
   width: 8rem;
@@ -293,15 +152,6 @@ const SelectPages = styled.span`
 const StyledSearchContainer = styled.span`
   display: inline;
   width: 8rem;
-`
-
-const StyledCategoryButton = styled.button`
-  border: none;
-  cursor: pointer;
-  float: right;
-  font-size: 0.875rem;
-  background-color: white;
-  width: auto;
 `
 
 const Body = styled.div`
@@ -333,7 +183,7 @@ const ListCategory = styled.div`
   padding: 3px 3px 3px 3px;
   color: #9f9f9f;
 `
-const WtiteBtnBox = styled.div`
+const WriteBtnBox = styled.div`
   display: flex;
   justify-content: flex-end;
 `
