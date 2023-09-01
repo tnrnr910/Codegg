@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react"
 import { useNavigate, Outlet } from "react-router"
 import { styled } from "styled-components"
 import { auth } from "../axios/firebase"
-import { onAuthStateChanged, signOut, deleteUser } from "firebase/auth"
-import Swal from "sweetalert2"
+import { onAuthStateChanged } from "firebase/auth"
 import { BiSearch } from "react-icons/bi"
 import ProfilePicture from "../Components/ProfilePicture"
+import OpenProfile from "../Components/OpenProfile"
 
 function Header() {
   const navigate = useNavigate()
-
+  const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
+
   useEffect(() => {
     // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
@@ -20,43 +21,13 @@ function Header() {
     console.log("currentUser", currentUser)
   }, [])
 
-  // 로그아웃 함수
-  const logOut = async (event: any) => {
-    event.preventDefault()
-    if (currentUser != null) {
-      // currentUser가 null이 아닌 경우에만 실행
-      await signOut(auth)
-      void Swal.fire("정상적으로 로그아웃 되었습니다.")
-      navigate("/")
-    }
+  // 프로필 모달 오픈
+  const openModal = (e: any) => {
+    setIsOpen(true)
   }
 
-  // 회원탈퇴 함수
-  const deleteCurrentUser = async (event: any) => {
-    event.preventDefault()
-    if (currentUser != null) {
-      // currentUser가 null이 아닌 경우에만 실행
-      await Swal.fire({
-        title: "정말로 탈퇴하시겠습니까?",
-        text: "탈퇴 버튼 선택 시, 계정은 삭제되며 복구되지 않습니다.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "회원 탈퇴",
-        cancelButtonText: "취소"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          void Swal.fire(
-            "탈퇴 완료",
-            "계정이 정상적으로 탈퇴되었습니다.",
-            "success"
-          )
-          void deleteUser(currentUser)
-          navigate("/")
-        }
-      })
-    }
+  const closeModal = (e: any) => {
+    setIsOpen(false)
   }
 
   return (
@@ -130,8 +101,6 @@ function Header() {
             </>
           ) : (
             <>
-              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-              <StAuth onClick={deleteCurrentUser}>회원탈퇴</StAuth>
               <StAuth
                 onClick={() => {
                   navigate("/MyProfilePage")
@@ -140,12 +109,15 @@ function Header() {
                 {auth.currentUser?.displayName}님.안녕하세요.
               </StAuth>
               {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-              <StAuth onClick={logOut}>로그아웃</StAuth>
-              <ProfilePicture style={{ width: "2.5rem", height: "2.5rem" }} />
+              <ProfilePicture
+                onClick={openModal}
+                style={{ width: "2.5rem", height: "2.5rem" }}
+              />
             </>
           )}
         </Authcontainer>
       </HeaderContainer>
+      {isOpen && <OpenProfile closeModal={closeModal} />}
     </>
   )
 }
@@ -199,16 +171,16 @@ const HeaderContainer = styled.div`
   color: black;
 `
 const Logo = styled.img`
-  width: 144px;
-  height: 38px;
-  margin-right: 59px;
+  width: 9rem;
+  height: 2.375rem;
+  margin-right: 3.6875rem;
   cursor: pointer;
 `
 const Pagelist = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 1.5rem;
 `
 const Stp = styled.p`
   cursor: pointer;
@@ -216,8 +188,8 @@ const Stp = styled.p`
 const Authcontainer = styled.div`
   width: 15%;
   display: flex;
-  gap: 24px;
-  margin-left: 100px;
+  gap: 1.5rem;
+  margin-left: 6.25rem;
 `
 
 const StAuth = styled.div`
@@ -231,7 +203,7 @@ const FooterContainer = styled.div`
   color: #e9e6d8;
   align-items: center;
   justify-content: space-evenly;
-  font-size: 12px;
+  font-size: 0.75rem;
   gap: 1rem;
 `
 
@@ -247,14 +219,14 @@ const FooterBody = styled.div`
 const FooterDiretor = styled.div`
   display: flex;
   color: #9f9f9f;
-  gap: 45px;
-  padding: 15px 10px 0px 10px;
+  gap: 2.8125rem;
+  padding: 0.9375rem 0.625rem 0rem 0.625rem;
 `
 const FooterBodyDiv = styled.div`
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: #9f9f9f;
   border-right: solid #9f9f9f 1px;
-  padding: 0px 10px 0px 10px;
+  padding: 0rem 0.625rem 0rem 0.625rem;
 `
 
 const FooterBtnbox = styled.div`
@@ -269,7 +241,7 @@ const FooterBtnbody = styled.div`
   align-items: center;
   justify-content: center;
   border: solid #dadada 1px;
-  border-radius: 22.5px;
+  border-radius: 1.40625rem;
 `
 
 const StLayout = styled.div`
@@ -286,15 +258,15 @@ const StLayout = styled.div`
 const SearchInput = styled.div`
   display: flex;
   align-items: center;
-  width: 270px;
-  height: 40px;
-  margin-right: 12px 0px 12px 0px;
+  width: 16.875rem;
+  height: 2.5rem;
+  margin-right: 0.75rem 0rem 0.75rem 0rem;
   border: solid 1px #63717f;
   float: left;
   color: #63717f;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  -webkit-border-radius: 0.3125rem;
+  -moz-border-radius: 0.3125rem;
+  border-radius: 0.3125rem;
 `
 
 const InputField = styled.input`
@@ -302,7 +274,7 @@ const InputField = styled.input`
   border: none;
   outline: none;
   color: #63717f;
-  padding-right: 10px;
+  padding-right: 0.625rem;
 `
 
 const SearchIcon = styled(BiSearch)`

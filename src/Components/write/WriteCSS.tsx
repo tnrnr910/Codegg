@@ -1,6 +1,8 @@
 import styled from "styled-components"
-import SimpleMDE from "react-simplemde-editor"
 
+const StyledTitle = styled.div`
+  font-size: 25px;
+`
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
@@ -21,6 +23,7 @@ const StyledForm = styled.form`
 const StyledLabel = styled.label`
   font-weight: bold;
   margin-bottom: 5px;
+  margin-top: 12px;
 `
 
 const StyledInput = styled.input`
@@ -38,7 +41,7 @@ const StyledInput = styled.input`
 `
 
 const StyledSelect = styled.select`
-  margin-top: 20px;
+  margin-top: 54px;
   margin-bottom: 20px;
   padding: 5px;
   width: 834px;
@@ -48,9 +51,10 @@ const StyledSelect = styled.select`
   border: 1px solid #dadada;
   border-radius: 7px;
 `
-const StyledSimpleMDE = styled(SimpleMDE)`
+const StyledSimpleMDE = styled.textarea`
   width: 834px;
   height: 298px;
+  resize: none;
 
   .easymde-container .CodeMirror {
     height: auto;
@@ -68,11 +72,11 @@ const StyledButton = styled.button`
 `
 
 const StyledInputFile = styled.input`
-  /* display: none; */
+  display: none;
 `
 
 const UploadIcon = styled.label`
-  margin-top: 100px;
+  margin-top: 20px;
   width: 834px;
   height: 50px;
   background: #ffffff url("/WritePictureIcon.png") no-repeat center;
@@ -112,7 +116,19 @@ const SubmitButton = styled(StyledButton)`
   border-radius: 4px;
 `
 
+const StyledFileLabel = styled.label`
+  position: absolute;
+  left: 60px;
+  bottom: 73px;
+`
+
+const FileBtnImg = styled.img`
+  width: 25px;
+  height: 20px;
+`
+
 export {
+  StyledTitle,
   StyledForm,
   StyledLabel,
   StyledInput,
@@ -121,5 +137,7 @@ export {
   UploadIcon,
   StyledInputFile,
   CancelButton,
-  SubmitButton
+  SubmitButton,
+  StyledFileLabel,
+  FileBtnImg
 }

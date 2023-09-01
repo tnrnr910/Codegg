@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { BiSearch } from "react-icons/bi"
+import { useNavigate } from "react-router"
 interface Post {
   id: string
   title: string
@@ -22,26 +23,35 @@ interface TabOption {
 
 const MyLikePage: React.FC = () => {
   const auth = getAuth()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
-  const [categorySelected, setCategorySelected] = useState("모든 카테고리")
+  const [categorySelected, setCategorySelected] = useState("카테고리")
   const [userId, setUserId] = useState<string | null>("")
   const [posts, setPosts] = useState<Post[]>([])
   const activeMenuItem = "/MyLikePage"
 
+  // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         console.log(user.email)
         setUserId(user.email)
-        void GetPostData(activeTab)
+        setCategorySelected("카테고리")
+        const list = GetPostData(activeTab)
+        const getData = () => {
+          list.then((dummyData: any) => {
+            setPosts(dummyData)
+          })
+        }
+        getData()
       }
     })
-  }, [])
+  }, [userId])
 
-  const GetPostData = async (postBoard: string) => {
-    setPosts([])
-    console.log(postBoard)
+  // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
+  const GetPostData: any = async (postBoard: string) => {
+    const postsTemp: Post[] = []
     const dbPosts = query(
       collection(db, "posts"),
       where("postUserEmail", "==", userId),
@@ -50,7 +60,6 @@ const MyLikePage: React.FC = () => {
     const userSnapshot = await getDocs(dbPosts)
     userSnapshot.forEach((doc: any) => {
       if (doc != null) {
-        console.log(doc.data())
         const newPost: Post = {
           id: doc.id,
           category: doc.data().postCategory,
@@ -60,10 +69,31 @@ const MyLikePage: React.FC = () => {
           likes: 0,
           comments: 0
         }
-        setPosts([...posts, newPost])
+        // setPosts([...posts, newPost])
+
+        postsTemp.push(newPost)
       }
-      console.log(posts)
     })
+    console.log(postsTemp)
+    return postsTemp
+  }
+
+  // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
+  const GoToDetailPage: any = (id: string) => {
+    navigate(`/DetailPage/${id}`)
+  }
+
+  // 돋보기 버튼 클릭시 작동하는 이벤트 함수
+  const SearchIncludeWord: any = () => {
+    console.log("sksksksksk")
+  }
+
+  // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
+  const handleOnKeyPress = (e: any) => {
+    if (e.key === "Enter") {
+      // Enter 입
+      console.log("dididididi")
+    }
   }
 
   // 탭탭탭
@@ -73,24 +103,31 @@ const MyLikePage: React.FC = () => {
     { value: "meetups", label: "모임" },
     { value: "comments", label: "댓글" }
   ]
-  const SearchIncludeWord: any = () => {
-    console.log("sksksksksk")
-  }
+
   const [searchTerm, setSearchTerm] = useState("")
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const filteredPosts = posts.filter((post) => {
-    return (
-      (post.category === activeTab || activeTab === "all") &&
-      (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-  })
+  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const filteredPosts = posts.filter((post) => {
+  //   return (
+  //     (post.category === activeTab || activeTab === "all") &&
+  //     (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       post.content.toLowerCase().includes(searchTerm.toLowerCase()))
+  //   )
+  // })
 
   function DropDown() {
     return (
       <StyledCategoryDropdown open={categoryOpen}>
         <StyledCategoryList>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("카테고리")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "카테고리"}
+          >
+            카테고리
+          </StyledCategoryItem>
           <StyledCategoryItem
             onClick={() => {
               setCategorySelected("JS")
@@ -129,14 +166,13 @@ const MyLikePage: React.FC = () => {
           </StyledCategoryItem>
           <StyledCategoryItem
             onClick={() => {
-              setCategorySelected("파이썬")
-              setCategoryOpen(false) // 자동으로 닫히게 하는 로직
+              setCategorySelected("Python")
+              setCategoryOpen(false)
             }}
-            selected={categorySelected === "파이썬"}
+            selected={categorySelected === "Python"}
           >
-            파이썬
+            Python
           </StyledCategoryItem>
-          {/* ... Add other categories ... */}
         </StyledCategoryList>
       </StyledCategoryDropdown>
     )
@@ -146,7 +182,7 @@ const MyLikePage: React.FC = () => {
     <MyPostWrap>
       <MyPageMenuBar activeMenuItem={activeMenuItem} />
       <StyledContainer>
-        <StyledTitle>좋아요 한 글</StyledTitle>
+        <StyledTitle>좋아요 한 게시물</StyledTitle>
 
         <StyledTabButtons>
           {tabOptions.map((tab) => (
@@ -157,7 +193,14 @@ const MyLikePage: React.FC = () => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
                 setCategorySelected("")
-                void GetPostData(tab.value)
+                const list = GetPostData(tab.value)
+
+                const getData = () => {
+                  list.then((dummyData: any) => {
+                    setPosts(dummyData)
+                  })
+                }
+                getData()
               }}
             >
               {tab.label}
@@ -167,7 +210,6 @@ const MyLikePage: React.FC = () => {
         <NumberAndSearchBox>
           <NumberBox>
             전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
-            &nbsp;&nbsp;&nbsp; 글<StyledNumberBlue> {1}</StyledNumberBlue>개
           </NumberBox>
 
           <SelectAndSearchBox>
@@ -194,6 +236,7 @@ const MyLikePage: React.FC = () => {
               onChange={(e) => {
                 setSearchTerm(e.target.value)
               }}
+              onKeyPress={handleOnKeyPress}
             />
           </SelectAndSearchBox>
         </NumberAndSearchBox>
@@ -211,13 +254,42 @@ const MyLikePage: React.FC = () => {
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
-              {posts.map((post) => (
-                <StyledPost key={post.id}>
-                  <StyledPostCategory>{post.category}</StyledPostCategory>
-                  <h3>{post.title}</h3>
-                  <p>작성 일자: {post.date}</p>
-                </StyledPost>
-              ))}
+              {categorySelected === "카테고리"
+                ? posts.map((post) => (
+                    <StyledPost
+                      key={post.id}
+                      onClick={() => {
+                        GoToDetailPage(post.id)
+                      }}
+                    >
+                      <StyledPostCategory>{post.category}</StyledPostCategory>
+                      <h3>{post.title}</h3>
+                      <p>작성 일자: {post.date}</p>
+                    </StyledPost>
+                  ))
+                : posts
+                    .filter(
+                      (post) =>
+                        categorySelected !== "카테고리" &&
+                        post.category === categorySelected
+                      // (post) => {
+                      //   categorySelected !== "카테고리" &&
+                      //   post.category === categorySelected
+                      // }
+                      // return post
+                    )
+                    .map((post) => (
+                      <StyledPost
+                        key={post.id}
+                        onClick={() => {
+                          GoToDetailPage(post.id)
+                        }}
+                      >
+                        <StyledPostCategory>{post.category}</StyledPostCategory>
+                        <h3>{post.title}</h3>
+                        <p>작성 일자: {post.date}</p>
+                      </StyledPost>
+                    ))}
             </StyledPostList>
           )}
         </StyledPostContainer>
@@ -225,6 +297,7 @@ const MyLikePage: React.FC = () => {
     </MyPostWrap>
   )
 }
+
 const MyPostWrap = styled.div`
   display: flex;
   margin-top: 6.875rem;
@@ -262,25 +335,30 @@ const StyledCategoryDropdown = styled.div<{ open: boolean }>`
   top: ${({ open }) => (open ? "2.5rem" : "-12.5rem")};
   transition: top 0.3s ease;
   z-index: 1;
+  width: 9%;
+  text-align: center;
 `
 
 const StyledCategoryList = styled.ul`
   list-style: none;
-  padding: 0;
-  background-color: #fff;
-  border: 0.0625rem solid #ccc;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+  margin: 0; /* 수정 */
+  padding: 0; /* 추가 */
+  background-color: #ffffff;
+  border: 1px solid #e7e7e7; /* 추가 */
 `
 
 const StyledCategoryItem = styled.li<{ selected: boolean }>`
-  padding: 0.1875rem 2.5rem;
-  margin: 0rem 0.4rem 0rem 0.5rem;
   cursor: pointer;
-  background-color: ${(props) => (props.selected ? "#0C356A" : "0C356A")};
-  color: ${(props) => (props.selected ? "#ffffff" : "#000000")};
-
+  border: none;
+  border-top: 1px solid #e7e7e7; /* 추가 */
+  padding: 8px 12px; /* 수정 */
+  background-color: ${(props) => (props.selected ? "#f0f0f0" : "transparent")};
+  transition: background-color 0.3s ease; /* 추가 */
+  &:first-child {
+    border-top: none; /* 추가 */
+  }
   &:hover {
-    background-color: ${(props) => (props.selected ? "#0C356A" : "#e0e0e0")};
+    background-color: #f0f0f0; /* 추가 */
   }
 `
 
@@ -377,7 +455,7 @@ const NumberBox = styled.span`
 
 const SelectAndSearchBox = styled.span`
   float: right;
-  width: 39.375rem;
+  width: 37rem;
 `
 
 const SelectPageBox = styled.span`
@@ -389,7 +467,7 @@ const SelectPages = styled.span`
   display: inline-block;
   border: 0.0625rem solid #dadada;
   padding: 0.625rem;
-  width: 8rem;
+  width: 6rem;
   border-radius: 0.3125rem;
   font-size: 0.875rem;
   height: 1rem;
@@ -447,5 +525,4 @@ const SearchWord = styled.span`
   margin-left: 2.8rem;
   font-size: 0.875rem;
 `
-
 export default MyLikePage
