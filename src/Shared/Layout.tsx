@@ -8,6 +8,7 @@ import { BiSearch } from "react-icons/bi"
 
 function Header() {
   const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState("")
 
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
   useEffect(() => {
@@ -58,6 +59,8 @@ function Header() {
     }
   }
 
+  const handleSearch = () => {}
+
   return (
     <>
       <HeaderContainer>
@@ -105,8 +108,15 @@ function Header() {
             포인트 샵
           </Stp>
           <SearchInput>
-            <InputField />
-            <SearchIcon />
+            <InputField
+              type="text"
+              placeholder="검색어를 입력하세요."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+              }}
+            />
+            <SearchIcon onClick={handleSearch} />
           </SearchInput>
         </Pagelist>
         <Authcontainer>
@@ -311,6 +321,7 @@ const InputField = styled.input`
 
 const SearchIcon = styled(BiSearch)`
   color: #63717f;
+  cursor: pointer;
 `
 const ProfileImage = styled.img`
   width: 2rem;
