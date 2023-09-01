@@ -10,6 +10,7 @@ import { db } from "./firebase"
 
 interface Post {
   id: string
+  postBoard: string
   postCategory: string
   postContent: string
   postDisplayName: string
@@ -74,17 +75,20 @@ const getBoardPosts: any = async (
 
   const posts: Post[] = []
   let count = 0
-  querySnapshot.forEach((doc: DocumentSnapshot) => {
-    const data = {
-      id: doc.id,
-      ...doc.data()
-    }
-    posts.push(data as Post) // 형 변환을 통해 타입 일치화
-    count++
-    if (count === limit) {
-      return posts
-    }
-  })
+  try {
+    querySnapshot.forEach((doc: DocumentSnapshot) => {
+      const data = {
+        id: doc.id,
+        ...doc.data()
+      }
+      posts.push(data as Post) // 형 변환을 통해 타입 일치화
+      count++
+      if (count === limit) {
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+        throw limit
+      }
+    })
+  } catch {}
 
   return posts
 }

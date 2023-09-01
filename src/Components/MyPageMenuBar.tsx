@@ -13,7 +13,6 @@ interface MyPageMenuBarProps {
 
 function MyPageMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
   const navigate = useNavigate()
-  console.log(activeMenuItem)
   const handleMenuItemClick = (path: string) => {
     navigate(path)
   }
@@ -43,7 +42,7 @@ function MyPageMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
           handleMenuItemClick("/MyLikePage")
         }}
       >
-        좋아요 한 글
+        좋아요 한 게시물
       </MenuItem>
       <MenuItem
         active={activeMenuItem === "/FollowPage"}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "easymde/dist/easymde.min.css"
 import { storage, db } from "../../axios/firebase"
-import { doc, setDoc } from "firebase/firestore"
+import { addDoc, collection } from "firebase/firestore"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import {
   StyledForm,
@@ -81,7 +81,7 @@ const Write: React.FC = () => {
   }
 
   function savePost(imageUrl: string | null) {
-    setDoc(doc(db, "posts", Math.random().toString(36).substr(2, 9)), {
+    addDoc(collection(db, "posts"), {
       postCategory: category,
       postTitle: title,
       postContent: content,
@@ -106,7 +106,7 @@ const Write: React.FC = () => {
         <StyledLabel>
           <StyledSelect value={category} onChange={handleCategoryChange}>
             <option value="">카테고리를 선택하세요</option>
-            <option value="Vanilla JS">Vanilla JS</option>
+            <option value="JS">JS</option>
             <option value="React">React.js</option>
             <option value="Node">Node.js</option>
             <option value="Next">Next.js</option>

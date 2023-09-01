@@ -1,33 +1,37 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { styled } from "styled-components"
-import { useQuery } from "react-query"
-import { getPosts, getBoardPosts } from "../axios/api"
+// import { useQuery } from "react-query"
+import { getBoardPosts } from "../axios/api"
 import SideRanking from "../Components/SideRanking"
 
 function MainPage() {
   const navigate = useNavigate()
-  const { isLoading, data } = useQuery("posts", getPosts)
+  // const { isLoading, data } = useQuery("posts", getPosts)
+  const [dataQuestions, setDataQuestions] = useState([])
+  const [dataMeetups, setDataMeetups] = useState([])
+  const [dataTips, setDataTips] = useState([])
+  const [dataNotice, setDataNotice] = useState([])
 
-  // const dataMeetups = useQuery("postsMeetups", getBoardPosts("meetups", 3))
-  // const dataTips = useQuery("postsTips", getBoardPosts("tips", 8))
-  // const dataNotice = useQuery("postsNotice", getBoardPosts("Notice", 8))
-
-  const list: any = data
-  if (isLoading) {
-    return <div>로딩중입니다..</div>
-  }
-
-  const getData = () => {
-    list.then((dummyData: any) => {
-      // setPosts(dummyData)
+  // const list: any = data
+  // console.log(list)
+  // if (isLoading) {
+  //   return <div>로딩중입니다..</div>
+  // }
+  useEffect(() => {
+    getBoardPosts("questions", 8).then((dummyData: any) => {
+      setDataQuestions(dummyData)
     })
-  }
-  getData()
-
-  const dataQuestions = getBoardPosts("Notice", 8)
-  console.log(dataQuestions)
-
+    getBoardPosts("meetups", 8).then((dummyData: any) => {
+      setDataMeetups(dummyData)
+    })
+    getBoardPosts("tips", 8).then((dummyData: any) => {
+      setDataTips(dummyData)
+    })
+    getBoardPosts("Notice", 8).then((dummyData: any) => {
+      setDataNotice(dummyData)
+    })
+  }, [])
   return (
     <>
       <Banner>
@@ -89,35 +93,30 @@ function MainPage() {
             </Title>
             <Body>
               <BodyDiv>
-                {list
-                  .filter(
-                    (item: { postBoard: string }) =>
-                      item.postBoard === "meetups"
-                  )
-                  .map(
-                    (info: {
-                      id: string
-                      postTitle: string
-                      postCategory: string
-                    }) => {
-                      return (
-                        <ListContainer key={info.id}>
-                          <ListDiv
-                            onClick={() => {
-                              navigate(`/detailPage/${info.id}`)
-                            }}
-                          >
-                            <ListCategory> {info.postCategory}</ListCategory>
-                            {info.postTitle}
-                          </ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
-                        </ListContainer>
-                      )
-                    }
-                  )}
+                {dataMeetups.map(
+                  (info: {
+                    id: string
+                    postTitle: string
+                    postCategory: string
+                  }) => {
+                    return (
+                      <ListContainer key={info.id}>
+                        <ListDiv
+                          onClick={() => {
+                            navigate(`/detailPage/${info.id}`)
+                          }}
+                        >
+                          <ListCategory> {info.postCategory}</ListCategory>
+                          {info.postTitle}
+                        </ListDiv>
+                        <ListBox>
+                          <div>좋아요</div>
+                          <div>댓글수</div>
+                        </ListBox>
+                      </ListContainer>
+                    )
+                  }
+                )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -134,35 +133,30 @@ function MainPage() {
             </Title>
             <Body>
               <BodyDiv>
-                {list
-                  .filter(
-                    (item: { postBoard: string; postCategory: string }) =>
-                      item.postBoard === "tips"
-                  )
-                  .map(
-                    (info: {
-                      id: string
-                      postTitle: string
-                      postCategory: string
-                    }) => {
-                      return (
-                        <ListContainer key={info.id}>
-                          <ListDiv
-                            onClick={() => {
-                              navigate(`/detailPage/${info.id}`)
-                            }}
-                          >
-                            <ListCategory> {info.postCategory}</ListCategory>
-                            {info.postTitle}
-                          </ListDiv>
-                          <ListBox>
-                            <div>좋아요</div>
-                            <div>댓글수</div>
-                          </ListBox>
-                        </ListContainer>
-                      )
-                    }
-                  )}
+                {dataTips.map(
+                  (info: {
+                    id: string
+                    postTitle: string
+                    postCategory: string
+                  }) => {
+                    return (
+                      <ListContainer key={info.id}>
+                        <ListDiv
+                          onClick={() => {
+                            navigate(`/detailPage/${info.id}`)
+                          }}
+                        >
+                          <ListCategory> {info.postCategory}</ListCategory>
+                          {info.postTitle}
+                        </ListDiv>
+                        <ListBox>
+                          <div>좋아요</div>
+                          <div>댓글수</div>
+                        </ListBox>
+                      </ListContainer>
+                    )
+                  }
+                )}
               </BodyDiv>
             </Body>
           </PostBox>
@@ -179,29 +173,25 @@ function MainPage() {
             </Title>
             <Body>
               <BodyDiv>
-                {list
-                  .filter(
-                    (item: { postBoard: string }) => item.postBoard === "Notice"
-                  )
-                  .map(
-                    (info: {
-                      id: string
-                      postTitle: string
-                      postCategory: string
-                    }) => {
-                      return (
-                        <ListContainer key={info.id}>
-                          <ListDiv
-                            onClick={() => {
-                              navigate(`/detailPage/${info.id}`)
-                            }}
-                          >
-                            {info.postTitle}
-                          </ListDiv>
-                        </ListContainer>
-                      )
-                    }
-                  )}
+                {dataNotice.map(
+                  (info: {
+                    id: string
+                    postTitle: string
+                    postCategory: string
+                  }) => {
+                    return (
+                      <ListContainer key={info.id}>
+                        <ListDiv
+                          onClick={() => {
+                            navigate(`/detailPage/${info.id}`)
+                          }}
+                        >
+                          {info.postTitle}
+                        </ListDiv>
+                      </ListContainer>
+                    )
+                  }
+                )}
               </BodyDiv>
             </Body>
           </PostBox>
