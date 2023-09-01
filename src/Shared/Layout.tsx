@@ -172,16 +172,16 @@ const HeaderContainer = styled.div`
   color: black;
 `
 const Logo = styled.img`
-  width: 144px;
-  height: 38px;
-  margin-right: 59px;
+  width: 9rem;
+  height: 2.375rem;
+  margin-right: 3.6875rem;
   cursor: pointer;
 `
 const Pagelist = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 1.5rem;
 `
 const Stp = styled.p`
   cursor: pointer;
@@ -189,8 +189,8 @@ const Stp = styled.p`
 const Authcontainer = styled.div`
   width: 15%;
   display: flex;
-  gap: 24px;
-  margin-left: 100px;
+  gap: 1.5rem;
+  margin-left: 6.25rem;
 `
 
 const StAuth = styled.div`
@@ -204,7 +204,7 @@ const FooterContainer = styled.div`
   color: #e9e6d8;
   align-items: center;
   justify-content: space-evenly;
-  font-size: 12px;
+  font-size: 0.75rem;
   gap: 1rem;
 `
 
@@ -220,14 +220,14 @@ const FooterBody = styled.div`
 const FooterDiretor = styled.div`
   display: flex;
   color: #9f9f9f;
-  gap: 45px;
-  padding: 15px 10px 0px 10px;
+  gap: 2.8125rem;
+  padding: 0.9375rem 0.625rem 0rem 0.625rem;
 `
 const FooterBodyDiv = styled.div`
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: #9f9f9f;
   border-right: solid #9f9f9f 1px;
-  padding: 0px 10px 0px 10px;
+  padding: 0rem 0.625rem 0rem 0.625rem;
 `
 
 const FooterBtnbox = styled.div`
@@ -242,7 +242,7 @@ const FooterBtnbody = styled.div`
   align-items: center;
   justify-content: center;
   border: solid #dadada 1px;
-  border-radius: 22.5px;
+  border-radius: 1.40625rem;
 `
 
 const StLayout = styled.div`
@@ -259,15 +259,15 @@ const StLayout = styled.div`
 const SearchInput = styled.div`
   display: flex;
   align-items: center;
-  width: 270px;
-  height: 40px;
-  margin-right: 12px 0px 12px 0px;
+  width: 16.875rem;
+  height: 2.5rem;
+  margin-right: 0.75rem 0rem 0.75rem 0rem;
   border: solid 1px #63717f;
   float: left;
   color: #63717f;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  -webkit-border-radius: 0.3125rem;
+  -moz-border-radius: 0.3125rem;
+  border-radius: 0.3125rem;
 `
 
 const InputField = styled.input`
@@ -275,7 +275,7 @@ const InputField = styled.input`
   border: none;
   outline: none;
   color: #63717f;
-  padding-right: 10px;
+  padding-right: 0.625rem;
 `
 
 const SearchIcon = styled(BiSearch)`
