@@ -12,10 +12,13 @@
     "easymde",
     "firestore",
     "Imgs",
+    "Navi",
     "Pagelist",
     "seonyoug",
     "Signin",
     "Signout",
+    "Swal",
+    "sweetalert",
     "Tabmenu"
   ]
 }

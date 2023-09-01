@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react"
 import { useNavigate, Outlet } from "react-router"
 import { styled } from "styled-components"
 import { auth } from "../axios/firebase"
-import { onAuthStateChanged, signOut, deleteUser } from "firebase/auth"
-import Swal from "sweetalert2"
+import { onAuthStateChanged } from "firebase/auth"
 import { BiSearch } from "react-icons/bi"
+import OpenProfile from "../Components/OpenProfile"
 
 function Header() {
   const navigate = useNavigate()
-
+  const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
+
   useEffect(() => {
     // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
@@ -19,43 +20,13 @@ function Header() {
     console.log("currentUser", currentUser)
   }, [])
 
-  // 로그아웃 함수
-  const logOut = async (event: any) => {
-    event.preventDefault()
-    if (currentUser != null) {
-      // currentUser가 null이 아닌 경우에만 실행
-      await signOut(auth)
-      void Swal.fire("정상적으로 로그아웃 되었습니다.")
-      navigate("/")
-    }
+  // 프로필 모달 오픈
+  const openModal = (e: any) => {
+    setIsOpen(true)
   }
 
-  // 회원탈퇴 함수
-  const deleteCurrentUser = async (event: any) => {
-    event.preventDefault()
-    if (currentUser != null) {
-      // currentUser가 null이 아닌 경우에만 실행
-      await Swal.fire({
-        title: "정말로 탈퇴하시겠습니까?",
-        text: "탈퇴 버튼 선택 시, 계정은 삭제되며 복구되지 않습니다.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "회원 탈퇴",
-        cancelButtonText: "취소"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          void Swal.fire(
-            "탈퇴 완료",
-            "계정이 정상적으로 탈퇴되었습니다.",
-            "success"
-          )
-          void deleteUser(currentUser)
-          navigate("/")
-        }
-      })
-    }
+  const closeModal = (e: any) => {
+    setIsOpen(false)
   }
 
   return (
@@ -129,8 +100,6 @@ function Header() {
             </>
           ) : (
             <>
-              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-              <StAuth onClick={deleteCurrentUser}>회원탈퇴</StAuth>
               <StAuth
                 onClick={() => {
                   navigate("/MyProfilePage")
@@ -138,18 +107,18 @@ function Header() {
               >
                 {auth.currentUser?.displayName}님.안녕하세요.
               </StAuth>
-              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-              <StAuth onClick={logOut}>로그아웃</StAuth>
               <ProfileImage
                 src={
                   auth.currentUser?.photoURL ??
                   require("../Pages/MyPages/profile.jpg")
                 }
+                onClick={openModal}
               />
             </>
           )}
         </Authcontainer>
       </HeaderContainer>
+      {isOpen && <OpenProfile closeModal={closeModal} />}
     </>
   )
 }
@@ -317,4 +286,5 @@ const ProfileImage = styled.img`
   height: 2rem;
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
 `
