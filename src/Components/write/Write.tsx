@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import ReactMarkdown from "react-markdown"
 import "easymde/dist/easymde.min.css"
 import { storage, db } from "../../axios/firebase"
 import { doc, setDoc } from "firebase/firestore"
@@ -8,7 +9,7 @@ import {
   StyledLabel,
   StyledInput,
   StyledSelect,
-  StyledTextArea,
+  StyledSimpleMDE,
   UploadIcon,
   StyledInputFile,
   CancelButton,
@@ -26,14 +27,12 @@ const Write: React.FC = () => {
   const [content, setContent] = useState<string>("")
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>("")
-  const [displayName, setDisplayName] = useState<string | null>("")
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         console.log(user.email)
         setUserEmail(user.email)
-        setDisplayName(user.displayName)
       } else {
         navigate("/")
       }
@@ -81,7 +80,7 @@ const Write: React.FC = () => {
   }
 
   function savePost(imageUrl: string | null) {
-    setDoc(doc(db, "posts", Math.random().toString(36).substr(2, 9)), {
+    setDoc(doc(db, "posts", new Date().getTime().toString()), {
       postCategory: category,
       postTitle: title,
       postContent: content,
@@ -89,7 +88,7 @@ const Write: React.FC = () => {
       postBoard: board,
       postTime: new Date(),
       postUserEmail: userEmail,
-      postDisplayName: displayName
+      postDisplayName: ""
     })
       .then(() => {
         alert("글 작성이 완료되었습니다.")
@@ -123,13 +122,16 @@ const Write: React.FC = () => {
           />
         </StyledLabel>
 
-        <StyledTextArea
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value)
-          }}
-          placeholder="내용을 입력해주세요."
-        />
+        <StyledLabel>
+          <StyledSimpleMDE
+            value={content}
+            onChange={(value) => {
+              setContent(value)
+            }}
+            placeholder="내용을 입력해주세요."
+          />
+        </StyledLabel>
+        <ReactMarkdown>{content}</ReactMarkdown>
 
         <UploadIcon
           onClick={() => {
