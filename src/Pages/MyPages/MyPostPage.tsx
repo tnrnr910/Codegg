@@ -13,6 +13,7 @@ interface Post {
   content: string
   category: string
   date: string
+  board: string
   likes: number
   comments: number
 }
@@ -27,9 +28,10 @@ const MyPostPage: React.FC = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
-  const [categorySelected, setCategorySelected] = useState("모든 카테고리")
+  const [categorySelected, setCategorySelected] = useState("카테고리")
   const [userId, setUserId] = useState<string | null>("")
   const [posts, setPosts] = useState<Post[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = "/MyPostPage"
 
   // 맨처음 페이지 렌더링시 작동하는 useEffect
@@ -38,7 +40,7 @@ const MyPostPage: React.FC = () => {
       if (user !== null) {
         console.log(user.email)
         setUserId(user.email)
-        setCategorySelected("모든 카테고리")
+        setCategorySelected("카테고리")
         const list = GetPostData(activeTab)
         const getData = () => {
           list.then((dummyData: any) => {
@@ -67,6 +69,7 @@ const MyPostPage: React.FC = () => {
           title: doc.data().postTitle,
           date: String(doc.data().postTime.toDate()),
           content: doc.data().postContent,
+          board: doc.data().postBoard,
           likes: 0,
           comments: 0
         }
@@ -79,6 +82,51 @@ const MyPostPage: React.FC = () => {
     return postsTemp
   }
 
+  // 9월 1일자로 한거
+  // 파이어베이스에서 내가 쓴 게시글에서 단어 검색 해서 찾아내는 함수
+  const GetFindPostData: any = async (
+    postCategory: string,
+    postBoard: string,
+    keyword: string
+  ) => {
+    const postsTemp: Post[] = []
+    const dbPosts = query(
+      collection(db, "posts"),
+      where("postUserEmail", "==", userId),
+      where("postBoard", "==", postBoard)
+    )
+    const userSnapshot = await getDocs(dbPosts)
+    userSnapshot.forEach((doc: any) => {
+      if (
+        doc != null &&
+        doc.data().postUserEmail === userId &&
+        postBoard === doc.data().postBoard
+      ) {
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (doc.data().postContent.includes(keyword)) {
+          const newPost: Post = {
+            id: doc.id,
+            category: doc.data().postCategory,
+            title: doc.data().postTitle,
+            date: String(doc.data().postTime.toDate()),
+            content: doc.data().postContent,
+            board: doc.data().postBoard,
+            likes: 0,
+            comments: 0
+          }
+          // setPosts([...posts, newPost])
+
+          postsTemp.push(newPost)
+        }
+      }
+    })
+    console.log(postsTemp)
+    if (postCategory !== "카테고리") {
+      postsTemp.filter((post) => post.category === postCategory)
+    }
+    return postsTemp
+  }
+
   // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
   const GoToDetailPage: any = (id: string) => {
     navigate(`/DetailPage/${id}`)
@@ -86,14 +134,21 @@ const MyPostPage: React.FC = () => {
 
   // 돋보기 버튼 클릭시 작동하는 이벤트 함수
   const SearchIncludeWord: any = () => {
-    console.log("sksksksksk")
+    GetFindPostData(categorySelected, activeTab, searchTerm).then(
+      (dummyData: any) => {
+        setPosts(dummyData)
+      }
+    )
   }
 
   // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
   const handleOnKeyPress = (e: any) => {
     if (e.key === "Enter") {
-      // Enter 입
-      console.log("dididididi")
+      GetFindPostData(categorySelected, activeTab, searchTerm).then(
+        (dummyData: any) => {
+          setPosts(dummyData)
+        }
+      )
     }
   }
 
@@ -104,8 +159,6 @@ const MyPostPage: React.FC = () => {
     { value: "meetups", label: "모임" },
     { value: "comments", label: "댓글" }
   ]
-
-  const [searchTerm, setSearchTerm] = useState("")
 
   // // eslint-disable-next-line @typescript-eslint/no-unused-vars
   // const filteredPosts = posts.filter((post) => {
@@ -120,6 +173,15 @@ const MyPostPage: React.FC = () => {
     return (
       <StyledCategoryDropdown open={categoryOpen}>
         <StyledCategoryList>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("카테고리")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "카테고리"}
+          >
+            카테고리
+          </StyledCategoryItem>
           <StyledCategoryItem
             onClick={() => {
               setCategorySelected("JS")
@@ -158,12 +220,12 @@ const MyPostPage: React.FC = () => {
           </StyledCategoryItem>
           <StyledCategoryItem
             onClick={() => {
-              setCategorySelected("파이썬")
-              setCategoryOpen(false) // 자동으로 닫히게 하는 로직
+              setCategorySelected("Python")
+              setCategoryOpen(false)
             }}
-            selected={categorySelected === "파이썬"}
+            selected={categorySelected === "Python"}
           >
-            파이썬
+            Python
           </StyledCategoryItem>
         </StyledCategoryList>
       </StyledCategoryDropdown>
@@ -184,7 +246,7 @@ const MyPostPage: React.FC = () => {
               onClick={() => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
-                setCategorySelected("")
+                setCategorySelected("카테고리")
                 const list = GetPostData(tab.value)
 
                 const getData = () => {
@@ -246,18 +308,42 @@ const MyPostPage: React.FC = () => {
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
-              {posts.map((post) => (
-                <StyledPost
-                  key={post.id}
-                  onClick={() => {
-                    GoToDetailPage(post.id)
-                  }}
-                >
-                  <StyledPostCategory>{post.category}</StyledPostCategory>
-                  <h3>{post.title}</h3>
-                  <p>작성 일자: {post.date}</p>
-                </StyledPost>
-              ))}
+              {categorySelected === "카테고리"
+                ? posts.map((post) => (
+                    <StyledPost
+                      key={post.id}
+                      onClick={() => {
+                        GoToDetailPage(post.id)
+                      }}
+                    >
+                      <StyledPostCategory>{post.category}</StyledPostCategory>
+                      <h3>{post.title}</h3>
+                      <p>작성 일자: {post.date}</p>
+                    </StyledPost>
+                  ))
+                : posts
+                    .filter(
+                      (post) =>
+                        categorySelected !== "카테고리" &&
+                        post.category === categorySelected
+                      // (post) => {
+                      //   categorySelected !== "카테고리" &&
+                      //   post.category === categorySelected
+                      // }
+                      // return post
+                    )
+                    .map((post) => (
+                      <StyledPost
+                        key={post.id}
+                        onClick={() => {
+                          GoToDetailPage(post.id)
+                        }}
+                      >
+                        <StyledPostCategory>{post.category}</StyledPostCategory>
+                        <h3>{post.title}</h3>
+                        <p>작성 일자: {post.date}</p>
+                      </StyledPost>
+                    ))}
             </StyledPostList>
           )}
         </StyledPostContainer>
@@ -303,25 +389,30 @@ const StyledCategoryDropdown = styled.div<{ open: boolean }>`
   top: ${({ open }) => (open ? "2.5rem" : "-12.5rem")};
   transition: top 0.3s ease;
   z-index: 1;
+  width: 9%;
+  text-align: center;
 `
 
 const StyledCategoryList = styled.ul`
   list-style: none;
-  padding: 0;
-  background-color: #fff;
-  border: 0.0625rem solid #ccc;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+  margin: 0; /* 수정 */
+  padding: 0; /* 추가 */
+  background-color: #ffffff;
+  border: 1px solid #e7e7e7; /* 추가 */
 `
 
 const StyledCategoryItem = styled.li<{ selected: boolean }>`
-  padding: 0.1875rem 2.5rem;
-  margin: 0rem 0.4rem 0rem 0.5rem;
   cursor: pointer;
-  background-color: ${(props) => (props.selected ? "#0C356A" : "0C356A")};
-  color: ${(props) => (props.selected ? "#ffffff" : "#000000")};
-
+  border: none;
+  border-top: 1px solid #e7e7e7; /* 추가 */
+  padding: 8px 12px; /* 수정 */
+  background-color: ${(props) => (props.selected ? "#f0f0f0" : "transparent")};
+  transition: background-color 0.3s ease; /* 추가 */
+  &:first-child {
+    border-top: none; /* 추가 */
+  }
   &:hover {
-    background-color: ${(props) => (props.selected ? "#0C356A" : "#e0e0e0")};
+    background-color: #f0f0f0; /* 추가 */
   }
 `
 
@@ -418,7 +509,7 @@ const NumberBox = styled.span`
 
 const SelectAndSearchBox = styled.span`
   float: right;
-  width: 39.375rem;
+  width: 37rem;
 `
 
 const SelectPageBox = styled.span`
@@ -430,7 +521,7 @@ const SelectPages = styled.span`
   display: inline-block;
   border: 0.0625rem solid #dadada;
   padding: 0.625rem;
-  width: 8rem;
+  width: 6rem;
   border-radius: 0.3125rem;
   font-size: 0.875rem;
   height: 1rem;
