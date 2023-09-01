@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react"
+// import ReactMarkdown from "react-markdown"
 import "easymde/dist/easymde.min.css"
 import { storage, db } from "../../axios/firebase"
 import { addDoc, collection } from "firebase/firestore"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import {
+  StyledTitle,
   StyledForm,
   StyledLabel,
   StyledInput,
   StyledSelect,
-  StyledTextArea,
+  StyledSimpleMDE,
   UploadIcon,
   StyledInputFile,
   CancelButton,
-  SubmitButton
+  SubmitButton,
+  StyledFileLabel,
+  FileBtnImg
 } from "./WriteCSS"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useNavigate, useParams } from "react-router"
@@ -21,19 +25,17 @@ const Write: React.FC = () => {
   const { board } = useParams()
   const auth = getAuth()
   const navigate = useNavigate()
-  const [category, setCategory] = useState<string>("")
+  const [category, setCategory] = useState<string>("카테고리를 선택하세요")
   const [title, setTitle] = useState<string>("")
   const [content, setContent] = useState<string>("")
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>("")
-  const [displayName, setDisplayName] = useState<string | null>("")
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         console.log(user.email)
         setUserEmail(user.email)
-        setDisplayName(user.displayName)
       } else {
         navigate("/")
       }
@@ -81,27 +83,40 @@ const Write: React.FC = () => {
   }
 
   function savePost(imageUrl: string | null) {
-    addDoc(collection(db, "posts"), {
-      postCategory: category,
-      postTitle: title,
-      postContent: content,
-      postImgUrl: imageUrl ?? null,
-      postBoard: board,
-      postTime: new Date(),
-      postUserEmail: userEmail,
-      postDisplayName: displayName
-    })
-      .then(() => {
-        alert("글 작성이 완료되었습니다.")
-        navigate("/")
-      })
-      .catch((e) => {
-        console.error("글 작성에 실패했습니다.:", e)
-      })
+    if (category !== "카테고리를 선택하세요") {
+      if (title !== "") {
+        if (content !== "") {
+          addDoc(collection(db, "posts"), {
+            postCategory: category,
+            postTitle: title,
+            postContent: content,
+            postImgUrl: imageUrl ?? null,
+            postBoard: board,
+            postTime: new Date(),
+            postUserEmail: userEmail,
+            postDisplayName: ""
+          })
+            .then(() => {
+              alert("글 작성이 완료되었습니다.")
+              navigate("/")
+            })
+            .catch((e) => {
+              console.error("글 작성에 실패했습니다.:", e)
+            })
+        } else {
+          alert("내용을 작성해 주세요")
+        }
+      } else {
+        alert("제목을 작성해 주세요")
+      }
+    } else {
+      alert("카테고리를 설정해 주세요")
+    }
   }
 
   return (
     <>
+      <StyledTitle>게시글 작성</StyledTitle>
       <StyledForm onSubmit={handleSubmitPost}>
         <StyledLabel>
           <StyledSelect value={category} onChange={handleCategoryChange}>
@@ -123,21 +138,27 @@ const Write: React.FC = () => {
           />
         </StyledLabel>
 
-        <StyledTextArea
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value)
-          }}
-          placeholder="내용을 입력해주세요."
-        />
-
+        <StyledLabel>
+          <StyledSimpleMDE
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value)
+            }}
+            placeholder="내용을 입력해주세요."
+          />
+        </StyledLabel>
+        {/* <ReactMarkdown>{content}</ReactMarkdown> */}
         <UploadIcon
           onClick={() => {
             document.getElementById("file-upload")?.click()
           }}
         />
+        <StyledFileLabel htmlFor="file-upload">
+          <FileBtnImg src="/WritePicturIcon.png" alt="업로드 파일" />
+        </StyledFileLabel>
         <StyledInputFile
           id="file-upload"
+          name="fifle-upload"
           type="file"
           accept="image/*"
           onChange={handleImageUpload}

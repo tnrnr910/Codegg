@@ -246,7 +246,7 @@ const MyPostPage: React.FC = () => {
               onClick={() => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
-                setCategorySelected("")
+                setCategorySelected("카테고리")
                 const list = GetPostData(tab.value)
 
                 const getData = () => {
