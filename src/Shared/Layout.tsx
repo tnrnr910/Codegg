@@ -6,11 +6,14 @@ import { onAuthStateChanged } from "firebase/auth"
 import { BiSearch } from "react-icons/bi"
 import ProfilePicture from "../Components/ProfilePicture"
 import OpenProfile from "../Components/OpenProfile"
+import { getSearchedData } from "../axios/api"
 
 function Header() {
   const navigate = useNavigate()
+
   const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     // 사용자 인증 정보 확인하기
@@ -28,6 +31,21 @@ function Header() {
 
   const closeModal = (e: any) => {
     setIsOpen(false)
+  }
+
+  const handleSearchInputChange = (e: any) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const handleSearch = () => {
+    getSearchedData(searchTerm)
+      .then((searchResults: any) => {
+        console.log("검색 결과:", searchResults)
+        navigate("/SearchResultPage")
+      })
+      .catch((error: any) => {
+        console.error("검색 에러:", error)
+      })
   }
 
   return (
@@ -77,8 +95,12 @@ function Header() {
             포인트 샵
           </Stp>
           <SearchInput>
-            <InputField />
-            <SearchIcon />
+            <InputField
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchInputChange}
+            />
+            <SearchIcon onClick={handleSearch} />
           </SearchInput>
         </Pagelist>
         <Authcontainer>
@@ -279,4 +301,5 @@ const InputField = styled.input`
 
 const SearchIcon = styled(BiSearch)`
   color: #63717f;
+  cursor: pointer;
 `
