@@ -4,7 +4,10 @@ import {
   query,
   where,
   type DocumentSnapshot,
-  type Timestamp
+  type Timestamp,
+  orderBy,
+  startAt,
+  endAt
 } from "firebase/firestore"
 import { db } from "./firebase"
 
@@ -116,5 +119,35 @@ const getPostData: any = async (
 
   return posts
 }
+const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
+  const posts: Post[] = []
 
-export { getPosts, getComments, getBoardPosts, getPostData }
+  const q = query(
+    collection(db, "posts"),
+    orderBy("postTitle"),
+    startAt(searchKeyword),
+    endAt(searchKeyword + "\uf8ff")
+  )
+
+  try {
+    const querySnapshot = await getDocs(q)
+    console.log(querySnapshot)
+    querySnapshot.forEach((doc: DocumentSnapshot) => {
+      console.log(doc.data())
+      if (doc != null) {
+        const newData = {
+          id: doc.id,
+          ...doc.data()
+        }
+        posts.push(newData as Post)
+        console.log("dd", newData)
+      }
+    })
+  } catch (error) {
+    console.error("에러 발생: ", error)
+  }
+  console.log(posts)
+  return posts
+}
+
+export { getPosts, getComments, getBoardPosts, getPostData, getSearchedData }

@@ -5,13 +5,14 @@ import { auth } from "../axios/firebase"
 import { onAuthStateChanged } from "firebase/auth"
 import { BiSearch } from "react-icons/bi"
 import OpenProfile from "../Components/OpenProfile"
+import { getSearchedData } from "../axios/api"
 
 function Header() {
   const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState("")
 
   const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     // 사용자 인증 정보 확인하기
@@ -31,7 +32,20 @@ function Header() {
     setIsOpen(false)
   }
 
-  const handleSearch = () => {}
+  const handleSearchInputChange = (e: any) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const handleSearch = () => {
+    getSearchedData(searchTerm)
+      .then((searchResults: any) => {
+        console.log("검색 결과:", searchResults)
+        navigate("/SearchResultPage")
+      })
+      .catch((error: any) => {
+        console.error("검색 에러:", error)
+      })
+  }
 
   return (
     <>
@@ -82,11 +96,8 @@ function Header() {
           <SearchInput>
             <InputField
               type="text"
-              placeholder="검색어를 입력하세요."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-              }}
+              value={searchTerm}
+              onChange={handleSearchInputChange}
             />
             <SearchIcon onClick={handleSearch} />
           </SearchInput>
