@@ -4,6 +4,7 @@ import { styled } from "styled-components"
 import { auth } from "../axios/firebase"
 import { onAuthStateChanged } from "firebase/auth"
 import { BiSearch } from "react-icons/bi"
+import ProfilePicture from "../Components/ProfilePicture"
 import OpenProfile from "../Components/OpenProfile"
 import { getSearchedData } from "../axios/api"
 
@@ -129,12 +130,10 @@ function Header() {
               >
                 {auth.currentUser?.displayName}님.안녕하세요.
               </StAuth>
-              <ProfileImage
-                src={
-                  auth.currentUser?.photoURL ??
-                  require("../Pages/MyPages/profile.jpg")
-                }
+              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+              <ProfilePicture
                 onClick={openModal}
+                style={{ width: "2.5rem", height: "2.5rem" }}
               />
             </>
           )}
@@ -302,12 +301,5 @@ const InputField = styled.input`
 
 const SearchIcon = styled(BiSearch)`
   color: #63717f;
-  cursor: pointer;
-`
-const ProfileImage = styled.img`
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  object-fit: cover;
   cursor: pointer;
 `
