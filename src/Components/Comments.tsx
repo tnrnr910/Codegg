@@ -7,13 +7,7 @@ import "moment/locale/ko"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
-import {
-  addDoc,
-  collection,
-  getDocs,
-  query
-  // serverTimestamp
-} from "firebase/firestore"
+import { addDoc, collection, getDocs, query } from "firebase/firestore"
 import { db, auth } from "../axios/firebase"
 import { useParams } from "react-router-dom"
 import { useQuery } from "react-query"

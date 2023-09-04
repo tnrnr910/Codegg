@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { useNavigate } from "react-router"
 import { FcGoogle } from "react-icons/fc"
 import Swal from "sweetalert2"
+// import swal from "sweetalert"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -118,11 +119,7 @@ function SigninPage() {
         displayName: displayNameWatch,
         photoURL: "https://i.ibb.co/K5B1hKZ/blank-profile.png"
       })
-      await Swal.fire(
-        "환영합니다!",
-        "성공적으로 회원가입되었습니다.",
-        "success"
-      )
+      await Swal.fire("환영합니다!", "성공적으로 회원가입되었습니다.")
       await signOut(auth)
       // await 뒤에는 프로미스만 올 수 있음
       reset()
@@ -152,7 +149,6 @@ function SigninPage() {
       navigate("/")
       void Swal.fire({
         position: "center",
-        icon: "success",
         title: "정상적으로 로그인 되었습니다.",
         text: "잠시 후 홈으로 이동합니다.",
         showConfirmButton: false,

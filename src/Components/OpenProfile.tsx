@@ -42,7 +42,6 @@ function OpenProfile({ closeModal }: any) {
       void Swal.fire({
         title: "정말로 탈퇴하시겠습니까?",
         text: "탈퇴 버튼 선택 시, 계정은 삭제되며 복구되지 않습니다.",
-        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
@@ -50,11 +49,7 @@ function OpenProfile({ closeModal }: any) {
         cancelButtonText: "취소"
       }).then((result) => {
         if (result.isConfirmed) {
-          void Swal.fire(
-            "탈퇴 완료",
-            "계정이 정상적으로 탈퇴되었습니다.",
-            "success"
-          )
+          void Swal.fire("탈퇴 완료", "정상적으로 탈퇴되었습니다.")
           void deleteUser(currentUser)
           navigate("/")
         }
