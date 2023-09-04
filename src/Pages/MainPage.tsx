@@ -201,13 +201,13 @@ function MainPage() {
                   }) => {
                     return (
                       <ListContainer key={info.id}>
-                        <ListDiv
+                        <NoticeDiv
                           onClick={() => {
                             navigate(`/detailPage/${info.id}`)
                           }}
                         >
                           {info.postTitle}
-                        </ListDiv>
+                        </NoticeDiv>
                       </ListContainer>
                     )
                   }
@@ -297,7 +297,14 @@ const ListDiv = styled.div`
   gap: 4px;
   cursor: pointer;
 `
-
+const NoticeDiv = styled.div`
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-weight: bold;
+`
 const ListCategory = styled.div`
   border: solid #e7e7e7 1px;
   padding: 3px 3px 3px 3px;

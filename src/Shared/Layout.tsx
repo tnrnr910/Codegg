@@ -45,6 +45,12 @@ function Header() {
     setSearchTerm(e.target.value)
   }
 
+  const handleEnterKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch()
+    }
+  }
+
   const handleSearch = () => {
     getSearchedData(searchTerm)
       .then((searchResults) => {
@@ -108,6 +114,7 @@ function Header() {
               type="text"
               value={searchTerm}
               onChange={handleSearchInputChange}
+              onKeyDown={handleEnterKeyPress}
             />
             <SearchIcon onClick={handleSearch} />
           </SearchInput>
@@ -139,7 +146,6 @@ function Header() {
               >
                 {auth.currentUser?.displayName}님.안녕하세요.
               </StAuth>
-              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
               <ProfilePicture
                 onClick={openModal}
                 style={{ width: "2.5rem", height: "2.5rem" }}
