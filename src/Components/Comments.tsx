@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import ProfilePicture from "../Components/ProfilePicture"
+import moment from "moment"
+import "moment/locale/ko"
 // import { PiSiren, PiArrowBendDownRightBold } from "react-icons/pi"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
@@ -9,8 +11,8 @@ import {
   addDoc,
   collection,
   getDocs,
-  query,
-  serverTimestamp
+  query
+  // serverTimestamp
 } from "firebase/firestore"
 import { db, auth } from "../axios/firebase"
 import { useParams } from "react-router-dom"
@@ -96,7 +98,7 @@ function Comments() {
     event.preventDefault()
     const newComment = {
       commentContent: inputText,
-      commentTime: serverTimestamp(),
+      commentTime: moment().format("L"),
       commentUserEmail: auth.currentUser?.email,
       commentUserProfileImg: auth.currentUser?.photoURL,
       commentUserDisplayName: auth.currentUser?.displayName,
@@ -132,9 +134,7 @@ function Comments() {
                         <CommentWriter>
                           {commentItem.commentUserDisplayName}
                         </CommentWriter>
-                        <CommentTime>
-                          {commentItem.commentTime?.toDate}
-                        </CommentTime>
+                        <CommentTime>{commentItem.commentTime}</CommentTime>
                       </div>
                       <CommentText>{commentItem.commentContent}</CommentText>
                     </CommentContents>
@@ -200,21 +200,23 @@ function Comments() {
             )
           })}
       </CommentLists>
-      <CommentWrite>
-        <ProfilePicture style={{ width: "2rem", height: "2rem" }} />
-        <CommentWriteInputForm>
-          <input
-            type="text"
-            value={inputText}
-            name="inputText"
-            onChange={onInputChange}
-            placeholder="댓글을 작성하면 pt가 지급됩니다."
-            required
-          />
-          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-          <button onClick={addComment}>등록</button>
-        </CommentWriteInputForm>
-      </CommentWrite>
+      {auth.currentUser != null ? (
+        <CommentWrite>
+          <ProfilePicture style={{ width: "2rem", height: "2rem" }} />
+          <CommentWriteInputForm>
+            <input
+              type="text"
+              value={inputText}
+              name="inputText"
+              onChange={onInputChange}
+              placeholder="댓글을 작성하면 pt가 지급됩니다."
+              required
+            />
+            {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+            <button onClick={addComment}>등록</button>
+          </CommentWriteInputForm>
+        </CommentWrite>
+      ) : null}
     </CommentContainer>
   )
 }
@@ -237,7 +239,6 @@ const CommentHead = styled.div`
 `
 
 const CommentLists = styled.div`
-  border-bottom: solid #dadada 1px;
   padding: 1rem 1rem;
 `
 
@@ -245,6 +246,8 @@ const Comment = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: solid #dadada 1px;
+  padding: 1rem 0;
 `
 
 // const ReplyComment = styled.div`
