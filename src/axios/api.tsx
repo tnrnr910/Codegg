@@ -119,8 +119,9 @@ const getPostData: any = async (
 
   return posts
 }
+
 const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
-  const posts: Post[] = []
+  const searchResults: Post[] = []
 
   const q = query(
     collection(db, "posts"),
@@ -129,25 +130,38 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
     endAt(searchKeyword + "\uf8ff")
   )
 
+  const q1 = query(
+    collection(db, "posts"),
+    orderBy("postContent"),
+    startAt(searchKeyword),
+    endAt(searchKeyword + "\uf8ff")
+  )
+
   try {
     const querySnapshot = await getDocs(q)
-    console.log(querySnapshot)
+    const querySnapshot2 = await getDocs(q1)
     querySnapshot.forEach((doc: DocumentSnapshot) => {
-      console.log(doc.data())
       if (doc != null) {
         const newData = {
           id: doc.id,
           ...doc.data()
         }
-        posts.push(newData as Post)
-        console.log("dd", newData)
+        searchResults.push(newData as Post)
+      }
+    })
+    querySnapshot2.forEach((doc: DocumentSnapshot) => {
+      if (doc != null) {
+        const newData = {
+          id: doc.id,
+          ...doc.data()
+        }
+        searchResults.push(newData as Post)
       }
     })
   } catch (error) {
     console.error("에러 발생: ", error)
   }
-  console.log(posts)
-  return posts
+  return searchResults
 }
 
 export { getPosts, getComments, getBoardPosts, getPostData, getSearchedData }

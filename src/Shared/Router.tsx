@@ -34,7 +34,7 @@ function Router(): any {
           <Route path="/SigninPage" element={<SigninPage />} />
           <Route path="/NoticePage" element={<NoticePage />} />
           <Route path="/QnAPage" element={<QnAPage />} />
-          <Route path="/SearchResultPage" element={<SearchResultPage />} />
+          <Route path="/SearchResultPage" element={<SearchResultPage />} />{" "}
           <Route path="/TipPage" element={<TipPage />} />
           <Route path="/TogetherPage" element={<TogetherPage />} />
           <Route path="/WritePage/:board" element={<WritePage />} />
