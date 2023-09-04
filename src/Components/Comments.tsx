@@ -20,6 +20,7 @@ import {
   orderBy
 } from "firebase/firestore"
 import { db, auth } from "../axios/firebase"
+import Swal from "sweetalert2"
 
 interface CommentInterface {
   commentContent: string | undefined
@@ -120,10 +121,22 @@ function Comments() {
 
   // 댓글 삭제
   const deleteComment = async (id: string) => {
-    await deleteDoc(doc(db, "comments", id))
-
-    setCommentsData((prev) => {
-      return prev.filter((element) => element.id !== id)
+    await Swal.fire({
+      title: "정말로 삭제하시겠습니까?",
+      text: "삭제된 댓글은 복원할 수 없습니다.",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "삭제",
+      cancelButtonText: "취소"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        void deleteDoc(doc(db, "comments", id))
+        void Swal.fire("삭제 완료", "정상적으로 삭제되었습니다.")
+        setCommentsData((prev) => {
+          return prev.filter((element) => element.id !== id)
+        })
+      }
     })
   }
 
