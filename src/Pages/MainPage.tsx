@@ -35,7 +35,10 @@ function MainPage() {
   return (
     <>
       <Banner>
-        <div>배너</div>
+        <img
+          src="https://i.postimg.cc/65pxBtZD/banner2.png"
+          alt="main-banner"
+        />
       </Banner>
       <Container>
         <SideRanking />
@@ -210,6 +213,11 @@ const Banner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  & > img {
+    width: 100%;
+    object-fit: cover;
+  }
 `
 
 const Container = styled.div`
