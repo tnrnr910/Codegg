@@ -94,7 +94,8 @@ const Write: React.FC = () => {
             postBoard: board,
             postTime: new Date(),
             postUserEmail: userEmail,
-            postDisplayName: ""
+            postDisplayName: "",
+            likes: 0
           })
             .then(() => {
               alert("글 작성이 완료되었습니다.")

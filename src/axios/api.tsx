@@ -7,7 +7,14 @@ import {
   type Timestamp,
   orderBy,
   startAt,
-  endAt
+  endAt,
+  addDoc,
+  doc,
+  deleteDoc,
+  limit,
+  updateDoc,
+  increment,
+  getDoc
 } from "firebase/firestore"
 import { db } from "./firebase"
 
@@ -21,6 +28,7 @@ interface Post {
   postTitle: string
   postTime: Timestamp
   postUserEmail: string
+  likes: number
 }
 
 interface Comment {
@@ -35,8 +43,30 @@ interface Comment {
   postUserdisplayName: string
 }
 
+interface like {
+  id: string
+  postId: string
+  count: number
+}
+
+const getPost: any = async (postId: string): Promise<Post[]> => {
+  const docRef = doc(db, "posts", postId)
+  const docSnap = await getDoc(docRef)
+
+  const posts: Post[] = []
+
+  if (docSnap.exists()) {
+    const data = {
+      id: docSnap.id,
+      ...docSnap.data()
+    }
+    posts.push(data as Post) // 형 변환을 통해 타입 일치화
+  }
+  return posts
+}
+
 const getPosts = async (): Promise<Post[]> => {
-  const q = query(collection(db, "posts"))
+  const q = query(collection(db, "posts"), orderBy("postTime", "desc"))
   const querySnapshot = await getDocs(q)
 
   const posts: Post[] = []
@@ -69,29 +99,133 @@ const getComments = async (): Promise<Comment[]> => {
   return comments
 }
 
+const getLikes = async (): Promise<like[]> => {
+  const q = query(collection(db, "likes"))
+  const querySnapshot = await getDocs(q)
+
+  const likes: like[] = []
+
+  querySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    likes.push(data as like) // 형 변환을 통해 타입 일치화
+  })
+
+  return likes
+}
+
+// 좋아요 삭제 함수
+const deleteLike = async (postId: string, likeDocId: string) => {
+  await deleteDoc(doc(db, "likes", likeDocId))
+  await updateDoc(doc(collection(db, "likes"), postId), {
+    likes: increment(-1)
+  })
+}
+
+// 좋아요 추가 함수
+const addLike = async (userId: string, postId: string) => {
+  addDoc(collection(db, "likes"), {
+    userId,
+    postId
+  })
+    .then(() => {
+      console.error("좋아요")
+    })
+    .catch((e: any) => {
+      console.error("글 작성에 실패했습니다.:", e)
+    })
+
+  await updateDoc(doc(collection(db, "likes"), postId), {
+    likes: increment(1)
+  })
+}
+
+// 좋아요 setting 함수
+const setLikes: any = async (set: boolean, userId: string, postId: string) => {
+  if (!set) {
+    await addLike(userId, postId)
+  } else {
+    let docId = ""
+    const q = query(
+      collection(db, "likes"),
+      where("userId", "==", userId),
+      where("postId", "==", postId)
+    )
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((doc: DocumentSnapshot) => {
+      if (doc.id !== null) {
+        docId = doc.id
+      }
+    })
+    await deleteLike(postId, docId)
+  }
+}
+
+const findLikes: any = async (userId: string, postId: string) => {
+  const q = query(
+    collection(db, "likes"),
+    where("userId", "==", userId),
+    where("postId", "==", postId)
+  )
+  const querySnapshot = await getDocs(q)
+  querySnapshot.forEach((doc: DocumentSnapshot) => {
+    if (doc.id !== null) {
+      return "exist"
+    }
+  })
+  return "none"
+}
+
+// const getBoardPosts: any = async (
+//   board: string,
+//   limit: number
+// ): Promise<Post[]> => {
+//   const q = query(collection(db, "posts"), where("postBoard", "==", board))
+//   const querySnapshot = await getDocs(q)
+
+//   const posts: Post[] = []
+//   let count = 0
+//   try {
+//     querySnapshot.forEach((doc: DocumentSnapshot) => {
+//       const data = {
+//         id: doc.id,
+//         ...doc.data()
+//       }
+//       posts.push(data as Post) // 형 변환을 통해 타입 일치화
+//       count++
+//       if (count === limit) {
+//         // eslint-disable-next-line @typescript-eslint/no-throw-literal
+//         throw limit // 에러 throw
+//       }
+//     })
+//   } catch {}
+
+//   return posts
+// }
+
 const getBoardPosts: any = async (
   board: string,
-  limit: number
+  limitNum: number
 ): Promise<Post[]> => {
-  const q = query(collection(db, "posts"), where("postBoard", "==", board))
+  const q = query(
+    collection(db, "posts"),
+    where("postBoard", "==", board),
+    orderBy("postTime", "desc"),
+    limit(limitNum)
+  )
   const querySnapshot = await getDocs(q)
 
   const posts: Post[] = []
-  let count = 0
-  try {
-    querySnapshot.forEach((doc: DocumentSnapshot) => {
-      const data = {
-        id: doc.id,
-        ...doc.data()
-      }
-      posts.push(data as Post) // 형 변환을 통해 타입 일치화
-      count++
-      if (count === limit) {
-        // eslint-disable-next-line @typescript-eslint/no-throw-literal
-        throw limit
-      }
-    })
-  } catch {}
+
+  querySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    posts.push(data as Post) // 형 변환을 통해 타입 일치화
+  })
 
   return posts
 }
@@ -164,4 +298,14 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   return searchResults
 }
 
-export { getPosts, getComments, getBoardPosts, getPostData, getSearchedData }
+export {
+  getPost,
+  getPosts,
+  getComments,
+  getBoardPosts,
+  getPostData,
+  getSearchedData,
+  getLikes,
+  setLikes,
+  findLikes
+}
