@@ -32,6 +32,11 @@ function MainPage() {
       setDataNotice(dummyData)
     })
   }, [])
+
+  const ClickLikeBtn: any = (id: string) => {
+    navigate(`/DetailPage/${id}`)
+  }
+
   return (
     <>
       <Banner>
@@ -58,6 +63,7 @@ function MainPage() {
                     id: string
                     postTitle: string
                     postCategory: string
+                    likes: number
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -70,8 +76,11 @@ function MainPage() {
                           {info.postTitle}
                         </ListDiv>
                         <ListBox>
-                          <div>좋아요</div>
-                          <div>댓글수</div>
+                          <LikeDiv>
+                            <img src="\WritePicturIcon.png" />
+                            {info.likes}
+                          </LikeDiv>
+                          <div> 댓글수</div>
                         </ListBox>
                       </ListContainer>
                     )
@@ -98,6 +107,7 @@ function MainPage() {
                     id: string
                     postTitle: string
                     postCategory: string
+                    likes: number
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -110,8 +120,11 @@ function MainPage() {
                           {info.postTitle}
                         </ListDiv>
                         <ListBox>
-                          <div>좋아요</div>
-                          <div>댓글수</div>
+                          <LikeDiv onClick={ClickLikeBtn}>
+                            <img src="\WritePicturIcon.png" />
+                            {info.likes}
+                          </LikeDiv>
+                          <div> 댓글수</div>
                         </ListBox>
                       </ListContainer>
                     )
@@ -138,6 +151,7 @@ function MainPage() {
                     id: string
                     postTitle: string
                     postCategory: string
+                    likes: number
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -150,8 +164,11 @@ function MainPage() {
                           {info.postTitle}
                         </ListDiv>
                         <ListBox>
-                          <div>좋아요</div>
-                          <div>댓글수</div>
+                          <LikeDiv onClick={ClickLikeBtn}>
+                            <img src="\WritePicturIcon.png" />
+                            {info.likes}
+                          </LikeDiv>
+                          <div> 댓글수</div>
                         </ListBox>
                       </ListContainer>
                     )
@@ -289,3 +306,5 @@ const ListContainer = styled.div`
 const ListBox = styled.div`
   display: flex;
 `
+
+const LikeDiv = styled.div``
