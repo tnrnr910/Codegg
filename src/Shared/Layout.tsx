@@ -7,13 +7,21 @@ import { BiSearch } from "react-icons/bi"
 import ProfilePicture from "../Components/ProfilePicture"
 import OpenProfile from "../Components/OpenProfile"
 import { getSearchedData } from "../axios/api"
+import { useDispatch, useSelector } from "react-redux"
 
+interface RootState {
+  searchResults: any[]
+}
 function Header() {
   const navigate = useNavigate()
 
   const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
   const [searchTerm, setSearchTerm] = useState("")
+
+  const searchResults = useSelector((state: RootState) => state.searchResults)
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     // 사용자 인증 정보 확인하기
@@ -39,15 +47,16 @@ function Header() {
 
   const handleSearch = () => {
     getSearchedData(searchTerm)
-      .then((searchResults: any) => {
-        console.log("검색 결과:", searchResults)
+      .then((searchResults) => {
+        dispatch({ type: "SET_SEARCH_RESULTS", payload: searchResults })
         navigate("/SearchResultPage")
       })
-      .catch((error: any) => {
+      .catch((error) => {
         console.error("검색 에러:", error)
       })
   }
 
+  useEffect(() => {}, [searchResults])
   return (
     <>
       <HeaderContainer>

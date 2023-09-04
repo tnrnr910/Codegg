@@ -1,16 +1,36 @@
 import React from "react"
 import { styled } from "styled-components"
+import { useSelector } from "react-redux"
+
+interface RootState {
+  searchResults: any[]
+}
 
 function SearchResultPage() {
+  const searchResults = useSelector((state: RootState) => state.searchResults)
+
   return (
     <SearchWrap>
       <QnA>
         <HeadWrap>
           <div>질의응답</div>
-          <div>검색결과 (3건)</div>
+          <div>검색결과 {searchResults.length}건</div>
           <div>더보기</div>
         </HeadWrap>
-        <div>글 목록~</div>
+        <div>
+          {searchResults.map((result, index) => (
+            <div key={index}>
+              <ResultWrap>
+                <div>{result.postCategory}</div>
+                <div>{result.postTitle}</div>
+                <div>{result.postDisplayName}</div>
+                <div>{result.postTime.seconds}</div>
+                <div>좋아요 수</div>
+                <div>댓글 수</div>
+              </ResultWrap>
+            </div>
+          ))}
+        </div>
       </QnA>
       <Tip>
         <HeadWrap>
@@ -67,4 +87,7 @@ const HeadWrap = styled.div`
   div:nth-child(2) {
     color: #3e3d42;
   }
+`
+const ResultWrap = styled.div`
+  display: flex;
 `
