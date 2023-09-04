@@ -353,7 +353,9 @@ const SigninSignoutContainer = styled.div`
   width: 100vw;
   display: flex;
   justify-content: end;
-  background-color: #c0c0c0;
+  background: url(https://i.postimg.cc/TwNqmVkj/background-signin1.png)
+    no-repeat center;
+  background-size: cover;
 `
 
 const TabBox = styled.div`
