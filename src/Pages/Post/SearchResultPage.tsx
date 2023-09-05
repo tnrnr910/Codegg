@@ -1,52 +1,117 @@
 import React from "react"
 import { styled } from "styled-components"
 import { useSelector } from "react-redux"
-
+import { formatDate } from "../../Components/DateChange"
 interface RootState {
   searchResults: any[]
 }
 
 function SearchResultPage() {
   const searchResults = useSelector((state: RootState) => state.searchResults)
-
+  console.log(searchResults)
   return (
     <SearchWrap>
       <QnA>
         <HeadWrap>
           <div>질의응답</div>
-          <div>검색결과 {searchResults.length}건</div>
+          <div>
+            검색결과 (
+            {
+              searchResults.filter((result) => result.postBoard === "questions")
+                .length
+            }
+            건)
+          </div>{" "}
           <div>더보기</div>
         </HeadWrap>
         <div>
-          {searchResults.map((result, index) => (
-            <div key={index}>
-              <ResultWrap>
-                <div>{result.postCategory}</div>
-                <div>{result.postTitle}</div>
-                <div>{result.postDisplayName}</div>
-                <div>{result.postTime.seconds}</div>
-                <div>좋아요 수</div>
-                <div>댓글 수</div>
-              </ResultWrap>
-            </div>
-          ))}
+          {searchResults
+            .filter((result) => result.postBoard === "questions")
+            .map((result, index) => (
+              <div key={index}>
+                <ResultWrap>
+                  <LeftContainer>
+                    <CategoryTitle>{result.postCategory}</CategoryTitle>
+                    <PostTitle>{result.postTitle}</PostTitle>
+                  </LeftContainer>
+                  <RightContainer>
+                    <div>{result.postDisplayName}</div>
+                    <div>{formatDate(result.postTime.seconds)}</div>
+                    <Likes>좋아요 수</Likes>
+                    <div>댓글 수</div>
+                  </RightContainer>
+                </ResultWrap>
+              </div>
+            ))}
         </div>
       </QnA>
       <Tip>
         <HeadWrap>
           <div>코딩 팁</div>
-          <div>검색결과 (0건)</div>
+          <div>
+            검색결과 (
+            {
+              searchResults.filter((result) => result.postBoard === "tips")
+                .length
+            }
+            건)
+          </div>{" "}
           <div>더보기</div>
         </HeadWrap>
-        <div>검색결과가 없습니다.</div>
+        <div>
+          {searchResults
+            .filter((result) => result.postBoard === "tips")
+            .map((result, index) => (
+              <div key={index}>
+                <ResultWrap>
+                  <LeftContainer>
+                    <CategoryTitle>{result.postCategory}</CategoryTitle>
+                    <PostTitle>{result.postTitle}</PostTitle>
+                  </LeftContainer>
+                  <RightContainer>
+                    <div>{result.postDisplayName}</div>
+                    <div>{formatDate(result.postTime.seconds)}</div>
+                    <Likes>좋아요 수</Likes>
+                    <div>댓글 수</div>
+                  </RightContainer>
+                </ResultWrap>
+              </div>
+            ))}
+        </div>
       </Tip>
       <Together>
         <HeadWrap>
           <div>모임</div>
-          <div>검색결과 (0건)</div>
+          <div>
+            검색결과 (
+            {
+              searchResults.filter((result) => result.postBoard === "meetups")
+                .length
+            }
+            건)
+          </div>{" "}
           <div>더보기</div>
         </HeadWrap>
-        <div>검색결과가 없습니다.</div>
+        <div>
+          {searchResults
+            .filter((result) => result.postBoard === "meetups")
+            .map((result, index) => (
+              <div key={index}>
+                <ResultWrap>
+                  <LeftContainer>
+                    <CategoryTitle>{result.postCategory}</CategoryTitle>
+                    <PostTitle>{result.postTitle}</PostTitle>
+                  </LeftContainer>
+                  <RightContainer>
+                    <div>{result.postDisplayName}</div>
+                    <div>{formatDate(result.postTime.seconds)}</div>
+                    <Likes>좋아요 수</Likes>
+                    <div>댓글 수</div>
+                  </RightContainer>
+                </ResultWrap>
+              </div>
+            ))}
+        </div>
       </Together>
     </SearchWrap>
   )
@@ -90,4 +155,34 @@ const HeadWrap = styled.div`
 `
 const ResultWrap = styled.div`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+`
+
+const LeftContainer = styled.div`
+  flex: 1;
+  display: flex;
+`
+
+const RightContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+`
+const Likes = styled.div`
+  margin-left: 0.3125rem;
+  margin-right: 0.3125rem;
+`
+const CategoryTitle = styled.div`
+  font-weight: bold;
+  color: #9f9f9f;
+  border: 1px solid #ccc;
+`
+
+const PostTitle = styled.div`
+  margin-left: 5px;
 `
