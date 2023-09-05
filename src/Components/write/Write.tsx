@@ -29,13 +29,11 @@ const Write: React.FC = () => {
   const [title, setTitle] = useState<string>("")
   const [content, setContent] = useState<string>("")
   const [imageFile, setImageFile] = useState<File | null>(null)
-  const [userEmail, setUserEmail] = useState<string | null>("")
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         console.log(user.email)
-        setUserEmail(user.email)
       } else {
         navigate("/")
       }
@@ -93,8 +91,8 @@ const Write: React.FC = () => {
             postImgUrl: imageUrl ?? null,
             postBoard: board,
             postTime: new Date(),
-            postUserEmail: userEmail,
-            postDisplayName: "",
+            postUserEmail: auth.currentUser?.email,
+            postDisplayName: auth.currentUser?.displayName,
             likes: 0
           })
             .then(() => {
@@ -159,7 +157,7 @@ const Write: React.FC = () => {
         </StyledFileLabel>
         <StyledInputFile
           id="file-upload"
-          name="fifle-upload"
+          name="file-upload"
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
