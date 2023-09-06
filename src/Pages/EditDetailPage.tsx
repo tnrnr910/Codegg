@@ -95,7 +95,13 @@ function EditDetailPage() {
             <EditBtn onClick={handleEdit} id={postInfo.id}>
               저장
             </EditBtn>
-            <DeleteBtn>취소</DeleteBtn>
+            <DeleteBtn
+              onClick={() => {
+                navigate(-1)
+              }}
+            >
+              취소
+            </DeleteBtn>
           </EditBox>
         </DetailContainer>
         <Comments />
