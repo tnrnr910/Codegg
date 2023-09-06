@@ -62,7 +62,7 @@ function OpenProfile({ closeModal }: any) {
             const currentUserInfoData = usersinfoData.find((data: any) => {
               return data.email === currentUser.email
             })
-            await deleteDoc(doc(db, "usersinfo", currentUserInfoData.id))
+            await deleteDoc(doc(db, "usersinfo", currentUserInfoData?.id))
             console.log({ currentUserInfoData })
             // 현재 로그인한 사용자를 Authentication에서 삭제
             await deleteUser(currentUser)

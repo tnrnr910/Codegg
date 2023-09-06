@@ -1,19 +1,24 @@
-import { query, collection, where, getDocs } from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
-import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
+import { useQuery } from "react-query"
 import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { BiSearch } from "react-icons/bi"
 import { useNavigate } from "react-router"
+import { getUserLikes, getPost } from "../../axios/api"
+import { type Timestamp } from "firebase/firestore"
+// import { getLikes, getPost } from "../../axios/api"
 interface Post {
   id: string
-  title: string
-  content: string
-  category: string
-  date: string
+  postBoard: string
+  postCategory: string
+  postContent: string
+  postDisplayName: string
+  postImgUrl: string
+  postTitle: string
+  postTime: Timestamp
+  postUserEmail: string
   likes: number
-  comments: number
 }
 
 interface TabOption {
@@ -27,56 +32,61 @@ const MyLikePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
-  const [userId, setUserId] = useState<string | null>("")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [userId, setUserId] = useState<string | null | undefined>(
+    auth?.currentUser?.email
+  )
   const [posts, setPosts] = useState<Post[]>([])
   const activeMenuItem = "/MyLikePage"
+
+  const { isLoading, data } = useQuery(
+    ["likes", userId],
+    async () => await getUserLikes(userId)
+  )
+
+  const myLikePostsId: string[] = []
+  data?.forEach((like) => {
+    myLikePostsId.push(like.postId)
+    console.log(like.postId)
+  })
 
   // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
-        console.log(user.email)
         setUserId(user.email)
         setCategorySelected("카테고리")
-        const list = GetPostData(activeTab)
-        const getData = () => {
-          list.then((dummyData: any) => {
-            setPosts(dummyData)
-          })
-        }
-        getData()
       }
     })
-  }, [userId])
-
-  // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
-  const GetPostData: any = async (postBoard: string) => {
-    const postsTemp: Post[] = []
-    const dbPosts = query(
-      collection(db, "posts"),
-      where("postUserEmail", "==", userId),
-      where("postBoard", "==", postBoard)
-    )
-    const userSnapshot = await getDocs(dbPosts)
-    userSnapshot.forEach((doc: any) => {
-      if (doc != null) {
-        const newPost: Post = {
-          id: doc.id,
-          category: doc.data().postCategory,
-          title: doc.data().postTitle,
-          date: String(doc.data().postTime.toDate()),
-          content: doc.data().postContent,
-          likes: 0,
-          comments: 0
-        }
-        // setPosts([...posts, newPost])
-
-        postsTemp.push(newPost)
-      }
+    // setPosts(getMyLikePosts(myLikePostsId).then((dummyData: Post[]) => {
+    //   console.log(dummyData)
+    //   setPosts(dummyData)
+    // })
+    const PostsArr: Post[] = []
+    myLikePostsId.forEach((id) => {
+      void getPost(id).then((dummyData: any) => {
+        PostsArr.push(dummyData)
+      })
     })
-    console.log(postsTemp)
-    return postsTemp
+    setPosts(PostsArr)
+  }, [])
+
+  if (isLoading) {
+    return <div>로딩중입니다..</div>
   }
+
+  // const likePosts = useQuery(["likes", myLikePostsId], async () => {
+  //   await getMyLikePosts(myLikePostsId).then((dummyData: any) => {
+  //     console.log(dummyData)
+  //     return dummyData
+  //   })
+  // })
+
+  // if (likePosts.isLoading) {
+  //   return <div>로딩중입니다..</div>
+  // }
+
+  console.log(posts)
 
   // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
   const GoToDetailPage: any = (id: string) => {
@@ -103,17 +113,6 @@ const MyLikePage: React.FC = () => {
     { value: "meetups", label: "모임" },
     { value: "comments", label: "댓글" }
   ]
-
-  const [searchTerm, setSearchTerm] = useState("")
-
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const filteredPosts = posts.filter((post) => {
-  //   return (
-  //     (post.category === activeTab || activeTab === "all") &&
-  //     (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       post.content.toLowerCase().includes(searchTerm.toLowerCase()))
-  //   )
-  // })
 
   function DropDown() {
     return (
@@ -193,14 +192,6 @@ const MyLikePage: React.FC = () => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
                 setCategorySelected("")
-                const list = GetPostData(tab.value)
-
-                const getData = () => {
-                  list.then((dummyData: any) => {
-                    setPosts(dummyData)
-                  })
-                }
-                getData()
               }}
             >
               {tab.label}
@@ -209,7 +200,7 @@ const MyLikePage: React.FC = () => {
         </StyledTabButtons>
         <NumberAndSearchBox>
           <NumberBox>
-            전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
+            전체<StyledNumberBlue> {posts?.length}</StyledNumberBlue>개
           </NumberBox>
 
           <SelectAndSearchBox>
@@ -250,28 +241,35 @@ const MyLikePage: React.FC = () => {
           </StyledPostTitlePostCommentNum>
         </StyledPostTitleBox>
         <StyledPostContainer>
-          {posts.length === 0 ? (
+          {posts?.length === 0 ? (
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
               {categorySelected === "카테고리"
-                ? posts.map((post) => (
-                    <StyledPost
-                      key={post.id}
-                      onClick={() => {
-                        GoToDetailPage(post.id)
-                      }}
-                    >
-                      <StyledPostCategory>{post.category}</StyledPostCategory>
-                      <h3>{post.title}</h3>
-                      <p>작성 일자: {post.date}</p>
-                    </StyledPost>
-                  ))
+                ? posts
+                    ?.filter((post) => post.postBoard === activeTab)
+                    .map((post) => (
+                      <StyledPost
+                        key={post.id}
+                        onClick={() => {
+                          GoToDetailPage(post.id)
+                        }}
+                      >
+                        <StyledPostCategory>
+                          {post.postCategory}
+                        </StyledPostCategory>
+                        <h3>{post.postTitle}</h3>
+                        <p>
+                          작성 일자: {post.postTime.toDate().toDateString()}
+                        </p>
+                      </StyledPost>
+                    ))
                 : posts
+                    ?.filter((post) => post.postBoard === activeTab)
                     .filter(
                       (post) =>
                         categorySelected !== "카테고리" &&
-                        post.category === categorySelected
+                        post.postCategory === categorySelected
                       // (post) => {
                       //   categorySelected !== "카테고리" &&
                       //   post.category === categorySelected
@@ -285,9 +283,13 @@ const MyLikePage: React.FC = () => {
                           GoToDetailPage(post.id)
                         }}
                       >
-                        <StyledPostCategory>{post.category}</StyledPostCategory>
-                        <h3>{post.title}</h3>
-                        <p>작성 일자: {post.date}</p>
+                        <StyledPostCategory>
+                          {post.postCategory}
+                        </StyledPostCategory>
+                        <h3>{post.postTitle}</h3>
+                        <p>
+                          작성 일자: {post.postTime.toDate().toDateString()}
+                        </p>
                       </StyledPost>
                     ))}
             </StyledPostList>

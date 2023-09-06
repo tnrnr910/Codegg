@@ -149,6 +149,9 @@ function Comments() {
       }
     })
   }
+  if (isLoading) {
+    return <div>로딩중입니다..</div>
+  }
 
   // 댓글 수정 버튼 클릭 시
   const editIsClicked = (commentItem: any) => {
