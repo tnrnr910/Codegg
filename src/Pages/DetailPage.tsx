@@ -1,15 +1,15 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
-import { useQuery } from "react-query"
 // import { getAuth } from "firebase/auth"
 import { useParams, useNavigate } from "react-router-dom"
-import { findLikes, getPost, getPosts, setLikes } from "../axios/api"
+import { findLikes, getPost, setLikes } from "../axios/api"
 import Comments from "../Components/Comments"
-import { doc, onSnapshot } from "firebase/firestore"
-import { db, auth } from "../axios/firebase"
+import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
+import { deleteDoc, doc } from "firebase/firestore"
 interface Post {
   id: string
   postBoard: string
@@ -25,40 +25,33 @@ interface Post {
 
 function DetailPage() {
   const { id } = useParams<string>()
-
   const navigate = useNavigate()
   const [postInfo, setPostInfo] = useState<Post>()
   const [likesCount, setLikesCount] = useState(0)
   const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
-  const { isLoading } = useQuery("posts", getPosts)
 
   // post 정보를 하나만 가져오기
   useEffect(() => {
     if (id !== undefined) {
       void getPost(id).then((dummyData: any) => {
         setPostInfo(dummyData)
+
         if (postInfo !== undefined) {
           setLikesCount(postInfo.likes)
         }
       })
 
-      // 실시간 좋아요 숫자 업데이트
-      onSnapshot(doc(db, "posts", id), (doc) => {
-        setLikesCount(doc?.data()?.likes)
-        console.log(doc.data())
-      })
-    }
-
-    // 좋아요 내가 눌렀는지 확인하는 기능
-    // TODO: userId는 로그인 했을 때만 존재하는 값!
-    if (auth.currentUser != null) {
-      findLikes(auth.currentUser.email, id).then((bool: boolean) => {
-        if (bool) {
-          setCheckLikeBtn(true)
-        } else {
-          setCheckLikeBtn(false)
-        }
-      })
+      // 좋아요 내가 눌렀는지 확인하는 기능
+      // TODO: userId는 로그인 했을 때만 존재하는 값!
+      if (auth.currentUser != null) {
+        findLikes(auth.currentUser.email, id).then((bool: boolean) => {
+          if (bool) {
+            setCheckLikeBtn(true)
+          } else {
+            setCheckLikeBtn(false)
+          }
+        })
+      }
     }
   }, [])
 
@@ -77,8 +70,29 @@ function DetailPage() {
     })
   }
 
-  if (isLoading) {
-    return <div>로딩중입니다...</div>
+  const editBtn = () => {
+    if (auth.currentUser?.email === postInfo?.postUserEmail) {
+      navigate(`/EditdetailPage/${postInfo?.id}`)
+    } else {
+      alert("작성자가 아닙니다.")
+    }
+  }
+
+  const deleteBtn = async () => {
+    if (postInfo == null) {
+      return // postInfo가 null 또는 undefined일 때 함수 종료
+    }
+
+    if (
+      Boolean(postInfo) &&
+      auth.currentUser?.email === postInfo?.postUserEmail
+    ) {
+      const idRef = doc(db, "posts", postInfo.id)
+      await deleteDoc(idRef)
+      navigate(-1)
+    } else {
+      alert("글 작성자가 아닙니다.")
+    }
   }
 
   return (
@@ -104,7 +118,13 @@ function DetailPage() {
             </BtnBox>
           </Detailtitle>
           <DetailUser>
-            <DetailUserName>{postInfo?.postDisplayName}</DetailUserName>
+            <DetailUserName
+              onClick={() => {
+                navigate(`/OtherProfilePage/${postInfo?.postUserEmail}`)
+              }}
+            >
+              {postInfo?.postDisplayName}
+            </DetailUserName>
             <DetailUserInfo>
               <div>
                 <AiOutlineLike size="12px" />
@@ -120,8 +140,8 @@ function DetailPage() {
             <DetailContentBody>{postInfo?.postContent}</DetailContentBody>
           </DetailContent>
           <EditBox>
-            <EditBtn>수정</EditBtn>
-            <DeleteBtn>삭제</DeleteBtn>
+            <EditBtn onClick={editBtn}>수정</EditBtn>
+            <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
           </EditBox>
         </DetailContainer>
         <Comments />
@@ -204,6 +224,7 @@ const DetailUserName = styled.div`
   font-size: 13px;
   color: #b5b5b5;
   padding-left: 16px;
+  cursor: pointer;
 `
 
 const DetailUserInfo = styled.div`
