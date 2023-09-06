@@ -146,14 +146,14 @@ function SigninPage() {
       )
       console.log("signIn", userCredential)
       reset()
-      navigate("/")
       void Swal.fire({
         position: "center",
         title: "정상적으로 로그인 되었습니다.",
         text: "잠시 후 홈으로 이동합니다.",
         showConfirmButton: false,
-        timer: 1500
+        timer: 1000
       })
+      navigate("/")
     } catch (error) {
       console.error("signInError", error)
       void Swal.fire("이메일 혹은 비밀번호를 다시 입력해 주세요")
