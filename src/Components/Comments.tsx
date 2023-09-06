@@ -60,7 +60,6 @@ function Comments() {
 
     querySnapshot.forEach((doc) => {
       // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/restrict-template-expressions
-      console.log(`1${doc.id} => ${doc.data()}`)
       if (id !== undefined) {
         const commentData: CommentInterface = {
           commentContent: doc.data().commentContent,
