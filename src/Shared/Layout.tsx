@@ -27,7 +27,7 @@ function Header() {
     // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
-      console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
+      // console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
     })
     console.log("currentUser", currentUser)
   }, [])

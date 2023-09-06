@@ -19,7 +19,6 @@ import {
   type Timestamp
 } from "firebase/firestore"
 import { db } from "./firebase"
-
 interface Post {
   id: string
   postBoard: string
@@ -32,7 +31,6 @@ interface Post {
   postUserEmail: string
   likes: number
 }
-
 interface Comment {
   id: string
   commentContent: string
@@ -44,13 +42,11 @@ interface Comment {
   postUserEmail: string
   postUserdisplayName: string
 }
-
 interface like {
   id: string
   postId: string
   userId: string
 }
-
 const getPost = async (postId: string): Promise<Post> => {
   let data = {}
   const postRef = doc(db, "posts", postId)
@@ -73,13 +69,10 @@ const getPost = async (postId: string): Promise<Post> => {
   console.log(data)
   return data as Post
 }
-
 const getPosts = async (): Promise<Post[]> => {
   const q = query(collection(db, "posts"), orderBy("postTime", "desc"))
   const querySnapshot = await getDocs(q)
-
   const posts: Post[] = []
-
   querySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
@@ -90,30 +83,23 @@ const getPosts = async (): Promise<Post[]> => {
   console.log(posts)
   return posts
 }
-
 const getMyLikePosts = async (postIds: string[]): Promise<Post[]> => {
-  const posts: Post[] = []
-  postIds.map(async (postId: string) => {
-    const postRef = doc(db, "posts", postId)
-    const postSnap = await getDoc(postRef)
-
-    const data = {
-      id: postSnap.id,
-      ...postSnap.data()
-    }
-    posts.push(data as Post) // 형 변환을 통해 타입 일치화
-  })
-
-  console.log(posts)
-  return posts
+  return await Promise.all(
+    postIds.map(async (postId: string) => {
+      const postRef = doc(db, "posts", postId)
+      const postSnap = await getDoc(postRef)
+      const data = {
+        id: postSnap.id,
+        ...postSnap.data()
+      }
+      return data as Post
+    })
+  )
 }
-
 const getComments = async (): Promise<Comment[]> => {
   const q = query(collection(db, "comments"))
   const querySnapshot = await getDocs(q)
-
   const comments: Comment[] = []
-
   querySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
@@ -121,16 +107,12 @@ const getComments = async (): Promise<Comment[]> => {
     }
     comments.push(data as Comment) // 형 변환을 통해 타입 일치화
   })
-
   return comments
 }
-
 const getLikes = async (): Promise<like[]> => {
   const q = query(collection(db, "likes"))
   const querySnapshot = await getDocs(q)
-
   const likes: like[] = []
-
   querySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
@@ -138,18 +120,12 @@ const getLikes = async (): Promise<like[]> => {
     }
     likes.push(data as like) // 형 변환을 통해 타입 일치화
   })
-
   return likes
 }
-
-const getUserLikes = async (
-  userId: string | null | undefined
-): Promise<like[]> => {
+const getUserLikes = async (userId: string | null): Promise<like[]> => {
   const q = query(collection(db, "likes"), where("userId", "==", userId))
   const querySnapshot = await getDocs(q)
-
   const likes: like[] = []
-
   querySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
@@ -157,10 +133,14 @@ const getUserLikes = async (
     }
     likes.push(data as like) // 형 변환을 통해 타입 일치화
   })
-
   return likes
 }
-
+const getUserLikesPost = async (userId: string | null) => {
+  const likes = await getUserLikes(userId)
+  const postIds = likes.map((like) => like.postId)
+  const posts = await getMyLikePosts(postIds)
+  return posts
+}
 // 좋아요 삭제 함수
 const deleteLike = async (postId: string, likeDocId: string) => {
   await deleteDoc(doc(db, "likes", likeDocId))
@@ -168,7 +148,6 @@ const deleteLike = async (postId: string, likeDocId: string) => {
     likes: increment(-1)
   })
 }
-
 // 좋아요 추가 함수
 const addLike = async (userId: string, postId: string) => {
   addDoc(collection(db, "likes"), {
@@ -181,12 +160,10 @@ const addLike = async (userId: string, postId: string) => {
     .catch((e: any) => {
       console.error("좋아요 등록에 실패했습니다.:", e)
     })
-
   await updateDoc(doc(collection(db, "posts"), postId), {
     likes: increment(1)
   })
 }
-
 // 좋아요 setting 함수
 const setLikes: any = async (set: boolean, userId: string, postId: string) => {
   console.log(set)
@@ -208,7 +185,6 @@ const setLikes: any = async (set: boolean, userId: string, postId: string) => {
     await deleteLike(postId, docId)
   }
 }
-
 const findLikes: any = async (userId: string, postId: string) => {
   console.log(userId, postId)
   const q = query(
@@ -224,14 +200,12 @@ const findLikes: any = async (userId: string, postId: string) => {
     return true
   }
 }
-
 // const getBoardPosts: any = async (
 //   board: string,
 //   limit: number
 // ): Promise<Post[]> => {
 //   const q = query(collection(db, "posts"), where("postBoard", "==", board))
 //   const querySnapshot = await getDocs(q)
-
 //   const posts: Post[] = []
 //   let count = 0
 //   try {
@@ -248,10 +222,8 @@ const findLikes: any = async (userId: string, postId: string) => {
 //       }
 //     })
 //   } catch {}
-
 //   return posts
 // }
-
 const getBoardPosts: any = async (
   board: string,
   limitNum: number
@@ -263,9 +235,7 @@ const getBoardPosts: any = async (
     limit(limitNum)
   )
   const querySnapshot = await getDocs(q)
-
   const posts: Post[] = []
-
   querySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
@@ -273,10 +243,8 @@ const getBoardPosts: any = async (
     }
     posts.push(data as Post) // 형 변환을 통해 타입 일치화
   })
-
   return posts
 }
-
 const getPostData: any = async (
   postBoard: string,
   userId: string
@@ -297,15 +265,11 @@ const getPostData: any = async (
       posts.push(newPost as Post)
     }
   })
-
   return posts
 }
-
 const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   const searchResults: Post[] = []
-
   const keywords = searchKeyword.split(" ")
-
   for (const keyword of keywords) {
     const q = query(
       collection(db, "posts"),
@@ -313,38 +277,32 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
       startAt(keyword),
       endAt(keyword + "\uf8ff")
     )
-
     const q1 = query(
       collection(db, "posts"),
       orderBy("postContent"),
       startAt(keyword),
       endAt(keyword + "\uf8ff")
     )
-
     try {
       const querySnapshot = await getDocs(q)
       const querySnapshot2 = await getDocs(q1)
-
       querySnapshot.forEach((doc: DocumentSnapshot) => {
         if (doc != null) {
           const newData = {
             id: doc.id,
             ...doc.data()
           }
-
           if (!searchResults.some((item) => item.id === newData.id)) {
             searchResults.push(newData as Post)
           }
         }
       })
-
       querySnapshot2.forEach((doc: DocumentSnapshot) => {
         if (doc != null) {
           const newData = {
             id: doc.id,
             ...doc.data()
           }
-
           if (!searchResults.some((item) => item.id === newData.id)) {
             searchResults.push(newData as Post)
           }
@@ -354,10 +312,8 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
       console.error("에러 발생: ", error)
     }
   }
-
   return searchResults
 }
-
 export {
   getPost,
   getPosts,
@@ -369,5 +325,6 @@ export {
   setLikes,
   findLikes,
   getUserLikes,
-  getMyLikePosts
+  getMyLikePosts,
+  getUserLikesPost
 }

@@ -5,21 +5,7 @@ import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { BiSearch } from "react-icons/bi"
 import { useNavigate } from "react-router"
-import { getUserLikes, getPost } from "../../axios/api"
-import { type Timestamp } from "firebase/firestore"
-// import { getLikes, getPost } from "../../axios/api"
-interface Post {
-  id: string
-  postBoard: string
-  postCategory: string
-  postContent: string
-  postDisplayName: string
-  postImgUrl: string
-  postTitle: string
-  postTime: Timestamp
-  postUserEmail: string
-  likes: number
-}
+import { getUserLikesPost } from "../../axios/api"
 
 interface TabOption {
   value: string
@@ -33,60 +19,28 @@ const MyLikePage: React.FC = () => {
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
   const [searchTerm, setSearchTerm] = useState("")
-  const [userId, setUserId] = useState<string | null | undefined>(
-    auth?.currentUser?.email
-  )
-  const [posts, setPosts] = useState<Post[]>([])
+  const [userId, setUserId] = useState<string | null>(null)
   const activeMenuItem = "/MyLikePage"
 
   const { isLoading, data } = useQuery(
     ["likes", userId],
-    async () => await getUserLikes(userId)
+    async () => await getUserLikesPost(userId),
+    { enabled: userId !== null } // 값이 있으면 true
   )
 
-  const myLikePostsId: string[] = []
-  data?.forEach((like) => {
-    myLikePostsId.push(like.postId)
-    console.log(like.postId)
-  })
-
+  console.log(data)
   // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         setUserId(user.email)
-        setCategorySelected("카테고리")
       }
     })
-    // setPosts(getMyLikePosts(myLikePostsId).then((dummyData: Post[]) => {
-    //   console.log(dummyData)
-    //   setPosts(dummyData)
-    // })
-    const PostsArr: Post[] = []
-    myLikePostsId.forEach((id) => {
-      void getPost(id).then((dummyData: any) => {
-        PostsArr.push(dummyData)
-      })
-    })
-    setPosts(PostsArr)
   }, [])
 
   if (isLoading) {
     return <div>로딩중입니다..</div>
   }
-
-  // const likePosts = useQuery(["likes", myLikePostsId], async () => {
-  //   await getMyLikePosts(myLikePostsId).then((dummyData: any) => {
-  //     console.log(dummyData)
-  //     return dummyData
-  //   })
-  // })
-
-  // if (likePosts.isLoading) {
-  //   return <div>로딩중입니다..</div>
-  // }
-
-  console.log(posts)
 
   // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
   const GoToDetailPage: any = (id: string) => {
@@ -200,7 +154,7 @@ const MyLikePage: React.FC = () => {
         </StyledTabButtons>
         <NumberAndSearchBox>
           <NumberBox>
-            전체<StyledNumberBlue> {posts?.length}</StyledNumberBlue>개
+            전체<StyledNumberBlue> {data?.length}</StyledNumberBlue>개
           </NumberBox>
 
           <SelectAndSearchBox>
@@ -241,13 +195,13 @@ const MyLikePage: React.FC = () => {
           </StyledPostTitlePostCommentNum>
         </StyledPostTitleBox>
         <StyledPostContainer>
-          {posts?.length === 0 ? (
+          {data === undefined ? (
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
               {categorySelected === "카테고리"
-                ? posts
-                    ?.filter((post) => post.postBoard === activeTab)
+                ? data
+                    .filter((post) => post.postBoard === activeTab)
                     .map((post) => (
                       <StyledPost
                         key={post.id}
@@ -264,18 +218,8 @@ const MyLikePage: React.FC = () => {
                         </p>
                       </StyledPost>
                     ))
-                : posts
-                    ?.filter((post) => post.postBoard === activeTab)
-                    .filter(
-                      (post) =>
-                        categorySelected !== "카테고리" &&
-                        post.postCategory === categorySelected
-                      // (post) => {
-                      //   categorySelected !== "카테고리" &&
-                      //   post.category === categorySelected
-                      // }
-                      // return post
-                    )
+                : data
+                    .filter((post) => post.postBoard === activeTab)
                     .map((post) => (
                       <StyledPost
                         key={post.id}
