@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import {
   collection,
   getDocs,
   query,
   where,
   type DocumentSnapshot,
-  type Timestamp,
   orderBy,
   startAt,
   endAt,
@@ -14,7 +15,8 @@ import {
   limit,
   updateDoc,
   increment,
-  getDoc
+  getDoc,
+  type Timestamp
 } from "firebase/firestore"
 import { db } from "./firebase"
 
@@ -34,7 +36,7 @@ interface Post {
 interface Comment {
   id: string
   commentContent: string
-  commentTime: Timestamp
+  commentTime: string
   commentUserEmail: string
   commentUserdisplayName: string
   isSecret: boolean
@@ -46,23 +48,30 @@ interface Comment {
 interface like {
   id: string
   postId: string
-  count: number
+  userId: string
 }
 
-const getPost: any = async (postId: string): Promise<Post[]> => {
-  const docRef = doc(db, "posts", postId)
-  const docSnap = await getDoc(docRef)
-
-  const posts: Post[] = []
-
-  if (docSnap.exists()) {
-    const data = {
-      id: docSnap.id,
-      ...docSnap.data()
+const getPost = async (postId: string): Promise<Post> => {
+  let data = {}
+  const postRef = doc(db, "posts", postId)
+  const postSnap = await getDoc(postRef)
+  if (postSnap.exists()) {
+    data = {
+      id: postSnap.id,
+      ...postSnap.data()
+      // postBoard: postSnap.data().postBoard,
+      // postCategory: postSnap.data().postCategory,
+      // postContent: postSnap.data().postContent,
+      // postDisplayName: postSnap.data().postDisplayName,
+      // postImgUrl: postSnap.data().postImgUrl,
+      // postTitle: postSnap.data().postTitle,
+      // postTime: postSnap.data().postTime,
+      // postUserEmail: postSnap.data().postUserEmail,
+      // likes: 0
     }
-    posts.push(data as Post) // 형 변환을 통해 타입 일치화
   }
-  return posts
+  console.log(data)
+  return data as Post
 }
 
 const getPosts = async (): Promise<Post[]> => {
@@ -78,7 +87,24 @@ const getPosts = async (): Promise<Post[]> => {
     }
     posts.push(data as Post) // 형 변환을 통해 타입 일치화
   })
+  console.log(posts)
+  return posts
+}
 
+const getMyLikePosts = async (postIds: string[]): Promise<Post[]> => {
+  const posts: Post[] = []
+  postIds.map(async (postId: string) => {
+    const postRef = doc(db, "posts", postId)
+    const postSnap = await getDoc(postRef)
+
+    const data = {
+      id: postSnap.id,
+      ...postSnap.data()
+    }
+    posts.push(data as Post) // 형 변환을 통해 타입 일치화
+  })
+
+  console.log(posts)
   return posts
 }
 
@@ -116,10 +142,29 @@ const getLikes = async (): Promise<like[]> => {
   return likes
 }
 
+const getUserLikes = async (
+  userId: string | null | undefined
+): Promise<like[]> => {
+  const q = query(collection(db, "likes"), where("userId", "==", userId))
+  const querySnapshot = await getDocs(q)
+
+  const likes: like[] = []
+
+  querySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    likes.push(data as like) // 형 변환을 통해 타입 일치화
+  })
+
+  return likes
+}
+
 // 좋아요 삭제 함수
 const deleteLike = async (postId: string, likeDocId: string) => {
   await deleteDoc(doc(db, "likes", likeDocId))
-  await updateDoc(doc(collection(db, "likes"), postId), {
+  await updateDoc(doc(collection(db, "posts"), postId), {
     likes: increment(-1)
   })
 }
@@ -134,16 +179,17 @@ const addLike = async (userId: string, postId: string) => {
       console.error("좋아요")
     })
     .catch((e: any) => {
-      console.error("글 작성에 실패했습니다.:", e)
+      console.error("좋아요 등록에 실패했습니다.:", e)
     })
 
-  await updateDoc(doc(collection(db, "likes"), postId), {
+  await updateDoc(doc(collection(db, "posts"), postId), {
     likes: increment(1)
   })
 }
 
 // 좋아요 setting 함수
 const setLikes: any = async (set: boolean, userId: string, postId: string) => {
+  console.log(set)
   if (!set) {
     await addLike(userId, postId)
   } else {
@@ -164,18 +210,19 @@ const setLikes: any = async (set: boolean, userId: string, postId: string) => {
 }
 
 const findLikes: any = async (userId: string, postId: string) => {
+  console.log(userId, postId)
   const q = query(
     collection(db, "likes"),
     where("userId", "==", userId),
     where("postId", "==", postId)
   )
   const querySnapshot = await getDocs(q)
-  querySnapshot.forEach((doc: DocumentSnapshot) => {
-    if (doc.id !== null) {
-      return "exist"
-    }
-  })
-  return "none"
+  console.log(querySnapshot.size)
+  if (querySnapshot.size === 0) {
+    return false
+  } else {
+    return true
+  }
 }
 
 // const getBoardPosts: any = async (
@@ -320,5 +367,7 @@ export {
   getSearchedData,
   getLikes,
   setLikes,
-  findLikes
+  findLikes,
+  getUserLikes,
+  getMyLikePosts
 }

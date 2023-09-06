@@ -153,17 +153,19 @@ const Write: React.FC = () => {
           }}
         />
         <StyledFileLabel htmlFor="file-upload">
+          <StyledInputFile
+            id="file-upload"
+            name="fifle-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
           <FileBtnImg src="/WritePicturIcon.png" alt="업로드 파일" />
         </StyledFileLabel>
-        <StyledInputFile
-          id="file-upload"
-          name="file-upload"
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
-        <CancelButton type="button">Cancel</CancelButton>
-        <SubmitButton type="submit">Submit</SubmitButton>
+        <div>
+          <CancelButton type="button">Cancel</CancelButton>
+          <SubmitButton type="submit">Submit</SubmitButton>
+        </div>
       </StyledForm>
     </>
   )
