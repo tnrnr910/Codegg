@@ -13,6 +13,7 @@
     "easymde",
     "Editdetail",
     "firestore",
+    "getusersinfo",
     "Imgs",
     "Navi",
     "Pagelist",
@@ -22,6 +23,11 @@
     "Signout",
     "Swal",
     "sweetalert",
-    "Tabmenu"
+    "Tabmenu",
+    "uesrsinfoes",
+    "Userdisplay",
+    "usersinfo",
+    "usersinfoid",
+    "usersinfos"
   ]
 }

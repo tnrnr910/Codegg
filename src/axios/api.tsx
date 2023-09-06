@@ -56,16 +56,7 @@ interface usersinfo {
   badgeImg: string
   displayName: string
   email: string
-  isAdmin: string
-  profileImg: string
-}
-
-interface usersinfo {
-  id: string
-  badgeImg: string
-  displayName: string
-  email: string
-  isAdmin: string
+  isAdmin: boolean
   profileImg: string
 }
 
@@ -305,6 +296,7 @@ const getPostData: any = async (
     where("postUserEmail", "==", userId),
     where("postBoard", "==", postBoard)
   )
+
   const userSnapshot = await getDocs(dbPosts)
   userSnapshot.forEach((doc: DocumentSnapshot) => {
     if (doc != null) {
@@ -393,19 +385,38 @@ const getusersinfos: any = async (): Promise<usersinfo[]> => {
   return usersinfo
 }
 
-const getusersinfo: any = async (usersinfoid: string): Promise<usersinfo> => {
-  let data = {}
-  const usersinfoRef = doc(db, "usersinfo", usersinfoid)
-  const usersinfoSnap = await getDoc(usersinfoRef)
+const getusersinfo: any = async (
+  email: string
+): Promise<usersinfo | undefined> => {
+  try {
+    const usersinfoQuery = query(
+      collection(db, "usersinfo"),
+      where("email", "==", email)
+    )
+    const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
 
-  if (usersinfoSnap.exists()) {
-    data = {
-      id: usersinfoSnap.id,
-      ...usersinfoSnap.data()
+    if (!usersinfoQuerySnapshot.empty) {
+      const userInfoDoc = usersinfoQuerySnapshot.docs[0]
+      const data: usersinfo = {
+        id: userInfoDoc.id,
+        badgeImg: "",
+        displayName: "",
+        email: "",
+        isAdmin: false,
+        profileImg: "",
+        ...userInfoDoc.data()
+      }
+
+      console.log(data)
+      return data
+    } else {
+      console.log("사용자를 찾을 수 없습니다.")
+      return undefined
     }
+  } catch (error) {
+    console.error("사용자 데이터를 가져오는 중 오류 발생:", error)
+    throw error
   }
-  console.log(data)
-  return data as usersinfo
 }
 
 export {
