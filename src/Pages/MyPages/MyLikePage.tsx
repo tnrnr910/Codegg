@@ -114,15 +114,6 @@ const MyLikePage: React.FC = () => {
     { value: "comments", label: "댓글" }
   ]
 
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const filteredPosts = posts.filter((post) => {
-  //   return (
-  //     (post.category === activeTab || activeTab === "all") &&
-  //     (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       post.content.toLowerCase().includes(searchTerm.toLowerCase()))
-  //   )
-  // })
-
   function DropDown() {
     return (
       <StyledCategoryDropdown open={categoryOpen}>

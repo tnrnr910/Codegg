@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 // import { useQuery } from "react-query"
-import { getAuth } from "firebase/auth"
+// import { getAuth } from "firebase/auth"
 import { useParams, useNavigate } from "react-router-dom"
 import { findLikes, getPost, setLikes } from "../axios/api"
 import Comments from "../Components/Comments"
 import { doc, onSnapshot } from "firebase/firestore"
-import { db } from "../axios/firebase"
+import { db, auth } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
@@ -26,7 +26,7 @@ interface Post {
 
 function DetailPage() {
   const { id } = useParams<string>()
-  const auth = getAuth()
+
   const navigate = useNavigate()
   const [postInfo, setPostInfo] = useState<Post>()
   const [likesCount, setLikesCount] = useState(0)
@@ -34,7 +34,6 @@ function DetailPage() {
 
   // post 정보를 하나만 가져오기
   useEffect(() => {
-    const userId = auth.currentUser?.email
     if (id !== undefined) {
       void getPost(id).then((dummyData: any) => {
         setPostInfo(dummyData)
@@ -51,24 +50,29 @@ function DetailPage() {
     }
 
     // 좋아요 내가 눌렀는지 확인하는 기능
-    findLikes(userId, id).then((bool: boolean) => {
-      if (bool) {
-        setCheckLikeBtn(true)
-      } else {
-        setCheckLikeBtn(false)
-      }
-    })
+    // TODO: userId는 로그인 했을 때만 존재하는 값!
+    if (auth.currentUser != null) {
+      findLikes(auth.currentUser.email, id).then((bool: boolean) => {
+        if (bool) {
+          setCheckLikeBtn(true)
+        } else {
+          setCheckLikeBtn(false)
+        }
+      })
+    }
   }, [])
 
   // 좋아요 버튼을 눌렀을 때 +/- 해주는 기능
   const clickLikeFn = () => {
-    findLikes(userId, id).then((bool: boolean) => {
+    const email = auth.currentUser?.email
+
+    findLikes(email, id).then((bool: boolean) => {
       if (bool) {
         setCheckLikeBtn(true)
-        setLikes(true, userId, id)
+        setLikes(true, email, id)
       } else {
         setCheckLikeBtn(false)
-        setLikes(false, userId, id)
+        setLikes(false, email, id)
       }
     })
   }

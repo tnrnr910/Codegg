@@ -5,7 +5,7 @@ import { getAuth } from "firebase/auth"
 import { getStorage, ref as storageRef } from "firebase/storage"
 // eslint-disable-next-line import/no-duplicates
 import { GoogleAuthProvider } from "firebase/auth"
-import { getAnalytics } from "firebase/analytics"
+// import { getAnalytics } from "firebase/analytics"
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FB_API_KEY,
@@ -23,7 +23,7 @@ export const db = getFirestore(firebaseApp)
 export const auth = getAuth(firebaseApp)
 export const storage = getStorage(firebaseApp)
 export const app = initializeApp(firebaseConfig)
-export const analytics = getAnalytics(app)
+// export const analytics = getAnalytics(app)
 export const provider = new GoogleAuthProvider()
 export { storageRef }
 

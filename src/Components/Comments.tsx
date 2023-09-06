@@ -44,10 +44,6 @@ function Comments() {
     return data.id === id
   })
 
-  if (isLoading) {
-    return <div>로딩중입니다..</div>
-  }
-
   const [inputText, setInputText] = useState("")
   const [commentsData, setCommentsData] = useState<CommentInterface[]>([])
   // const date = new Date(commentsData.commentTime*1000)
@@ -138,6 +134,9 @@ function Comments() {
         })
       }
     })
+  }
+  if (isLoading) {
+    return <div>로딩중입니다..</div>
   }
 
   return (
