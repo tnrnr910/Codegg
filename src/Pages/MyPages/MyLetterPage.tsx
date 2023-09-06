@@ -16,48 +16,48 @@ function MyLetterPage() {
         </StyledTabButtons>
         <NumberAndSearchBox>
           <NumberBox>
-            전체<StyledNumberBlue></StyledNumberBlue>개
+            전체<StyledNumberBlue>0</StyledNumberBlue>개
           </NumberBox>
-          <SelectAndSearchBox>
-            <SearchWord>검색 &nbsp;</SearchWord>
-            <SelectPageBox>
-              <SelectPages>
-                <StyledSearchContainer>
-                  <StyledCategoryButton></StyledCategoryButton>
-                </StyledSearchContainer>
-              </SelectPages>
-            </SelectPageBox>
-            <SearchButton />
-            <StyledSearchInput />
-          </SelectAndSearchBox>
         </NumberAndSearchBox>
         <StyledPostTitleBox>
-          <StyledPostTitleCategory>보낸 사람</StyledPostTitleCategory>
-          <StyledPostTitlePostName>제목</StyledPostTitlePostName>
-          <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
-          <StyledPostTitlePostLikes>읽음 상태 </StyledPostTitlePostLikes>
-          <StyledPostTitlePostCommentNum>
-            댓글 수{" "}
-          </StyledPostTitlePostCommentNum>
+          <LeftContainer>
+            <StyledPostCategory>ㅁ</StyledPostCategory>
+            <StyledPostTitleCategory>보낸 사람</StyledPostTitleCategory>
+            <LetterContent>내용</LetterContent>
+          </LeftContainer>
+          <RightContainer>
+            <Day>작성 일자</Day>
+            <div>읽음 상태 </div>
+          </RightContainer>
         </StyledPostTitleBox>
-        <StyledPostContainer>
-          <StyledPostList>
-            <StyledPost>
+        <div>
+          <StyledPost>
+            <LeftContainer>
               <StyledPostCategory>ㅁ</StyledPostCategory>
-              <div>홍길동</div>
-              <div>쪽지 내용</div>
-              <div>작성 일자</div>
+              <Sender>홍길동</Sender>
+              <LetterContent>쪽지 내용</LetterContent>
+            </LeftContainer>
+            <RightContainer>
+              <Day>작성 일자</Day>
               <div>읽음 상태</div>
-            </StyledPost>
-            <StyledPost>
+            </RightContainer>
+          </StyledPost>
+          <StyledPost>
+            <LeftContainer>
               <StyledPostCategory>ㅁ</StyledPostCategory>
-              <div>홍길동</div>
-              <div>쪽지 내용</div>
-              <div>작성 일자</div>
+              <Sender>홍길동</Sender>
+              <LetterContent>쪽지 내용</LetterContent>
+            </LeftContainer>
+            <RightContainer>
+              <Day>작성 일자</Day>
               <div>읽음 상태</div>
-            </StyledPost>
-          </StyledPostList>
-        </StyledPostContainer>
+            </RightContainer>
+          </StyledPost>
+          <Buttons>
+            <DelButton>삭제</DelButton>
+            <SendButton>쪽지 보내기</SendButton>
+          </Buttons>
+        </div>
       </StyledContainer>
     </MyPostWrap>
   )
@@ -79,41 +79,6 @@ const StyledTitle = styled.div`
   margin-bottom: 3.125rem;
   font-size: 1.5625rem;
   font-weight: bold;
-`
-
-const StyledSearchContainer = styled.span`
-  display: inline;
-  width: 8rem;
-`
-
-const StyledCategoryButton = styled.button`
-  border: none;
-  cursor: pointer;
-  float: right;
-  padding: 0px;
-  padding-right: 10px;
-  font-size: 0.875rem;
-  background-color: white;
-  width: auto;
-`
-const StyledSearchInput = styled.input`
-  padding: 0.625rem;
-  width: 20rem;
-  height: 1rem;
-  background-color: var(--color-line-gray-200);
-  float: right;
-  border-radius: 0.3125rem;
-  border: 0.0625rem solid #dadada;
-`
-
-const SearchButton = styled.div`
-  margin: 5px;
-  float: right;
-  background: styled(BiSearch);
-  width: 30px;
-  height: 30px;
-  border: 0 solid white;
-  color: #63717f;
 `
 
 const StyledTabButtons = styled.div`
@@ -145,27 +110,15 @@ const StyledButton = styled.button`
       props.className === "active" ? "#f0f0f0" : "#e0e0e0"};
   }
 `
-
-const StyledPostContainer = styled.div`
-  border: 0.0625rem solid #ccc;
-  background-color: #f8f8f8;
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-`
-
-const StyledPostList = styled.ul`
-  list-style: none;
-  padding: 0;
-`
-
 const StyledPost = styled.li`
-  border: 0.0625rem solid #ccc;
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-  background-color: #f8f8f8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
 `
 
-const StyledPostCategory = styled.p`
+const StyledPostCategory = styled.div`
   font-weight: bold;
   margin-bottom: 0.3125rem;
 `
@@ -173,6 +126,7 @@ const StyledPostCategory = styled.p`
 const StyledNumberBlue = styled.span`
   color: #0c356a;
   font-weight: bold;
+  margin-left: 5px;
 `
 
 const NumberAndSearchBox = styled.div`
@@ -187,75 +141,62 @@ const NumberBox = styled.span`
   margin-left: 1.25rem;
 `
 
-const SelectAndSearchBox = styled.span`
-  float: right;
-  width: 37rem;
-`
-
-const SelectPageBox = styled.span`
-  font-size: 0.875rem;
-  margin-left: 5.2rem;
-`
-
-const SelectPages = styled.span`
-  display: inline-block;
-  border: 0.0625rem solid #dadada;
-  padding: 0.625rem;
-  width: 6rem;
-  border-radius: 0.3125rem;
-  font-size: 0.875rem;
-  height: 1rem;
-`
-
 const StyledPostTitleBox = styled.div`
-  width: 100%;
-  text-align: right;
-  height: 1.875rem;
-  margin-top: 0.625rem;
-  margin-bottom: 1.25rem;
-  border-top: 0.0625rem solid #dadada;
-  padding-top: 0.875rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
   border-bottom: 0.0625rem solid #333333;
+  border-top: 0.0625rem solid #dadada;
 `
-
-const StyledPostTitlePostName = styled.span`
-  float: left;
-  width: 31.25rem;
-  text-align: center;
-  font-size: 0.875rem;
-`
-
-const StyledPostTitlePostDay = styled.span`
-  display: inline-block;
-  width: 6.875rem;
-  text-align: center;
-  font-size: 0.875rem;
-`
-
-const StyledPostTitlePostLikes = styled.span`
-  display: inline-block;
-  width: 6.25rem;
-  text-align: center;
-  font-size: 0.875rem;
-`
-
-const StyledPostTitlePostCommentNum = styled.span`
-  display: inline-block;
-  width: 5.625rem;
-  text-align: center;
-  font-size: 0.875rem;
-`
-
 const StyledPostTitleCategory = styled.span`
   float: left;
   width: 5.625rem;
   text-align: center;
   font-size: 0.875rem;
 `
-
-const SearchWord = styled.span`
-  position: absolute;
-  margin-top: 12px;
-  margin-left: 2.8rem;
-  font-size: 0.875rem;
+const LeftContainer = styled.div`
+  flex: 1;
+  display: flex;
+`
+const Sender = styled.div`
+  margin-left: 5px;
+`
+const LetterContent = styled.div`
+  margin-left: 5px;
+`
+const RightContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+`
+const Day = styled.div`
+  margin-right: 0.3125rem;
+`
+const Buttons = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+`
+const DelButton = styled.button`
+  width: 4rem;
+  height: 2rem;
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  cursor: pointer;
+  font-weight: bold;
+`
+const SendButton = styled.button`
+  width: 6rem;
+  height: 2rem;
+  background-color: #0c356a;
+  border: 1px solid #000;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
 `
