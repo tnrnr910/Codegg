@@ -165,7 +165,7 @@ function Footer() {
       <FooterBox>
         <FooterBody>
           <FooterBodyDiv>서비스 소개</FooterBodyDiv>
-          <FooterBodyDiv>이용양관</FooterBodyDiv>
+          <FooterBodyDiv>이용약관</FooterBodyDiv>
           <FooterBodyDiv>디렉토리</FooterBodyDiv>
           <FooterBodyDiv>개인정보 처리 방침</FooterBodyDiv>
           <FooterBodyDiv>Codegg 기업 서비스</FooterBodyDiv>

@@ -1,35 +1,59 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-import React from "react"
+import React, { useState } from "react"
 import { styled } from "styled-components"
 import { useQuery } from "react-query"
 import { useParams, useNavigate } from "react-router"
 import { getPosts } from "../axios/api"
 import Comments from "../Components/Comments"
 import { auth, db } from "../axios/firebase"
-import { deleteDoc, doc } from "firebase/firestore"
+import { doc, updateDoc } from "firebase/firestore"
 
-function DetailPage() {
+function EditDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { isLoading, data } = useQuery("posts", getPosts)
-
   const postInfo: any = data?.find((item) => item.id === id)
+  const [item, setItem] = useState({
+    postBoard: postInfo.postBoard,
+    postCategory: postInfo.postCategory,
+    postContent: postInfo.postContent,
+    postDisplayName: postInfo.postDisplayName,
+    postImgUrl: postInfo.postImgUrl,
+    postTime: postInfo.postTime,
+    postTitle: postInfo.postTitle,
+    postUserEmail: postInfo.postUserEmail
+  })
 
-  if (isLoading) {
-    return <div>로딩중 ...</div>
+  const onChange = (event: { target: { value: string; name: string } }) => {
+    const { value, name } = event.target
+    setItem({
+      ...item,
+      [name]: value
+    })
   }
 
-  const deleteBtn = async () => {
-    if (
-      Boolean(postInfo) &&
-      auth.currentUser?.email === postInfo.postUserEmail
-    ) {
-      const idRef = doc(db, "posts", postInfo.id)
-      await deleteDoc(idRef)
-      navigate(-1)
-    } else {
-      alert("글 작성자가 아닙니다.")
+  const handleEdit = (event: { preventDefault: () => void }) => {
+    event.preventDefault()
+    if (item.postTitle === null || item.postContent === null) {
+      alert("빈칸을 채워주세요!")
+      return
     }
+    const newInfo = {
+      postBoard: item.postBoard !== undefined ? item.postBoard : null,
+      postCategory: item.postCategory !== undefined ? item.postCategory : null,
+      postContent: item.postContent !== undefined ? item.postContent : null,
+      postDisplayName: auth.currentUser?.displayName,
+      postImgUrl: item.postImgUrl !== undefined ? item.postImgUrl : null,
+      postTime: item.postTime !== undefined ? item.postTime : null,
+      postTitle: item.postTitle !== undefined ? item.postTitle : null,
+      postUserEmail: auth.currentUser?.email
+    }
+    const infoRef = doc(db, "posts", postInfo.id)
+    void updateDoc(infoRef, newInfo)
+    alert("저장되었습니다!")
+    navigate(`/detailPage/${id}`)
+  }
+  if (isLoading) {
+    return <div>로딩중 ...</div>
   }
 
   return (
@@ -39,7 +63,13 @@ function DetailPage() {
           <Detailtitle>
             <DetailtitleBox>
               <DetailCategory>{postInfo.postCategory}</DetailCategory>
-              <DetailTitleDiv>{postInfo.postTitle}</DetailTitleDiv>
+              <InputDetailTitle
+                type="text"
+                name="postTitle"
+                placeholder="제목"
+                value={item.postTitle}
+                onChange={onChange}
+              />
             </DetailtitleBox>
             <BtnBox>
               <DeclarationBtn>신고</DeclarationBtn>
@@ -47,24 +77,31 @@ function DetailPage() {
             </BtnBox>
           </Detailtitle>
           <DetailUser>
-            <DetailUserName>{postInfo.postDisplayName}</DetailUserName>
+            <DetailUserName>{postInfo.displayName}</DetailUserName>
             <DetailUserInfo>
               <div>좋아요</div>
               <div>댓글수</div>
             </DetailUserInfo>
           </DetailUser>
           <DetailContent>
-            <DetailContentBody>{postInfo.postContent}</DetailContentBody>
+            <InputDetailContent
+              name="postContent"
+              placeholder="내용을 입력해주세요"
+              value={item.postContent}
+              onChange={onChange}
+            />
           </DetailContent>
           <EditBox>
-            <EditBtn
+            <EditBtn onClick={handleEdit} id={postInfo.id}>
+              저장
+            </EditBtn>
+            <DeleteBtn
               onClick={() => {
-                navigate(`/EditdetailPage/${postInfo.id}`)
+                navigate(-1)
               }}
             >
-              수정
-            </EditBtn>
-            <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
+              취소
+            </DeleteBtn>
           </EditBox>
         </DetailContainer>
         <Comments />
@@ -83,7 +120,7 @@ function DetailPage() {
   )
 }
 
-export default DetailPage
+export default EditDetailPage
 
 const Container = styled.div`
   width: 100%;
@@ -163,7 +200,7 @@ const DetailContent = styled.div`
   border-radius: 7px;
   background-color: white;
 `
-const DetailContentBody = styled.div`
+const InputDetailContent = styled.input`
   font-size: 14px;
   margin: 17px 0px 0px 17px;
 `
@@ -180,7 +217,7 @@ const DetailCategory = styled.div`
   color: #9f9f9f;
 `
 
-const DetailTitleDiv = styled.div`
+const InputDetailTitle = styled.input`
   font-size: 19px;
   font-weight: Bold;
   color: #333333;

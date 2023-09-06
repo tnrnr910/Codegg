@@ -1,10 +1,7 @@
 import { getFirestore } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
-// eslint-disable-next-line import/no-duplicates
-import { getAuth } from "firebase/auth"
+import { getAuth, GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref as storageRef } from "firebase/storage"
-// eslint-disable-next-line import/no-duplicates
-import { GoogleAuthProvider } from "firebase/auth"
 import { getAnalytics } from "firebase/analytics"
 
 const firebaseConfig = {
