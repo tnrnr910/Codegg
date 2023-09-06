@@ -49,6 +49,14 @@ interface like {
   count: number
 }
 
+interface usersinfo {
+  id: string
+  badgeImg: string
+  displayName: string
+  email: string
+  inAdmin: boolean
+  profileImg: string
+}
 const getPost: any = async (postId: string): Promise<Post[]> => {
   const docRef = doc(db, "posts", postId)
   const docSnap = await getDoc(docRef)
@@ -311,6 +319,22 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   return searchResults
 }
 
+const getusersinfo: any = async (usersinfoid: string): Promise<usersinfo[]> => {
+  const docRef = doc(db, "usersinfo", usersinfoid)
+  const docSnap = await getDoc(docRef)
+
+  const usersinfo: usersinfo[] = []
+
+  if (docSnap.exists()) {
+    const data = {
+      id: docSnap.id,
+      ...docSnap.data()
+    }
+    usersinfo.push(data as usersinfo) // 형 변환을 통해 타입 일치화
+  }
+  return usersinfo
+}
+
 export {
   getPost,
   getPosts,
@@ -320,5 +344,6 @@ export {
   getSearchedData,
   getLikes,
   setLikes,
-  findLikes
+  findLikes,
+  getusersinfo
 }

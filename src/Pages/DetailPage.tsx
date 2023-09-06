@@ -15,8 +15,12 @@ function DetailPage() {
 
   const postInfo: any = data?.find((item) => item.id === id)
 
-  if (isLoading) {
-    return <div>로딩중 ...</div>
+  const editBtn = () => {
+    if (auth.currentUser?.email === postInfo.postUserEmail) {
+      navigate(`/EditdetailPage/${postInfo.id}`)
+    } else {
+      alert("작성자가 아닙니다.")
+    }
   }
 
   const deleteBtn = async () => {
@@ -30,6 +34,10 @@ function DetailPage() {
     } else {
       alert("글 작성자가 아닙니다.")
     }
+  }
+
+  if (isLoading) {
+    return <div>로딩중 ...</div>
   }
 
   return (
@@ -47,7 +55,15 @@ function DetailPage() {
             </BtnBox>
           </Detailtitle>
           <DetailUser>
-            <DetailUserName>{postInfo.postDisplayName}</DetailUserName>
+            <DetailUserName
+              onClick={() => {
+                navigate(
+                  `/OtherPostPage/${postInfo.postUserEmail}/${postInfo.postDisplayName}`
+                )
+              }}
+            >
+              {postInfo.postDisplayName}
+            </DetailUserName>
             <DetailUserInfo>
               <div>좋아요</div>
               <div>댓글수</div>
@@ -57,13 +73,7 @@ function DetailPage() {
             <DetailContentBody>{postInfo.postContent}</DetailContentBody>
           </DetailContent>
           <EditBox>
-            <EditBtn
-              onClick={() => {
-                navigate(`/EditdetailPage/${postInfo.id}`)
-              }}
-            >
-              수정
-            </EditBtn>
+            <EditBtn onClick={editBtn}>수정</EditBtn>
             <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
           </EditBox>
         </DetailContainer>
@@ -147,6 +157,7 @@ const DetailUserName = styled.div`
   font-size: 13px;
   color: #b5b5b5;
   padding-left: 16px;
+  cursor: pointer;
 `
 
 const DetailUserInfo = styled.div`

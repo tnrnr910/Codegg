@@ -44,7 +44,10 @@ function Router(): any {
           <Route path="/MyLikePage" element={<MyLikePage />} />
           <Route path="/MyPostPage" element={<MyPostPage />} />
           <Route path="/MyProfilePage" element={<MyProfilePage />} />
-          <Route path="/OtherPostPage" element={<OtherPostPage />} />
+          <Route
+            path="/OtherPostPage/:email/:displayName"
+            element={<OtherPostPage />}
+          />
           <Route path="/ProfilePage" element={<ProfilePage />} />
           <Route path="/EditMyProfilePage" element={<EditMyProfilePage />} />
           <Route path="/EditDetailPage/:id" element={<EditDetailPage />} />
