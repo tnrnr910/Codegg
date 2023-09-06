@@ -3,8 +3,11 @@ import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 import Swal from "sweetalert2"
-import { auth } from "../axios/firebase"
+import { auth, db } from "../axios/firebase"
 import { deleteUser, onAuthStateChanged, signOut } from "firebase/auth"
+import { deleteDoc, doc } from "firebase/firestore"
+import { getusersinfos } from "../axios/api"
+import { useQuery } from "react-query"
 
 interface auth {
   currentUser: string
@@ -13,6 +16,8 @@ interface auth {
 function OpenProfile({ closeModal }: any) {
   const navigate = useNavigate()
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
+  const { data } = useQuery("usersinfo", getusersinfos)
+  const usersinfoData: any = data
 
   useEffect(() => {
     // 사용자 인증 정보 확인하기
@@ -28,7 +33,10 @@ function OpenProfile({ closeModal }: any) {
     if (currentUser != null) {
       // currentUser가 null이 아닌 경우에만 실행
       void signOut(auth)
-      void Swal.fire("정상적으로 로그아웃 되었습니다.")
+      void Swal.fire({
+        text: "정상적으로 로그아웃 되었습니다.",
+        confirmButtonColor: "#0C356A"
+      })
       navigate("/")
       closeModal()
     }
@@ -43,19 +51,38 @@ function OpenProfile({ closeModal }: any) {
         title: "정말로 탈퇴하시겠습니까?",
         text: "탈퇴 버튼 선택 시, 계정은 삭제되며 복구되지 않습니다.",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
+        confirmButtonColor: "#0C356A",
         cancelButtonColor: "#d33",
         confirmButtonText: "회원 탈퇴",
         cancelButtonText: "취소"
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          void Swal.fire("탈퇴 완료", "정상적으로 탈퇴되었습니다.")
-          void deleteUser(currentUser)
-          navigate("/")
+          // 현재 로그인한 사용자 문서를 삭제
+          if (currentUser.email != null) {
+            const currentUserInfoData = usersinfoData.find((data: any) => {
+              return data.email === currentUser.email
+            })
+            await deleteDoc(doc(db, "usersinfo", currentUserInfoData.id))
+            console.log({ currentUserInfoData })
+            // 현재 로그인한 사용자를 Authentication에서 삭제
+            await deleteUser(currentUser)
+            // 알림창 띄우고 홈페이지로 이동
+            await Swal.fire({
+              title: "탈퇴 완료",
+              text: "정상적으로 탈퇴되었습니다.",
+              confirmButtonColor: "#0C356A"
+            })
+            navigate("/")
+            closeModal()
+          }
         }
       })
     }
   }
+
+  // const deleteUsersInfo = async (event: any) => {
+  //   await deleteDoc(doc(db, "usersinfo", "3vkcOPh9Mn5YBADbU3sg"))
+  // }
 
   return (
     <ModalBox
@@ -88,8 +115,22 @@ function OpenProfile({ closeModal }: any) {
           </ProfileEdit>
         </ModalBody>
         <Box>
-          <div>마이페이지</div>
-          <div>쪽지함</div>
+          <div
+            onClick={() => {
+              navigate("/MyProfilePage")
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            마이페이지
+          </div>
+          <div
+            onClick={() => {
+              navigate("/MyLetterPage")
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            쪽지함
+          </div>
           <LogoutBtn onClick={logOut}>로그아웃</LogoutBtn>
           <LogoutBtn onClick={deleteCurrentUser}>회원탈퇴</LogoutBtn>
         </Box>

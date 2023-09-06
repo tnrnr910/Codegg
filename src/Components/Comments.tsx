@@ -46,10 +46,6 @@ function Comments() {
     return data.id === id
   })
 
-  if (isLoading) {
-    return <div>로딩중입니다..</div>
-  }
-
   const [inputText, setInputText] = useState("")
   const [inputEditText, setInputEditText] = useState("")
   const [commentsData, setCommentsData] = useState<CommentInterface[]>([])
@@ -178,6 +174,10 @@ function Comments() {
     await Swal.fire("수정 완료", "정상적으로 수정되었습니다.")
     await fetchComments()
     setInputEditText("")
+  }
+
+  if (isLoading) {
+    return <div>로딩중입니다..</div>
   }
 
   return (

@@ -148,7 +148,7 @@ function Header() {
               </StAuth>
               <ProfilePicture
                 onClick={openModal}
-                style={{ width: "2.5rem", height: "2.5rem" }}
+                style={{ width: "2.5rem", height: "2.5rem", cursor: "pointer" }}
               />
             </>
           )}
