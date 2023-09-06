@@ -16,11 +16,12 @@ import MyLetterPage from "../Pages/MyPages/MyLetterPage"
 import MyLikePage from "../Pages/MyPages/MyLikePage"
 import MyPostPage from "../Pages/MyPages/MyPostPage"
 import MyProfilePage from "../Pages/MyPages/MyProfilePage"
-import OtherPostPage from "../Pages/MyPages/OtherPostPage"
 import ProfilePage from "../Pages/MyPages/ProfilePage"
 import Layout from "./Layout"
 import EditMyProfilePage from "../Pages/MyPages/EditMyProfilePage"
 import EditDetailPage from "../Pages/EditDetailPage"
+import OtherProfilePage from "../Pages/MyPages/OtherProfilePage"
+import OtherPostPage from "../Pages/MyPages/OtherPostPage"
 
 function Router(): any {
   return (
@@ -45,9 +46,10 @@ function Router(): any {
           <Route path="/MyPostPage" element={<MyPostPage />} />
           <Route path="/MyProfilePage" element={<MyProfilePage />} />
           <Route
-            path="/OtherPostPage/:email/:displayName"
-            element={<OtherPostPage />}
+            path="/OtherProfilePage/:email"
+            element={<OtherProfilePage />}
           />
+          <Route path="/OtherPostPage/:email" element={<OtherPostPage />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
           <Route path="/EditMyProfilePage" element={<EditMyProfilePage />} />
           <Route path="/EditDetailPage/:id" element={<EditDetailPage />} />

@@ -1,6 +1,7 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import { useNavigate, useParams } from "react-router"
+import { getusersinfo } from "../axios/api"
 
 interface MenuItemProps {
   active: boolean
@@ -11,32 +12,50 @@ interface OtherPageMenuBarProps {
   activeMenuItem: string
 }
 
+interface UserData {
+  id: string
+  badgeImg: string
+  displayName: string
+  email: string
+  isAdmin: string
+  profileImg: string
+}
+
 function OtherPageMenuBar({ activeMenuItem }: OtherPageMenuBarProps) {
   const { email } = useParams()
-  const { displayName } = useParams()
   const navigate = useNavigate()
+  const [userstInfo, setuserstInfo] = useState<UserData>()
+
   const handleMenuItemClick = (path: string) => {
     navigate(path)
   }
 
+  useEffect(() => {
+    if (email !== undefined) {
+      void getusersinfo(email).then((dummyData: any) => {
+        setuserstInfo(dummyData)
+      })
+    }
+  }, [])
+
   return (
     <MenuBarWrap>
-      <MyPageHead>{displayName}님 페이지</MyPageHead>
+      <MyPageHead>{userstInfo?.displayName}님 페이지</MyPageHead>
       <MenuItem
-        active={activeMenuItem === `/OtherProfilePage/${email}/${displayName}`}
+        active={activeMenuItem === `/OtherProfilePage/${email}`}
         onClick={() => {
-          handleMenuItemClick(`/OtherProfilePage/${email}/${displayName}`)
+          handleMenuItemClick(`/OtherProfilePage/${email}`)
         }}
       >
-        {displayName}님 프로필
+        {userstInfo?.displayName}님 프로필
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === "/MyPostPage"}
+        active={activeMenuItem === `/OtherPostPage/${email}`}
         onClick={() => {
-          handleMenuItemClick("/MyPostPage")
+          handleMenuItemClick(`/OtherPostPage/${email}`)
         }}
       >
-        {displayName}님이 쓴 글
+        {userstInfo?.displayName}님이 쓴 글
       </MenuItem>
     </MenuBarWrap>
   )

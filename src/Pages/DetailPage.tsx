@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
-import { useQuery } from "react-query"
 // import { getAuth } from "firebase/auth"
 import { useParams, useNavigate } from "react-router-dom"
-import { findLikes, getPost, getPosts, setLikes } from "../axios/api"
+import { findLikes, getPost, setLikes } from "../axios/api"
 import Comments from "../Components/Comments"
-import { auth } from "../axios/firebase"
+import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
+import { deleteDoc, doc } from "firebase/firestore"
 interface Post {
   id: string
   postBoard: string
@@ -24,18 +25,17 @@ interface Post {
 
 function DetailPage() {
   const { id } = useParams<string>()
-
   const navigate = useNavigate()
   const [postInfo, setPostInfo] = useState<Post>()
   const [likesCount, setLikesCount] = useState(0)
   const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
-  const { isLoading } = useQuery("posts", getPosts)
 
   // post 정보를 하나만 가져오기
   useEffect(() => {
     if (id !== undefined) {
       void getPost(id).then((dummyData: any) => {
         setPostInfo(dummyData)
+
         if (postInfo !== undefined) {
           setLikesCount(postInfo.likes)
         }
@@ -78,21 +78,21 @@ function DetailPage() {
     }
   }
 
-  // const deleteBtn = async () => {
-  //   if (
-  //     Boolean(postInfo) &&
-  //     auth.currentUser?.email === postInfo?.postUserEmail
-  //   ) {
-  //     const idRef = doc(db, "posts", posts.id)
-  //     await deleteDoc(idRef)
-  //     navigate(-1)
-  //   } else {
-  //     alert("글 작성자가 아닙니다.")
-  //   }
-  // }
+  const deleteBtn = async () => {
+    if (postInfo == null) {
+      return // postInfo가 null 또는 undefined일 때 함수 종료
+    }
 
-  if (isLoading) {
-    return <div>로딩중입니다...</div>
+    if (
+      Boolean(postInfo) &&
+      auth.currentUser?.email === postInfo?.postUserEmail
+    ) {
+      const idRef = doc(db, "posts", postInfo.id)
+      await deleteDoc(idRef)
+      navigate(-1)
+    } else {
+      alert("글 작성자가 아닙니다.")
+    }
   }
 
   return (
@@ -118,7 +118,13 @@ function DetailPage() {
             </BtnBox>
           </Detailtitle>
           <DetailUser>
-            <DetailUserName>{postInfo?.postDisplayName}</DetailUserName>
+            <DetailUserName
+              onClick={() => {
+                navigate(`/OtherProfilePage/${postInfo?.postUserEmail}`)
+              }}
+            >
+              {postInfo?.postDisplayName}
+            </DetailUserName>
             <DetailUserInfo>
               <div>
                 <AiOutlineLike size="12px" />
@@ -135,7 +141,7 @@ function DetailPage() {
           </DetailContent>
           <EditBox>
             <EditBtn onClick={editBtn}>수정</EditBtn>
-            <DeleteBtn>삭제</DeleteBtn>
+            <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
           </EditBox>
         </DetailContainer>
         <Comments />
