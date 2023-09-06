@@ -17,7 +17,8 @@ import {
   doc,
   getDocs,
   query,
-  orderBy
+  orderBy,
+  updateDoc
 } from "firebase/firestore"
 import { db, auth } from "../axios/firebase"
 import Swal from "sweetalert2"
@@ -29,6 +30,7 @@ interface CommentInterface {
   commentUserProfileImg: string | null | undefined
   commentUserDisplayName: string | null | undefined
   isSecret: boolean
+  isClicked: boolean
   postId: string | undefined
   postUserEmail: string | undefined
   postUserDisplayName: string | undefined
@@ -45,8 +47,8 @@ function Comments() {
   })
 
   const [inputText, setInputText] = useState("")
+  const [inputEditText, setInputEditText] = useState("")
   const [commentsData, setCommentsData] = useState<CommentInterface[]>([])
-  // const date = new Date(commentsData.commentTime*1000)
 
   // 댓글 가져오는 함수
   const fetchComments = async () => {
@@ -67,6 +69,7 @@ function Comments() {
           commentUserProfileImg: doc.data().commentUserProfileImg,
           commentUserDisplayName: doc.data().commentUserDisplayName,
           isSecret: doc.data().isSecret,
+          isClicked: doc.data().isClicked,
           postId: doc.data().postId,
           postUserEmail: doc.data().postUserEmail,
           postUserDisplayName: doc.data().postUserDisplayName,
@@ -89,6 +92,11 @@ function Comments() {
     console.log(inputText)
   }
 
+  // 댓글 수정 인풋값을 inputEditText로 샛함
+  const onInputEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputEditText(e.target.value)
+  }
+
   // 댓글 조회
   useEffect(() => {
     void fetchComments()
@@ -104,13 +112,13 @@ function Comments() {
       commentUserProfileImg: auth.currentUser?.photoURL,
       commentUserDisplayName: auth.currentUser?.displayName,
       isSecret: false,
+      isClicked: false,
       postId: id,
       postUserEmail: postData?.postUserEmail,
       postUserDisplayName: postData?.postDisplayName
     }
 
     setInputText("")
-
     await addDoc(collection(db, "comments"), newComment) // await가 batching처리 방해
     await fetchComments()
   }
@@ -128,7 +136,13 @@ function Comments() {
     }).then((result) => {
       if (result.isConfirmed) {
         void deleteDoc(doc(db, "comments", id))
-        void Swal.fire("삭제 완료", "정상적으로 삭제되었습니다.")
+        void Swal.fire({
+          position: "center",
+          title: "삭제 완료",
+          text: "정상적으로 삭제되었습니다.",
+          showConfirmButton: false,
+          timer: 1000
+        })
         setCommentsData((prev) => {
           return prev.filter((element) => element.id !== id)
         })
@@ -139,11 +153,39 @@ function Comments() {
     return <div>로딩중입니다..</div>
   }
 
+  // 댓글 수정 버튼 클릭 시
+  const editIsClicked = (commentItem: any) => {
+    const updatedCommentsData = commentsData.map((comment) => {
+      if (comment.id === commentItem.id) {
+        return {
+          ...comment,
+          isClicked: true
+        }
+      }
+      setInputEditText(commentItem.commentContent)
+      return comment
+    })
+    setCommentsData(updatedCommentsData)
+  }
+
+  // 댓글 수정완료 버튼 클릭 시
+  const editComment = async (id: string) => {
+    await updateDoc(doc(db, "comments", id), {
+      commentContent: inputEditText,
+      sClicked: false
+    })
+    await Swal.fire("수정 완료", "정상적으로 수정되었습니다.")
+    await fetchComments()
+    setInputEditText("")
+  }
+
   return (
     <CommentContainer>
       <CommentHead>댓글</CommentHead>
       <CommentLists>
         {/* 댓글 영역 */}
+        {commentsData.filter((item) => item.postId === id?.toString())
+          .length === 0 && <NoComments>작성된 댓글이 없습니다.</NoComments>}
         {commentsData
           .filter((item) => item.postId === id?.toString())
           .map((commentItem) => {
@@ -159,25 +201,62 @@ function Comments() {
                         </CommentWriter>
                         <CommentTime>{commentItem.commentTime}</CommentTime>
                       </div>
-                      <CommentText>{commentItem.commentContent}</CommentText>
+                      {!commentItem.isClicked ? (
+                        <CommentText>{commentItem.commentContent}</CommentText>
+                      ) : (
+                        <CommentText>
+                          <input
+                            type="text"
+                            value={inputEditText}
+                            name="inputEditText"
+                            placeholder="댓글을 수정해 주세요."
+                            onChange={onInputEditChange}
+                            required
+                          />
+                        </CommentText>
+                      )}
                     </CommentContents>
                   </CommentLeft>
                   <CommentRight>
                     {auth.currentUser?.email ===
                     commentItem?.commentUserEmail ? (
-                      <CommentEdit>
-                        <button>수정</button>
-                        <button
-                          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                          onClick={async () => {
-                            if (commentItem.id !== undefined) {
-                              await deleteComment(commentItem.id)
-                            }
-                          }}
-                        >
-                          삭제
-                        </button>
-                      </CommentEdit>
+                      !commentItem.isClicked ? (
+                        <CommentEdit>
+                          <button
+                            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                            onClick={() => {
+                              if (commentItem.id !== undefined) {
+                                editIsClicked(commentItem)
+                              }
+                            }}
+                          >
+                            수정
+                          </button>
+                          <button
+                            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                            onClick={async () => {
+                              if (commentItem.id !== undefined) {
+                                await deleteComment(commentItem.id)
+                              }
+                            }}
+                          >
+                            삭제
+                          </button>
+                        </CommentEdit>
+                      ) : (
+                        <CommentEdit>
+                          <button
+                            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                            onClick={async () => {
+                              if (commentItem.id !== undefined) {
+                                await editComment(commentItem.id)
+                              }
+                            }}
+                          >
+                            수정완료
+                          </button>
+                        </CommentEdit>
+                      )
                     ) : null}
                     {auth.currentUser?.email ===
                     commentItem?.commentUserEmail ? (
@@ -255,7 +334,7 @@ function Comments() {
               value={inputText}
               name="inputText"
               onChange={onInputChange}
-              placeholder="댓글을 작성하면 pt가 지급됩니다."
+              placeholder="댓글을 작성하면 포인트가 지급됩니다."
               required
             />
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
@@ -288,6 +367,13 @@ const CommentLists = styled.div`
   padding: 1rem 1rem;
 `
 
+const NoComments = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+`
+
 const Comment = styled.div`
   display: flex;
   justify-content: space-between;
@@ -309,7 +395,7 @@ const CommentLeft = styled.div`
   justify-content: start;
   align-items: center;
   gap: 0.8rem;
-  width: 60%;
+  width: 70%;
 `
 
 const CommentContents = styled.div`
@@ -318,6 +404,7 @@ const CommentContents = styled.div`
   justify-content: center;
   align-items: start;
   gap: 0.5rem;
+  width: 90%;
 
   & > div:first-child {
     display: flex;
@@ -333,14 +420,21 @@ const CommentTime = styled.div`
   color: #787878;
 `
 
-const CommentText = styled.div``
+const CommentText = styled.div`
+  width: 100%;
+
+  & > input {
+    width: 100%;
+  }
+`
 
 const CommentRight = styled.div`
   color: #787878;
   display: flex;
-  justify-content: center;
+  justify-content: end;
   align-items: center;
   gap: 1.8rem;
+  width: 30%;
 `
 
 const CommentEdit = styled.div`
@@ -350,8 +444,8 @@ const CommentEdit = styled.div`
     cursor: pointer;
   }
 
-  & > button:first-child {
-    border-right: 1px solid #787878;
+  & > button:nth-child(2) {
+    border-left: 1px solid #787878;
   }
 `
 

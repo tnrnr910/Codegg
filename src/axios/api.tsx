@@ -304,44 +304,57 @@ const getPostData: any = async (
 const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   const searchResults: Post[] = []
 
-  const q = query(
-    collection(db, "posts"),
-    orderBy("postTitle"),
-    startAt(searchKeyword),
-    endAt(searchKeyword + "\uf8ff")
-  )
+  const keywords = searchKeyword.split(" ")
 
-  const q1 = query(
-    collection(db, "posts"),
-    orderBy("postContent"),
-    startAt(searchKeyword),
-    endAt(searchKeyword + "\uf8ff")
-  )
+  for (const keyword of keywords) {
+    const q = query(
+      collection(db, "posts"),
+      orderBy("postTitle"),
+      startAt(keyword),
+      endAt(keyword + "\uf8ff")
+    )
 
-  try {
-    const querySnapshot = await getDocs(q)
-    const querySnapshot2 = await getDocs(q1)
-    querySnapshot.forEach((doc: DocumentSnapshot) => {
-      if (doc != null) {
-        const newData = {
-          id: doc.id,
-          ...doc.data()
+    const q1 = query(
+      collection(db, "posts"),
+      orderBy("postContent"),
+      startAt(keyword),
+      endAt(keyword + "\uf8ff")
+    )
+
+    try {
+      const querySnapshot = await getDocs(q)
+      const querySnapshot2 = await getDocs(q1)
+
+      querySnapshot.forEach((doc: DocumentSnapshot) => {
+        if (doc != null) {
+          const newData = {
+            id: doc.id,
+            ...doc.data()
+          }
+
+          if (!searchResults.some((item) => item.id === newData.id)) {
+            searchResults.push(newData as Post)
+          }
         }
-        searchResults.push(newData as Post)
-      }
-    })
-    querySnapshot2.forEach((doc: DocumentSnapshot) => {
-      if (doc != null) {
-        const newData = {
-          id: doc.id,
-          ...doc.data()
+      })
+
+      querySnapshot2.forEach((doc: DocumentSnapshot) => {
+        if (doc != null) {
+          const newData = {
+            id: doc.id,
+            ...doc.data()
+          }
+
+          if (!searchResults.some((item) => item.id === newData.id)) {
+            searchResults.push(newData as Post)
+          }
         }
-        searchResults.push(newData as Post)
-      }
-    })
-  } catch (error) {
-    console.error("에러 발생: ", error)
+      })
+    } catch (error) {
+      console.error("에러 발생: ", error)
+    }
   }
+
   return searchResults
 }
 
