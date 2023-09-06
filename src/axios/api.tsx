@@ -368,6 +368,23 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   return searchResults
 }
 
+const getusersinfos: any = async (): Promise<usersinfo[]> => {
+  const docRef = query(collection(db, "usersinfo"))
+  const docSnap = await getDocs(docRef)
+
+  const usersinfo: usersinfo[] = []
+
+  docSnap.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    usersinfo.push(data as usersinfo) // 형 변환을 통해 타입 일치화
+  })
+
+  return usersinfo
+}
+
 const getusersinfo: any = async (
   email: string
 ): Promise<usersinfo | undefined> => {
@@ -414,5 +431,6 @@ export {
   findLikes,
   getUserLikes,
   getMyLikePosts,
-  getusersinfo
+  getusersinfo,
+  getusersinfos
 }
