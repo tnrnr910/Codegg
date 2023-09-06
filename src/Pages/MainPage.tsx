@@ -4,6 +4,8 @@ import { styled } from "styled-components"
 // import { useQuery } from "react-query"
 import { getBoardPosts } from "../axios/api"
 import SideRanking from "../Components/SideRanking"
+import { AiOutlineLike } from "react-icons/ai"
+import { FaRegComment } from "react-icons/fa"
 
 function MainPage() {
   const navigate = useNavigate()
@@ -34,7 +36,7 @@ function MainPage() {
   }, [])
 
   const ClickLikeBtn: any = (id: string) => {
-    navigate(`/DetailPage/${id}`)
+    // navigate(`/DetailPage/${id}`)
   }
 
   return (
@@ -80,10 +82,12 @@ function MainPage() {
                         </ListDiv>
                         <ListBox>
                           <LikeDiv>
-                            <img src="\WritePicturIcon.png" />
+                            <AiOutlineLike size="16px" />
                             {info.likes}
                           </LikeDiv>
-                          <div> 댓글수</div>
+                          <div>
+                            <FaRegComment size="16px" /> 0
+                          </div>
                         </ListBox>
                       </ListContainer>
                     )
@@ -124,10 +128,12 @@ function MainPage() {
                         </ListDiv>
                         <ListBox>
                           <LikeDiv onClick={ClickLikeBtn}>
-                            <img src="\WritePicturIcon.png" />
+                            <AiOutlineLike size="16px" />
                             {info.likes}
                           </LikeDiv>
-                          <div> 댓글수</div>
+                          <div>
+                            <FaRegComment size="16px" /> 0
+                          </div>
                         </ListBox>
                       </ListContainer>
                     )
@@ -168,10 +174,12 @@ function MainPage() {
                         </ListDiv>
                         <ListBox>
                           <LikeDiv onClick={ClickLikeBtn}>
-                            <img src="\WritePicturIcon.png" />
+                            <AiOutlineLike size="16px" />
                             {info.likes}
                           </LikeDiv>
-                          <div> 댓글수</div>
+                          <div>
+                            <FaRegComment size="16px" /> 0
+                          </div>
                         </ListBox>
                       </ListContainer>
                     )
@@ -289,6 +297,7 @@ const BodyDiv = styled.div`
   margin-left: 24px;
   margin-right: 24px;
   height: 330px;
+  font-size: 13px;
 `
 const ListDiv = styled.div`
   font-size: 13px;
@@ -322,4 +331,6 @@ const ListBox = styled.div`
   display: flex;
 `
 
-const LikeDiv = styled.div``
+const LikeDiv = styled.div`
+  margin-right: 10px;
+`
