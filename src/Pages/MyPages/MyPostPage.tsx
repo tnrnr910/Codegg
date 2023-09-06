@@ -318,7 +318,7 @@ const MyPostPage: React.FC = () => {
                     >
                       <StyledPostCategory>{post.category}</StyledPostCategory>
                       <h3>{post.title}</h3>
-                      <p>작성 일자: {post.date}</p>
+                      <p>작성 일자: {post.date.toString()}</p>
                     </StyledPost>
                   ))
                 : posts

@@ -1,46 +1,116 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
-import { useQuery } from "react-query"
-import { useParams, useNavigate } from "react-router"
-import { getPosts } from "../axios/api"
+// import { useQuery } from "react-query"
+import { getAuth } from "firebase/auth"
+import { useParams, useNavigate } from "react-router-dom"
+import { findLikes, getPost, setLikes } from "../axios/api"
 import Comments from "../Components/Comments"
+import { doc, onSnapshot } from "firebase/firestore"
+import { db } from "../axios/firebase"
+import { PiSiren } from "react-icons/pi"
+import { AiOutlineLike } from "react-icons/ai"
+import { FaRegComment } from "react-icons/fa"
+
+interface Post {
+  id: string
+  postBoard: string
+  postCategory: string
+  postContent: string
+  postDisplayName: string
+  postImgUrl: string
+  postTitle: string
+  postTime: number
+  postUserEmail: string
+  likes: number
+}
 
 function DetailPage() {
-  const { id } = useParams()
+  const { id } = useParams<string>()
+  const auth = getAuth()
   const navigate = useNavigate()
+  const [postInfo, setPostInfo] = useState<Post>()
+  const [likesCount, setLikesCount] = useState(0)
+  const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
 
-  const { isLoading, data } = useQuery("posts", getPosts)
+  // post 정보를 하나만 가져오기
+  useEffect(() => {
+    const userId = auth.currentUser?.email
+    if (id !== undefined) {
+      void getPost(id).then((dummyData: any) => {
+        setPostInfo(dummyData)
+        if (postInfo !== undefined) {
+          setLikesCount(postInfo.likes)
+        }
+      })
 
-  const postInfo: any = data?.find((item) => item.id === id)
+      // 실시간 좋아요 숫자 업데이트
+      onSnapshot(doc(db, "posts", id), (doc) => {
+        setLikesCount(doc?.data()?.likes)
+        console.log(doc.data())
+      })
+    }
 
-  if (isLoading) {
-    return <div>로딩중 ...</div>
+    // 좋아요 내가 눌렀는지 확인하는 기능
+    findLikes(userId, id).then((bool: boolean) => {
+      if (bool) {
+        setCheckLikeBtn(true)
+      } else {
+        setCheckLikeBtn(false)
+      }
+    })
+  }, [])
+
+  // 좋아요 버튼을 눌렀을 때 +/- 해주는 기능
+  const clickLikeFn = () => {
+    findLikes(userId, id).then((bool: boolean) => {
+      if (bool) {
+        setCheckLikeBtn(true)
+        setLikes(true, userId, id)
+      } else {
+        setCheckLikeBtn(false)
+        setLikes(false, userId, id)
+      }
+    })
   }
 
   return (
     <>
       <Container>
-        <Title>{postInfo.postBoard}</Title>
+        <Title>{postInfo?.postBoard}</Title>
         <DetailContainer>
           <Detailtitle>
             <DetailtitleBox>
-              <DetailCategory>{postInfo.postCategory}</DetailCategory>
-              <DetailTitleDiv>{postInfo.postTitle}</DetailTitleDiv>
+              <DetailCategory>{postInfo?.postCategory}</DetailCategory>
+              <DetailTitleDiv>{postInfo?.postTitle}</DetailTitleDiv>
             </DetailtitleBox>
             <BtnBox>
-              <DeclarationBtn>신고</DeclarationBtn>
-              <LikeBtn>좋아요</LikeBtn>
+              <DeclarationBtn>
+                <PiSiren size="30px" />
+              </DeclarationBtn>
+              <LikeBtn onClick={clickLikeFn}>
+                {checkLikeBtn ? (
+                  <AiOutlineLike size="30px" />
+                ) : (
+                  <AiOutlineLike size="30px" />
+                )}
+              </LikeBtn>
             </BtnBox>
           </Detailtitle>
           <DetailUser>
-            <DetailUserName>{postInfo.postDisplayName}</DetailUserName>
+            <DetailUserName>{postInfo?.postDisplayName}</DetailUserName>
             <DetailUserInfo>
-              <div>좋아요</div>
-              <div>댓글수</div>
+              <div>
+                <AiOutlineLike size="12px" />
+                {likesCount}
+              </div>
+              <div>
+                <FaRegComment size="12px" />
+                댓글수
+              </div>
             </DetailUserInfo>
           </DetailUser>
           <DetailContent>
-            <DetailContentBody>{postInfo.postContent}</DetailContentBody>
+            <DetailContentBody>{postInfo?.postContent}</DetailContentBody>
           </DetailContent>
         </DetailContainer>
         <Comments />
