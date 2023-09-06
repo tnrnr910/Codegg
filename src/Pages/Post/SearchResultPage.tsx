@@ -8,7 +8,6 @@ interface RootState {
 
 function SearchResultPage() {
   const searchResults = useSelector((state: RootState) => state.searchResults)
-  console.log(searchResults)
   return (
     <SearchWrap>
       <QnA>
@@ -35,7 +34,7 @@ function SearchResultPage() {
                     <PostTitle>{result.postTitle}</PostTitle>
                   </LeftContainer>
                   <RightContainer>
-                    <div>{result.postDisplayName}</div>
+                    <NickName>{result.postDisplayName}</NickName>
                     <div>{formatDate(result.postTime.seconds)}</div>
                     <Likes>좋아요 수</Likes>
                     <div>댓글 수</div>
@@ -69,7 +68,7 @@ function SearchResultPage() {
                     <PostTitle>{result.postTitle}</PostTitle>
                   </LeftContainer>
                   <RightContainer>
-                    <div>{result.postDisplayName}</div>
+                    <NickName>{result.postDisplayName}</NickName>
                     <div>{formatDate(result.postTime.seconds)}</div>
                     <Likes>좋아요 수</Likes>
                     <div>댓글 수</div>
@@ -103,7 +102,7 @@ function SearchResultPage() {
                     <PostTitle>{result.postTitle}</PostTitle>
                   </LeftContainer>
                   <RightContainer>
-                    <div>{result.postDisplayName}</div>
+                    <NickName>{result.postDisplayName}</NickName>
                     <div>{formatDate(result.postTime.seconds)}</div>
                     <Likes>좋아요 수</Likes>
                     <div>댓글 수</div>
@@ -185,4 +184,7 @@ const CategoryTitle = styled.div`
 
 const PostTitle = styled.div`
   margin-left: 5px;
+`
+const NickName = styled.div`
+  margin-right: 5px;
 `
