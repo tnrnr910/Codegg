@@ -51,6 +51,24 @@ interface like {
   userId: string
 }
 
+interface usersinfo {
+  id: string
+  badgeImg: string
+  displayName: string
+  email: string
+  isAdmin: string
+  profileImg: string
+}
+
+interface usersinfo {
+  id: string
+  badgeImg: string
+  displayName: string
+  email: string
+  isAdmin: string
+  profileImg: string
+}
+
 const getPost = async (postId: string): Promise<Post> => {
   let data = {}
   const postRef = doc(db, "posts", postId)
@@ -358,6 +376,38 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   return searchResults
 }
 
+const getusersinfos: any = async (): Promise<usersinfo[]> => {
+  const docRef = query(collection(db, "usersinfo"))
+  const docSnap = await getDocs(docRef)
+
+  const usersinfo: usersinfo[] = []
+
+  docSnap.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    usersinfo.push(data as usersinfo) // 형 변환을 통해 타입 일치화
+  })
+
+  return usersinfo
+}
+
+const getusersinfo: any = async (usersinfoid: string): Promise<usersinfo> => {
+  let data = {}
+  const usersinfoRef = doc(db, "usersinfo", usersinfoid)
+  const usersinfoSnap = await getDoc(usersinfoRef)
+
+  if (usersinfoSnap.exists()) {
+    data = {
+      id: usersinfoSnap.id,
+      ...usersinfoSnap.data()
+    }
+  }
+  console.log(data)
+  return data as usersinfo
+}
+
 export {
   getPost,
   getPosts,
@@ -369,5 +419,7 @@ export {
   setLikes,
   findLikes,
   getUserLikes,
-  getMyLikePosts
+  getMyLikePosts,
+  getusersinfo,
+  getusersinfos
 }

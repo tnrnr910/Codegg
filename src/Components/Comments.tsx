@@ -179,6 +179,10 @@ function Comments() {
     setInputEditText("")
   }
 
+  if (isLoading) {
+    return <div>로딩중입니다..</div>
+  }
+
   return (
     <CommentContainer>
       <CommentHead>댓글</CommentHead>
