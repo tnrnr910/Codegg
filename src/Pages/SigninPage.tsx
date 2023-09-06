@@ -9,7 +9,7 @@ import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 
-import { auth } from "../axios/firebase"
+import { auth, db } from "../axios/firebase"
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -18,6 +18,7 @@ import {
   setPersistence,
   browserSessionPersistence
 } from "firebase/auth"
+import { addDoc, collection } from "firebase/firestore"
 
 // 유효성검사 스키마
 const schema = yup.object({
@@ -25,10 +26,6 @@ const schema = yup.object({
     .string()
     .email("이메일 형식을 입력해 주세요")
     .max(20, "20자 이하로 입력해 주세요")
-    // .matches(
-    //   /^[가-힣a-zA-Z][^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?\s]*$/,
-    //   "닉네임에 특수문자가 포함되면 안되고 숫자로 시작하면 안됩니다!"
-    // )
     .required("이메일을 입력해 주세요"),
   displayName: yup
     .string()
@@ -90,11 +87,7 @@ function SigninPage() {
   const onSubmitSignup: SubmitHandler<FormData> = () => {
     // event?.preventDefault()
     console.log(errors)
-    signUp()
-  }
-
-  // 회원가입 버튼 클릭 시 유효성검사 통과 후 실행
-  const signUp = () => {
+    // 유효성검사 통과 후 실행
     createUserWithEmailAndPassword(auth, emailWatch, passwordWatch)
       .then(async (userCredential: any) => {
         // Signed in
@@ -106,7 +99,10 @@ function SigninPage() {
         const errorCode = error.code
         const errorMessage = error.message
         console.log(errorCode, errorMessage)
-        void Swal.fire("이미 사용중인 이메일입니다.")
+        void Swal.fire({
+          text: "이미 사용중인 이메일입니다.",
+          confirmButtonColor: "#0C356A"
+        })
       })
   }
 
@@ -119,7 +115,18 @@ function SigninPage() {
         displayName: displayNameWatch,
         photoURL: "https://i.ibb.co/K5B1hKZ/blank-profile.png"
       })
-      await Swal.fire("환영합니다!", "성공적으로 회원가입되었습니다.")
+      await Swal.fire({
+        title: "환영합니다!",
+        text: "성공적으로 회원가입되었습니다.",
+        confirmButtonColor: "#0C356A"
+      })
+      await addDoc(collection(db, "usersinfo"), {
+        badgeImg: "",
+        displayName: displayNameWatch,
+        email: emailWatch,
+        isAdmin: false,
+        profileImg: "https://i.ibb.co/K5B1hKZ/blank-profile.png"
+      })
       await signOut(auth)
       // await 뒤에는 프로미스만 올 수 있음
       reset()
@@ -156,7 +163,10 @@ function SigninPage() {
       navigate("/")
     } catch (error) {
       console.error("signInError", error)
-      void Swal.fire("이메일 혹은 비밀번호를 다시 입력해 주세요")
+      void Swal.fire({
+        text: "이메일 혹은 비밀번호를 다시 입력해 주세요.",
+        confirmButtonColor: "#0C356A"
+      })
     }
   }
 
@@ -166,15 +176,6 @@ function SigninPage() {
   const displayNameWatch = watch("displayName")
   const passwordWatch = watch("password")
   const confirmPasswordWatch = watch("confirmPassword")
-
-  // 추출한 값 콘솔에 출력
-  // console.log(
-  //   emailWatch,
-  //   displayNameWatch,
-  //   passwordWatch,
-  //   confirmPasswordWatch,
-  //   errors.password
-  // )
 
   return (
     <SigninSignoutContainer>
