@@ -1,9 +1,28 @@
-import React from "react"
+import React, { useState } from "react"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import styled from "styled-components"
 
 function MyLetterPage() {
   const activeMenuItem = "/MyLetterPage"
+
+  const [isModalOpen, setModalOpen] = useState(false)
+
+  // 받는 사람 및 쪽지 내용 입력값 상태 관리
+  const [recipient, setRecipient] = useState("")
+  const [message, setMessage] = useState("")
+
+  const openModal = () => {
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+  }
+
+  const sendMessage = () => {
+    // 메시지 전송 로직
+    closeModal()
+  }
 
   return (
     <MyPostWrap>
@@ -55,7 +74,37 @@ function MyLetterPage() {
           </StyledPost>
           <Buttons>
             <DelButton>삭제</DelButton>
-            <SendButton>쪽지 보내기</SendButton>
+            <SendButton onClick={openModal}>쪽지 보내기</SendButton>
+            {isModalOpen && (
+              <ModalOverlay>
+                <ModalContainer>
+                  <ModalHeader>
+                    <ModalTitle>쪽지 보내기</ModalTitle>
+                    <CloseButton onClick={closeModal}>닫기</CloseButton>
+                  </ModalHeader>
+                  <ModalContent>
+                    <Input
+                      type="text"
+                      placeholder="받는 사람"
+                      value={recipient}
+                      onChange={(e) => {
+                        setRecipient(e.target.value)
+                      }}
+                    />
+                    <Textarea
+                      placeholder="쪽지 내용을 입력하세요"
+                      value={message}
+                      onChange={(e) => {
+                        setMessage(e.target.value)
+                      }}
+                    />
+
+                    {/* 보내기 버튼 */}
+                    <SendButton onClick={sendMessage}>보내기</SendButton>
+                  </ModalContent>
+                </ModalContainer>
+              </ModalOverlay>
+            )}
           </Buttons>
         </div>
       </StyledContainer>
@@ -199,4 +248,57 @@ const SendButton = styled.button`
   cursor: pointer;
   font-weight: bold;
   color: #fff;
+`
+const ModalOverlay = styled.div`
+  /* 모달을 화면 가운데 정렬하기 위한 스타일 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+`
+
+const ModalContainer = styled.div`
+  background: white;
+  width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+`
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const ModalTitle = styled.h2`
+  font-weight: bold;
+`
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+`
+
+const ModalContent = styled.div`
+  margin-top: 20px;
+`
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+`
+
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
 `
