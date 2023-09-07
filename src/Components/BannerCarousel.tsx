@@ -37,4 +37,21 @@ export default BannerCarousel
 const SliderContainer = styled.div`
   width: 100%;
   height: 10%;
+
+  & > .slick-slider {
+    & .slick-dots {
+      bottom: 25%;
+      left: 25%;
+      /* bottom: 6rem;
+      left: 29.5rem; */
+      text-align: start;
+      color: #fff;
+    }
+    & li.slick-active button:before {
+      color: #fff;
+    }
+    & button::before {
+      color: #fff;
+    }
+  }
 `
