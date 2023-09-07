@@ -6,6 +6,7 @@ import { getBoardPosts } from "../axios/api"
 import SideRanking from "../Components/SideRanking"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
+import BannerCarousel from "../Components/BannerCarousel"
 
 function MainPage() {
   const navigate = useNavigate()
@@ -41,12 +42,7 @@ function MainPage() {
 
   return (
     <>
-      <Banner>
-        <img
-          src="https://i.postimg.cc/65pxBtZD/banner2.png"
-          alt="main-banner"
-        />
-      </Banner>
+      <BannerCarousel />
       <Container>
         <SideRanking />
         <PostsContainer>
@@ -231,30 +227,29 @@ function MainPage() {
 
 export default MainPage
 
-const Banner = styled.div`
-  width: 100%;
-  height: 25rem;
-  border: solid #d9d9d9 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+// const Banner = styled.div`
+//   width: 100%;
+//   height: 25rem;
+//   border: solid #d9d9d9 1px;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
 
-  & > img {
-    width: 100%;
-    object-fit: cover;
-  }
-`
+//   & > img {
+//     width: 100%;
+//     object-fit: cover;
+//   }
+// `
 
 const Container = styled.div`
   width: 100%;
-  height: 59rem;
+  /* height: 100%; */
   display: flex;
-  overflow: auto;
+  /* overflow: auto; */
 `
 
 const PostsContainer = styled.div`
   width: 72rem;
-  height: 51rem;
   margin-top: 2.3rem;
   display: flex;
   flex-wrap: wrap;

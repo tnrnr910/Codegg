@@ -186,26 +186,36 @@ function Footer() {
 
 function Layout() {
   return (
-    <>
+    <Wrapper>
       <Header />
       <StLayout>
         <Outlet />
       </StLayout>
       <Footer />
-    </>
+    </Wrapper>
   )
 }
 
 export default Layout
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+`
 
 const HeaderContainer = styled.div`
   width: 100%;
   background: #ffffff;
   height: 3rem;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   color: black;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 `
 const Logo = styled.img`
   width: 9rem;
@@ -282,14 +292,14 @@ const FooterBtnbody = styled.div`
 `
 
 const StLayout = styled.div`
-  color: black;
-  background-color: white;
+  /* color: black;
+  background-color: white; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 80vh;
+  /* min-height: 80vh; */
   height: auto;
-  padding: 0px;
+  /* padding: 0px; */
 `
 
 const SearchInput = styled.div`
