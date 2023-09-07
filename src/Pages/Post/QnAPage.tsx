@@ -75,6 +75,15 @@ function QnAPage() {
           >
             파이썬
           </StyledCategoryItem>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("기타")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "기타"}
+          >
+            기타
+          </StyledCategoryItem>
         </StyledCategoryList>
       </StyledCategoryDropdown>
     )

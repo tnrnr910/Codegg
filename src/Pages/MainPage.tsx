@@ -3,7 +3,7 @@ import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 // import { useQuery } from "react-query"
 import { getBoardPosts } from "../axios/api"
-import SideRanking from "../Components/SideRanking"
+// import SideRanking from "../Components/SideRanking"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
 import BannerCarousel from "../Components/BannerCarousel"
@@ -44,7 +44,7 @@ function MainPage() {
     <>
       <BannerCarousel />
       <Container>
-        <SideRanking />
+        {/* <SideRanking /> */}
         <PostsContainer>
           <PostBox>
             <Title>
@@ -73,8 +73,8 @@ function MainPage() {
                             navigate(`/detailPage/${info.id}`)
                           }}
                         >
-                          <ListCategory> {info.postCategory}</ListCategory>
-                          {info.postTitle}
+                          <ListCategory>{info.postCategory}</ListCategory>
+                          <div>{info.postTitle}</div>
                         </ListDiv>
                         <ListBox>
                           <LikeDiv>
@@ -243,9 +243,9 @@ export default MainPage
 
 const Container = styled.div`
   width: 100%;
-  /* height: 100%; */
   display: flex;
-  /* overflow: auto; */
+  justify-content: center;
+  margin: 10px 0 40px 0;
 `
 
 const PostsContainer = styled.div`
@@ -289,8 +289,7 @@ const Body = styled.div`
 `
 
 const BodyDiv = styled.div`
-  margin-left: 24px;
-  margin-right: 24px;
+  margin: 0 24px;
   height: 330px;
   font-size: 13px;
 `
@@ -298,7 +297,7 @@ const ListDiv = styled.div`
   font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   cursor: pointer;
 `
 const NoticeDiv = styled.div`
@@ -310,8 +309,10 @@ const NoticeDiv = styled.div`
   font-weight: bold;
 `
 const ListCategory = styled.div`
+  width: 40px;
+  text-align: center;
   border: solid #e7e7e7 1px;
-  padding: 3px 3px 3px 3px;
+  padding: 3px;
   color: #9f9f9f;
 `
 
@@ -324,6 +325,14 @@ const ListContainer = styled.div`
 
 const ListBox = styled.div`
   display: flex;
+  color: #9f9f9f;
+
+  & > div {
+    width: 40px;
+    display: flex;
+    align-items: end;
+    gap: 4px;
+  }
 `
 
 const LikeDiv = styled.div`

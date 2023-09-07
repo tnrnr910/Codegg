@@ -125,6 +125,7 @@ const Write: React.FC = () => {
             <option value="Node">Node.js</option>
             <option value="Next">Next.js</option>
             <option value="Python">Python</option>
+            <option value="기타">기타</option>
           </StyledSelect>
         </StyledLabel>
 
