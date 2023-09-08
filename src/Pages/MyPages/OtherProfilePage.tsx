@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import { useParams } from "react-router"
 import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
-import { findfollow, getusersinfo, setfollow } from "../../axios/api"
-import { auth } from "../../axios/firebase"
+import { getusersinfo } from "../../axios/api"
 
 interface usersinfo {
   id: string
@@ -18,37 +17,14 @@ function OtherProfilePage() {
   const { email } = useParams()
   const activeMenuItem = `/OtherProfilePage/${email}`
   const [userstInfo, setuserstInfo] = useState<usersinfo>()
-  const [isfollow, setIsfollow] = useState<boolean>(false)
 
   useEffect(() => {
     if (email !== undefined) {
       void getusersinfo(email).then((dummyData: any) => {
         setuserstInfo(dummyData)
       })
-
-      if (auth.currentUser != null) {
-        findfollow(email, auth.currentUser.email).then((bool: boolean) => {
-          if (bool) {
-            setIsfollow(true)
-          } else {
-            setIsfollow(false)
-          }
-        })
-      }
     }
   }, [])
-
-  const FollowHandler = () => {
-    if (auth.currentUser != null) {
-      if (!isfollow) {
-        setIsfollow(true)
-        setfollow(false, userstInfo?.email, auth.currentUser?.email)
-      } else {
-        setIsfollow(false)
-        setfollow(true, userstInfo?.email, auth.currentUser?.email)
-      }
-    }
-  }
 
   return (
     <ProfileWrap>
@@ -81,9 +57,9 @@ function OtherProfilePage() {
                 <Following>팔로잉 15</Following>
                 <MyPost>작성글 32</MyPost>
               </MyData>
-              <FollowBtn onClick={FollowHandler}>
-                {isfollow ? <div>팔로우 취소</div> : <div>+팔로우 하기</div>}
-              </FollowBtn>
+              <MyEmail>
+                <div>+ 팔로우 하기</div>
+              </MyEmail>
               <MyStackAndPW>
                 <StackNotice>관심 있는 기술 태그</StackNotice>
                 <Stacks>React / Node / Spring</Stacks>
@@ -210,7 +186,7 @@ const MyDataWrap = styled.div`
   width: 16.25rem;
   margin-top: 101px;
 `
-const FollowBtn = styled.button`
+const MyEmail = styled.button`
   width: 356px;
   height: 52px;
   font-size: 16px;
