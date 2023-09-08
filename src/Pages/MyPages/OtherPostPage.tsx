@@ -236,7 +236,7 @@ const OtherPostPage: React.FC = () => {
     <MyPostWrap>
       <OtherPageMenuBar activeMenuItem={activeMenuItem} />
       <StyledContainer>
-        <StyledTitle>내가 쓴 글</StyledTitle>
+        <StyledTitle>{userstInfo?.displayName}님이 쓴 글</StyledTitle>
 
         <StyledTabButtons>
           {tabOptions.map((tab) => (
