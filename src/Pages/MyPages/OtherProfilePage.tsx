@@ -1,41 +1,54 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
-import { useNavigate } from "react-router"
-import { auth } from "../../axios/firebase"
-import MyPageMenuBar from "../../Components/MyPageMenuBar"
+import { useParams } from "react-router"
+import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
+import { getusersinfo } from "../../axios/api"
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-interface auth {
-  currentUser: string
+interface usersinfo {
+  id: string
+  badgeImg: string
+  displayName: string
+  email: string
+  isAdmin: string
+  profileImg: string
 }
 
-function MyProfilePage() {
-  const navigate = useNavigate()
-  const activeMenuItem = "/MyProfilePage"
+function OtherProfilePage() {
+  const { email } = useParams()
+  const activeMenuItem = `/OtherProfilePage/${email}`
+  const [userstInfo, setuserstInfo] = useState<usersinfo>()
 
-  console.log(auth.currentUser?.photoURL)
-  console.log(auth.currentUser)
+  useEffect(() => {
+    if (email !== undefined) {
+      void getusersinfo(email).then((dummyData: any) => {
+        setuserstInfo(dummyData)
+      })
+    }
+  }, [])
+
   return (
     <ProfileWrap>
-      <MyPageMenuBar activeMenuItem={activeMenuItem} />
+      <OtherPageMenuBar activeMenuItem={activeMenuItem} />
       <ProfileTap>
         <ProfileRightSide>
-          <ProfileHead>프로필 관리</ProfileHead>
+          <ProfileHead>{userstInfo?.displayName}님 프로필</ProfileHead>
           <ProfileDetail>
             <ProfileImgs>
               <ProfileImgBox>
                 <ProfileImage
-                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
+                  src={userstInfo?.profileImg ?? require("./profile.jpg")}
                 />
               </ProfileImgBox>
               <ProfileLevelAndNickName>
                 <div>
                   <BadgeWrap>
-                    <BadgeImage src={require("./profile.jpg")} alt="프사" />
+                    <BadgeImage
+                      src={userstInfo?.badgeImg ?? require("./profile.jpg")}
+                    />
                     <div>입문자</div>
                   </BadgeWrap>
                 </div>
-                <NickName>{auth.currentUser?.displayName}</NickName>
+                <NickName>{userstInfo?.displayName}</NickName>
               </ProfileLevelAndNickName>
             </ProfileImgs>
             <MyDataWrap>
@@ -44,24 +57,12 @@ function MyProfilePage() {
                 <Following>팔로잉 15</Following>
                 <MyPost>작성글 32</MyPost>
               </MyData>
-              <MyPoint>보유 포인트</MyPoint>
-              <PointScore>10,000p</PointScore>
-              <MyEmail>이메일</MyEmail>
-              <EmailAd>{auth.currentUser?.email}</EmailAd>
+              <MyEmail>
+                <div>+ 팔로우 하기</div>
+              </MyEmail>
               <MyStackAndPW>
                 <StackNotice>관심 있는 기술 태그</StackNotice>
                 <Stacks>React / Node / Spring</Stacks>
-                <PassWordHead>비밀번호 변경</PassWordHead>
-                <PassWordChange>
-                  변경을 원하시면 `수정` 버튼을 클릭해주세요.
-                </PassWordChange>
-                <EditBottom
-                  onClick={() => {
-                    navigate("/EditMyProfilePage")
-                  }}
-                >
-                  수정
-                </EditBottom>
               </MyStackAndPW>
             </MyDataWrap>
           </ProfileDetail>
@@ -71,7 +72,7 @@ function MyProfilePage() {
   )
 }
 
-export default MyProfilePage
+export default OtherProfilePage
 
 const ProfileWrap = styled.div`
   display: flex;
@@ -106,14 +107,15 @@ const ProfileDetail = styled.div`
 `
 const ProfileImgs = styled.div`
   display: flex;
+  flex-direction: column;
   height: 6.125rem;
   margin-bottom: 2.5rem;
+  gap: 22px;
 `
 const ProfileImgBox = styled.div`
-  width: 6.125rem;
-  height: 6.125rem;
+  width: 12.5rem;
+  height: 12.5rem;
   display: flex;
-  margin-right: 0.75rem;
   justify-content: center;
   flex-direction: column;
   border-radius: 50%;
@@ -122,13 +124,15 @@ const ProfileImgBox = styled.div`
 const ProfileImage = styled.img`
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 70%;
   object-fit: cover;
 `
 const ProfileLevelAndNickName = styled.div`
   display: flex;
-  justify-content: center;
   flex-direction: column;
+  margin-bottom: 0.375rem;
+  justify-content: center;
+  align-items: center;
 `
 const BadgeImage = styled.img`
   width: 1.375rem;
@@ -142,10 +146,10 @@ const BadgeWrap = styled.div`
 `
 const NickName = styled.div`
   font-weight: bold;
+  margin-top: 12px;
 `
 const MyData = styled.div`
   display: flex;
-  border: 1px solid #d9d9d9;
   margin-top: 2.1875rem;
   margin-bottom: 3rem;
   width: 15.4375rem;
@@ -158,7 +162,6 @@ const Follower = styled.div`
   height: 2.125rem;
   align-items: center;
   display: flex;
-  border-left: solid 1px #fff;
 `
 const Following = styled.div`
   border-left: solid 1px #dadada;
@@ -176,36 +179,31 @@ const MyPost = styled.div`
   align-items: center;
   display: flex;
 `
-const MyPoint = styled.div`
-  font-weight: bold;
-  margin-bottom: 0.625rem;
-`
-const PointScore = styled.div`
-  color: #979797;
-  margin-bottom: 3.125rem;
-  font-size: 0.7656rem;
-`
 const MyDataWrap = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   width: 16.25rem;
+  margin-top: 101px;
 `
-const MyEmail = styled.div`
-  margin-bottom: 0.625rem;
+const MyEmail = styled.button`
+  width: 356px;
+  height: 52px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 60px;
   font-weight: bold;
+  border: solid #0c356a 1px;
+  border-radius: 4px;
+  color: #0c356a;
+  background-color: #ffffff;
 `
-const EmailAd = styled.div`
-  color: #979797;
-  margin-bottom: 3.125rem;
-  font-size: 0.7656rem;
-`
+
 const MyStackAndPW = styled.div`
   width: 15.4375rem;
   height: 2.125rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 `
 const StackNotice = styled.div`
   margin-bottom: 0.625rem;
@@ -214,22 +212,4 @@ const StackNotice = styled.div`
 const Stacks = styled.div`
   margin-bottom: 3.125rem;
   font-size: 0.7656rem;
-`
-const PassWordHead = styled.div`
-  font-weight: bold;
-  margin-bottom: 0.625rem;
-`
-const PassWordChange = styled.div`
-  width: 100%;
-  font-size: 0.7656rem;
-  margin-bottom: 5rem;
-`
-const EditBottom = styled.button`
-  width: 4rem;
-  height: 2rem;
-  margin-left: 18rem;
-  background-color: #fff;
-  border: 1px solid #d9d9d9;
-  cursor: pointer;
-  font-weight: bold;
 `

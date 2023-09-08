@@ -5,7 +5,6 @@ import DetailPage from "../Pages/DetailPage"
 import ErrorPage from "../Pages/ErrorPage"
 import PointShopPage from "../Pages/PointShopPage"
 import SigninPage from "../Pages/SigninPage"
-import SignupPage from "../Pages/SignupPage"
 import NoticePage from "../Pages/Post/NoticePage"
 import QnAPage from "../Pages/Post/QnAPage"
 import SearchResultPage from "../Pages/Post/SearchResultPage"
@@ -17,9 +16,12 @@ import MyLetterPage from "../Pages/MyPages/MyLetterPage"
 import MyLikePage from "../Pages/MyPages/MyLikePage"
 import MyPostPage from "../Pages/MyPages/MyPostPage"
 import MyProfilePage from "../Pages/MyPages/MyProfilePage"
-import OtherPostPage from "../Pages/MyPages/OtherPostPage"
 import ProfilePage from "../Pages/MyPages/ProfilePage"
 import Layout from "./Layout"
+import EditMyProfilePage from "../Pages/MyPages/EditMyProfilePage"
+import EditDetailPage from "../Pages/EditDetailPage"
+import OtherProfilePage from "../Pages/MyPages/OtherProfilePage"
+import OtherPostPage from "../Pages/MyPages/OtherPostPage"
 
 function Router(): any {
   return (
@@ -27,24 +29,30 @@ function Router(): any {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<MainPage />} />
+          {/* <Route path="/" element={<WritePage />} /> */}
           <Route path="/DetailPage/:id" element={<DetailPage />} />
           <Route path="/*" element={<ErrorPage />} />
           <Route path="/PointShopPage" element={<PointShopPage />} />
           <Route path="/SigninPage" element={<SigninPage />} />
-          <Route path="/SignupPage" element={<SignupPage />} />
           <Route path="/NoticePage" element={<NoticePage />} />
           <Route path="/QnAPage" element={<QnAPage />} />
-          <Route path="/SearchResultPage" element={<SearchResultPage />} />
+          <Route path="/SearchResultPage" element={<SearchResultPage />} />{" "}
           <Route path="/TipPage" element={<TipPage />} />
           <Route path="/TogetherPage" element={<TogetherPage />} />
-          <Route path="/WritePage" element={<WritePage />} />
+          <Route path="/WritePage/:board" element={<WritePage />} />
           <Route path="/FollowPage" element={<FollowPage />} />
           <Route path="/MyLetterPage" element={<MyLetterPage />} />
           <Route path="/MyLikePage" element={<MyLikePage />} />
           <Route path="/MyPostPage" element={<MyPostPage />} />
           <Route path="/MyProfilePage" element={<MyProfilePage />} />
-          <Route path="/OtherPostPage" element={<OtherPostPage />} />
+          <Route
+            path="/OtherProfilePage/:email"
+            element={<OtherProfilePage />}
+          />
+          <Route path="/OtherPostPage/:email" element={<OtherPostPage />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
+          <Route path="/EditMyProfilePage" element={<EditMyProfilePage />} />
+          <Route path="/EditDetailPage/:id" element={<EditDetailPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
