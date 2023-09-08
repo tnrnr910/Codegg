@@ -80,19 +80,19 @@ function MyLetterPage() {
                 <ModalContainer>
                   <ModalHeader>
                     <ModalTitle>쪽지 보내기</ModalTitle>
-                    <CloseButton onClick={closeModal}>닫기</CloseButton>
+                    <CloseButton onClick={closeModal}>X</CloseButton>
                   </ModalHeader>
                   <ModalContent>
                     <Input
                       type="text"
-                      placeholder="받는 사람"
+                      placeholder="받는 사람을 검색해보세요."
                       value={recipient}
                       onChange={(e) => {
                         setRecipient(e.target.value)
                       }}
                     />
                     <Textarea
-                      placeholder="쪽지 내용을 입력하세요"
+                      placeholder="내용을 입력하세요"
                       value={message}
                       onChange={(e) => {
                         setMessage(e.target.value)
@@ -250,7 +250,6 @@ const SendButton = styled.button`
   color: #fff;
 `
 const ModalOverlay = styled.div`
-  /* 모달을 화면 가운데 정렬하기 위한 스타일 */
   position: fixed;
   top: 0;
   left: 0;
@@ -265,9 +264,9 @@ const ModalOverlay = styled.div`
 
 const ModalContainer = styled.div`
   background: white;
-  width: 400px;
-  padding: 20px;
-  border-radius: 10px;
+  width: 32.875rem;
+  height: 38.125rem;
+  border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 `
 
@@ -275,30 +274,42 @@ const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #0c356a;
+  height: 3.9375rem;
+  padding: 10px;
+  border-radius: 10px 10px 0 0;
+  color: white;
 `
 
 const ModalTitle = styled.h2`
   font-weight: bold;
+  margin-left: 10px;
 `
 
 const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
+  color: white;
 `
 
 const ModalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-top: 20px;
+  padding: 5px;
 `
 
 const Input = styled.input`
-  width: 100%;
+  width: 29.875rem;
   padding: 10px;
   margin-bottom: 10px;
 `
 
 const Textarea = styled.textarea`
-  width: 100%;
+  width: 29.875rem;
+  height: 23.4375rem;
   padding: 10px;
   margin-bottom: 10px;
 `
