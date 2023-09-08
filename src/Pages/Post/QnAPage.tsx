@@ -104,8 +104,11 @@ function QnAPage() {
               .map(
                 (info: {
                   id: string
+                  postTime: Timestamp
                   postTitle: string
                   postCategory: string
+                  likes: number
+                  comments: number
                 }) => {
                   return (
                     <ListContainer key={info.id}>
@@ -237,7 +240,7 @@ function QnAPage() {
               )}
             </BodyDiv>
           </Body>
-          <WtiteBtnBox>
+          <WriteBtnBox>
             <Buttons
               onClick={() => {
                 navigate("/WritePage/questions")
@@ -245,7 +248,7 @@ function QnAPage() {
             >
               글쓰기
             </Buttons>
-          </WtiteBtnBox>
+          </WriteBtnBox>
           {/* <Pagination>페이지네이션</Pagination> */}
         </StyledBox>
       </StyledContainer>
@@ -442,7 +445,7 @@ const ListHeadCategory = styled.div`
   color: #0c356a;
 `
 
-const WtiteBtnBox = styled.div`
+const WriteBtnBox = styled.div`
   display: flex;
   justify-content: flex-end;
   margin: 2rem 0 1rem 0;
