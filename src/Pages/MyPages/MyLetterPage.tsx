@@ -250,7 +250,6 @@ const SendButton = styled.button`
   color: #fff;
 `
 const ModalOverlay = styled.div`
-  /* 모달을 화면 가운데 정렬하기 위한 스타일 */
   position: fixed;
   top: 0;
   left: 0;
