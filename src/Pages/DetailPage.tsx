@@ -9,12 +9,8 @@ import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
-<<<<<<< HEAD
-import { deleteDoc, doc } from "firebase/firestore"
-
-=======
 import { deleteDoc, doc, onSnapshot } from "firebase/firestore"
->>>>>>> 14b8f803d48a57df5480bc741ebb546141954065
+
 interface Post {
   id: string
   postBoard: string
