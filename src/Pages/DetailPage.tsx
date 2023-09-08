@@ -9,8 +9,12 @@ import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
+<<<<<<< HEAD
 import { deleteDoc, doc } from "firebase/firestore"
 
+=======
+import { deleteDoc, doc, onSnapshot } from "firebase/firestore"
+>>>>>>> 14b8f803d48a57df5480bc741ebb546141954065
 interface Post {
   id: string
   postBoard: string
@@ -22,6 +26,7 @@ interface Post {
   postTime: number
   postUserEmail: string
   likes: number
+  comments: number
 }
 
 function DetailPage() {
@@ -29,6 +34,7 @@ function DetailPage() {
   const navigate = useNavigate()
   const [postInfo, setPostInfo] = useState<Post>()
   const [likesCount, setLikesCount] = useState(0)
+  const [commentsCount, setCommentsCount] = useState(0)
   const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
 
   // post 정보를 하나만 가져오기
@@ -39,10 +45,17 @@ function DetailPage() {
 
         if (postInfo !== undefined) {
           setLikesCount(postInfo.likes)
+          setCommentsCount(postInfo.comments)
         }
       })
 
-      // 좋아요 내가 눌렀는지 확인하는 기능
+      // 실시간 좋아요 숫자 업데이트
+      onSnapshot(doc(db, "posts", id), (doc) => {
+        setLikesCount(doc?.data()?.likes)
+        setCommentsCount(doc?.data()?.comments)
+        console.log(doc.data())
+      })
+
       // TODO: userId는 로그인 했을 때만 존재하는 값!
       if (auth.currentUser != null) {
         findLikes(auth.currentUser.email, id).then((bool: boolean) => {
@@ -133,7 +146,7 @@ function DetailPage() {
               </div>
               <div>
                 <FaRegComment size="12px" />
-                댓글수
+                {commentsCount}
               </div>
             </DetailUserInfo>
           </DetailUser>

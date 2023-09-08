@@ -28,10 +28,6 @@ function NoticePage() {
             </StyledPostTitleCategory>
             <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
             <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
-            <StyledPostTitlePostLikes>좋아요 수 </StyledPostTitlePostLikes>
-            <StyledPostTitlePostCommentNum>
-              댓글 수
-            </StyledPostTitlePostCommentNum>
           </StyledPostTitleBox>
           <Body>
             <BodyDiv>
@@ -54,7 +50,7 @@ function NoticePage() {
                             }}
                           >
                             <ListCategory> {info.postCategory}</ListCategory>
-                            {info.postTitle}
+                            <StyledPostTitle>{info.postTitle}</StyledPostTitle>
                           </ListDiv>
                         </ListContainer>
                       )
@@ -72,7 +68,6 @@ function NoticePage() {
               글쓰기
             </WriteBtn>
           </WriteBtnBox>
-          <div> 페이지 네이션</div>
         </StyledBox>
       </StyledContainer>
     </>
@@ -80,6 +75,12 @@ function NoticePage() {
 }
 
 export default NoticePage
+
+const StyledPostTitle = styled.p`
+  width: 500px;
+  justify-content: left;
+  padding-top: 3px;
+`
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -115,7 +116,7 @@ const StyledPostTitleCategory = styled.span`
 
 const StyledPostTitlePostName = styled.span`
   float: left;
-  width: 31.25rem;
+  width: 50rem;
   text-align: center;
   font-size: 0.875rem;
 `
@@ -123,20 +124,6 @@ const StyledPostTitlePostName = styled.span`
 const StyledPostTitlePostDay = styled.span`
   display: inline-block;
   width: 6.875rem;
-  text-align: center;
-  font-size: 0.875rem;
-`
-
-const StyledPostTitlePostLikes = styled.span`
-  display: inline-block;
-  width: 6.25rem;
-  text-align: center;
-  font-size: 0.875rem;
-`
-
-const StyledPostTitlePostCommentNum = styled.span`
-  display: inline-block;
-  width: 5.625rem;
   text-align: center;
   font-size: 0.875rem;
 `

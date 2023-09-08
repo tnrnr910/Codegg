@@ -1,15 +1,34 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import React, { useEffect, useState } from "react"
-import { useQuery } from "react-query"
+// import { useQuery } from "react-query"
 import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { BiSearch } from "react-icons/bi"
 import { useNavigate } from "react-router"
 import { getUserLikesPost } from "../../axios/api"
+import { db } from "../../axios/firebase"
+import {
+  getDocs,
+  query,
+  where,
+  collection,
+  type Timestamp
+} from "firebase/firestore"
 
 interface TabOption {
   value: string
   label: string
+}
+
+interface Post {
+  id: string
+  postBoard: string
+  postCategory: string
+  postContent: string
+  postTitle: string
+  postTime: Timestamp
+  likes: number
+  comments: number
 }
 
 const MyLikePage: React.FC = () => {
@@ -19,27 +38,89 @@ const MyLikePage: React.FC = () => {
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
   const [searchTerm, setSearchTerm] = useState("")
+  const [posts, setPosts] = useState<Post[]>([])
   const [userId, setUserId] = useState<string | null>(null)
   const activeMenuItem = "/MyLikePage"
 
-  const { isLoading, data } = useQuery(
-    ["likes", userId],
-    async () => await getUserLikesPost(userId),
-    { enabled: userId !== null } // 값이 있으면 true
-  )
-
-  console.log(data)
   // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         setUserId(user.email)
+        void getUserLikesPost(user.email).then((dummyData: any) => {
+          setPosts(dummyData)
+        })
       }
     })
   }, [])
 
-  if (isLoading) {
-    return <div>로딩중입니다..</div>
+  // let { isLoading, data } = useQuery(
+  //   ["likes", userId],
+  //   async () => await getUserLikesPost(userId),
+  //   { enabled: userId !== null } // 값이 있으면 true
+  // )
+
+  // formtDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
+  function formatDate(date: {
+    getFullYear: () => any
+    getMonth: () => number
+    getDate: () => any
+  }) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    return `${year}.${month}.${day}`
+  }
+
+  console.log(posts)
+
+  // if (isLoading) {
+  //   return <div>로딩중입니다..</div>
+  // }
+
+  // 9월 1일자로 한거
+  // 파이어베이스에서 내가 쓴 게시글에서 단어 검색 해서 찾아내는 함수
+  const GetFindPostData: any = async (
+    postCategory: string,
+    postBoard: string,
+    keyword: string
+  ) => {
+    const postsTemp: Post[] = []
+    const dbPosts = query(
+      collection(db, "posts"),
+      where("postUserEmail", "==", userId),
+      where("postBoard", "==", postBoard)
+    )
+    const userSnapshot = await getDocs(dbPosts)
+    userSnapshot.forEach((doc: any) => {
+      if (
+        doc != null &&
+        doc.data().postUserEmail === userId &&
+        postBoard === doc.data().postBoard
+      ) {
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (doc.data().postContent.includes(keyword)) {
+          const newPost: Post = {
+            id: doc.id,
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
+            likes: 0,
+            comments: 0
+          }
+          // setPosts([...posts, newPost])
+
+          postsTemp.push(newPost)
+        }
+      }
+    })
+    console.log(postsTemp)
+    if (postCategory !== "카테고리") {
+      postsTemp.filter((post) => post.postCategory === postCategory)
+    }
+    return postsTemp
   }
 
   // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
@@ -49,14 +130,23 @@ const MyLikePage: React.FC = () => {
 
   // 돋보기 버튼 클릭시 작동하는 이벤트 함수
   const SearchIncludeWord: any = () => {
-    console.log("sksksksksk")
+    GetFindPostData(categorySelected, activeTab, searchTerm).then(
+      (dummyData: any) => {
+        setPosts(dummyData)
+      }
+    )
+    setSearchTerm("")
   }
 
   // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
   const handleOnKeyPress = (e: any) => {
     if (e.key === "Enter") {
-      // Enter 입
-      console.log("dididididi")
+      GetFindPostData(categorySelected, activeTab, searchTerm).then(
+        (dummyData: any) => {
+          setPosts(dummyData)
+        }
+      )
+      setSearchTerm("")
     }
   }
 
@@ -145,7 +235,11 @@ const MyLikePage: React.FC = () => {
               onClick={() => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
-                setCategorySelected("")
+                setCategorySelected("카테고리")
+                setSearchTerm("")
+                void getUserLikesPost(userId).then((dummyData: any) => {
+                  setPosts(dummyData)
+                })
               }}
             >
               {tab.label}
@@ -154,7 +248,12 @@ const MyLikePage: React.FC = () => {
         </StyledTabButtons>
         <NumberAndSearchBox>
           <NumberBox>
-            전체<StyledNumberBlue> {data?.length}</StyledNumberBlue>개
+            전체
+            <StyledNumberBlue>
+              {" "}
+              {posts?.filter((post) => post.postBoard === activeTab)?.length}
+            </StyledNumberBlue>
+            개
           </NumberBox>
 
           <SelectAndSearchBox>
@@ -195,13 +294,13 @@ const MyLikePage: React.FC = () => {
           </StyledPostTitlePostCommentNum>
         </StyledPostTitleBox>
         <StyledPostContainer>
-          {data === undefined ? (
+          {posts === undefined ? (
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
               {categorySelected === "카테고리"
-                ? data
-                    .filter((post) => post.postBoard === activeTab)
+                ? posts
+                    ?.filter((post) => post.postBoard === activeTab)
                     .map((post) => (
                       <StyledPost
                         key={post.id}
@@ -212,14 +311,21 @@ const MyLikePage: React.FC = () => {
                         <StyledPostCategory>
                           {post.postCategory}
                         </StyledPostCategory>
-                        <h3>{post.postTitle}</h3>
-                        <p>
-                          작성 일자: {post.postTime.toDate().toDateString()}
-                        </p>
+                        <StyledPostTitle>{post.postTitle}</StyledPostTitle>
+                        <TimeAndLikeAndCommentBox>
+                          <p>{formatDate(post.postTime.toDate())}</p>
+                          <StyledNumber>{post.likes}</StyledNumber>
+                          <StyledNumber>{post.comments}</StyledNumber>
+                        </TimeAndLikeAndCommentBox>
                       </StyledPost>
                     ))
-                : data
-                    .filter((post) => post.postBoard === activeTab)
+                : posts
+                    ?.filter((post) => post.postBoard === activeTab)
+                    ?.filter(
+                      (post) =>
+                        categorySelected !== "카테고리" &&
+                        post.postCategory === categorySelected
+                    )
                     .map((post) => (
                       <StyledPost
                         key={post.id}
@@ -230,10 +336,13 @@ const MyLikePage: React.FC = () => {
                         <StyledPostCategory>
                           {post.postCategory}
                         </StyledPostCategory>
-                        <h3>{post.postTitle}</h3>
-                        <p>
-                          작성 일자: {post.postTime.toDate().toDateString()}
-                        </p>
+
+                        <StyledPostTitle>{post.postTitle}</StyledPostTitle>
+                        <TimeAndLikeAndCommentBox>
+                          <p>{post.postTime.toDate().toDateString()}</p>
+                          <StyledNumber>{post.likes}</StyledNumber>
+                          <StyledNumber>{post.comments}</StyledNumber>
+                        </TimeAndLikeAndCommentBox>
                       </StyledPost>
                     ))}
             </StyledPostList>
@@ -243,6 +352,24 @@ const MyLikePage: React.FC = () => {
     </MyPostWrap>
   )
 }
+
+const StyledPostTitle = styled.p`
+  width: 500px;
+  justify-content: left;
+  padding-top: 3px;
+`
+
+const StyledNumber = styled.p`
+  margin-right: 20px;
+`
+
+const TimeAndLikeAndCommentBox = styled.td`
+  display: flex;
+  justify-content: space-between;
+  float: right;
+  width: 255px;
+  margin-right: 24px;
+`
 
 const MyPostWrap = styled.div`
   display: flex;
@@ -359,27 +486,38 @@ const StyledButton = styled.button`
 `
 
 const StyledPostContainer = styled.div`
-  border: 0.0625rem solid #ccc;
-  background-color: #f8f8f8;
-  padding: 1.25rem;
+  font-size: 13px;
+  border: 0px solid;
+  background-color: white;
   margin-bottom: 1.25rem;
 `
 
-const StyledPostList = styled.ul`
+const StyledPostList = styled.table`
   list-style: none;
   padding: 0;
+  background-color: white;
+  border-color: white;
+  width: 100%;
 `
 
-const StyledPost = styled.li`
-  border: 0.0625rem solid #ccc;
-  padding: 1.25rem;
+const StyledPost = styled.tr`
+  display: flex;
+  justify-content: space-between;
+  border: 0.0625rem solid #ffffff;
   margin-bottom: 1.25rem;
-  background-color: #f8f8f8;
+  background-color: #ffffff;
+  height: 20px;
+  width: 100%;
 `
 
-const StyledPostCategory = styled.p`
-  font-weight: bold;
-  margin-bottom: 0.3125rem;
+const StyledPostCategory = styled.td`
+  border: solid #e7e7e7 1px;
+  padding: 3px 3px 3px 3px;
+  color: #9f9f9f;
+  display: flex;
+  width: 45px;
+  justify-content: center;
+  margin-left: 16px;
 `
 
 const StyledNumberBlue = styled.span`
@@ -435,6 +573,7 @@ const StyledPostTitlePostName = styled.span`
   width: 31.25rem;
   text-align: center;
   font-size: 0.875rem;
+  margin-left: 80px;
 `
 
 const StyledPostTitlePostDay = styled.span`
@@ -471,4 +610,5 @@ const SearchWord = styled.span`
   margin-left: 2.8rem;
   font-size: 0.875rem;
 `
+
 export default MyLikePage
