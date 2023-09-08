@@ -10,6 +10,7 @@ import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
 import { deleteDoc, doc, onSnapshot } from "firebase/firestore"
+
 interface Post {
   id: string
   postBoard: string
