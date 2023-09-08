@@ -1,59 +1,101 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
-import { useQuery } from "react-query"
 import { useParams, useNavigate } from "react-router"
-import { getPosts } from "../axios/api"
+import { getPost } from "../axios/api"
 import Comments from "../Components/Comments"
 import { auth, db } from "../axios/firebase"
-import { doc, updateDoc } from "firebase/firestore"
+import { doc, onSnapshot, updateDoc } from "firebase/firestore"
+import { AiOutlineLike } from "react-icons/ai"
+import { FaRegComment } from "react-icons/fa"
+import { PiSiren } from "react-icons/pi"
+
+interface Post {
+  id: string
+  postBoard: string
+  postCategory: string
+  postContent: string
+  postDisplayName: string
+  postImgUrl: string
+  postTitle: string
+  postTime: number
+  postUserEmail: string
+  likes: number
+  comments: number
+}
 
 function EditDetailPage() {
-  const { id } = useParams()
+  const { id } = useParams<string>()
   const navigate = useNavigate()
-  const { isLoading, data } = useQuery("posts", getPosts)
-  const postInfo: any = data?.find((item) => item.id === id)
-  const [item, setItem] = useState({
-    postBoard: postInfo.postBoard,
-    postCategory: postInfo.postCategory,
-    postContent: postInfo.postContent,
-    postDisplayName: postInfo.postDisplayName,
-    postImgUrl: postInfo.postImgUrl,
-    postTime: postInfo.postTime,
-    postTitle: postInfo.postTitle,
-    postUserEmail: postInfo.postUserEmail
+  const [postInfo, setPostInfo] = useState<Post>({
+    id: "",
+    postBoard: "",
+    postCategory: "",
+    postContent: "",
+    postDisplayName: "",
+    postImgUrl: "",
+    postTitle: "",
+    postTime: 0,
+    postUserEmail: "",
+    likes: 0,
+    comments: 0
   })
+  const [likesCount, setLikesCount] = useState(0)
+  const [commentsCount, setCommentsCount] = useState(0)
 
-  const onChange = (event: { target: { value: string; name: string } }) => {
-    const { value, name } = event.target
-    setItem({
-      ...item,
-      [name]: value
+  // post 정보를 하나만 가져오기
+  useEffect(() => {
+    if (id !== undefined) {
+      void getPost(id).then((dummyData: any) => {
+        setPostInfo(dummyData)
+
+        if (postInfo !== undefined) {
+          setLikesCount(postInfo.likes)
+          setCommentsCount(postInfo.comments)
+        }
+      })
+      // 실시간 좋아요 숫자 업데이트
+      onSnapshot(doc(db, "posts", id), (doc) => {
+        setLikesCount(doc?.data()?.likes)
+        setCommentsCount(doc?.data()?.comments)
+        console.log(doc.data())
+      })
+    }
+  }, [])
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+
+    setPostInfo((prevPostInfo) => {
+      return {
+        ...prevPostInfo,
+        [name]: value
+      }
     })
   }
 
   const handleEdit = (event: { preventDefault: () => void }) => {
     event.preventDefault()
-    if (item.postTitle === null || item.postContent === null) {
+    if (postInfo?.postTitle === null || postInfo?.postContent === null) {
       alert("빈칸을 채워주세요!")
       return
     }
     const newInfo = {
-      postBoard: item.postBoard !== undefined ? item.postBoard : null,
-      postCategory: item.postCategory !== undefined ? item.postCategory : null,
-      postContent: item.postContent !== undefined ? item.postContent : null,
+      postBoard: postInfo?.postBoard ?? null,
+      postCategory: postInfo?.postCategory ?? null,
+      postContent: postInfo?.postContent ?? null,
       postDisplayName: auth.currentUser?.displayName,
-      postImgUrl: item.postImgUrl !== undefined ? item.postImgUrl : null,
-      postTime: item.postTime !== undefined ? item.postTime : null,
-      postTitle: item.postTitle !== undefined ? item.postTitle : null,
+      postImgUrl: postInfo?.postImgUrl ?? null,
+      postTime: postInfo?.postTime ?? null,
+      postTitle: postInfo?.postTitle ?? null,
       postUserEmail: auth.currentUser?.email
     }
-    const infoRef = doc(db, "posts", postInfo.id)
-    void updateDoc(infoRef, newInfo)
-    alert("저장되었습니다!")
-    navigate(`/detailPage/${id}`)
-  }
-  if (isLoading) {
-    return <div>로딩중 ...</div>
+
+    if (postInfo?.id !== undefined) {
+      const infoRef = doc(db, "posts", postInfo.id)
+      void updateDoc(infoRef, newInfo)
+      alert("저장되었습니다!")
+      navigate(`/detailPage/${id}`)
+    }
   }
 
   return (
@@ -62,37 +104,47 @@ function EditDetailPage() {
         <DetailContainer>
           <Detailtitle>
             <DetailtitleBox>
-              <DetailCategory>{postInfo.postCategory}</DetailCategory>
+              <DetailCategory>{postInfo?.postCategory}</DetailCategory>
               <InputDetailTitle
                 type="text"
                 name="postTitle"
                 placeholder="제목"
-                value={item.postTitle}
+                value={postInfo?.postTitle}
                 onChange={onChange}
               />
             </DetailtitleBox>
             <BtnBox>
-              <DeclarationBtn>신고</DeclarationBtn>
-              <LikeBtn>좋아요</LikeBtn>
+              <DeclarationBtn>
+                <PiSiren size="30px" />
+              </DeclarationBtn>
+              <LikeBtn>
+                <AiOutlineLike size="30px" />
+              </LikeBtn>
             </BtnBox>
           </Detailtitle>
           <DetailUser>
-            <DetailUserName>{postInfo.displayName}</DetailUserName>
+            <DetailUserName>{postInfo?.postDisplayName}</DetailUserName>
             <DetailUserInfo>
-              <div>좋아요</div>
-              <div>댓글수</div>
+              <div>
+                <AiOutlineLike size="12px" />
+                {likesCount}
+              </div>
+              <div>
+                <FaRegComment size="12px" />
+                {commentsCount}
+              </div>
             </DetailUserInfo>
           </DetailUser>
           <DetailContent>
             <InputDetailContent
               name="postContent"
               placeholder="내용을 입력해주세요"
-              value={item.postContent}
+              value={postInfo?.postContent}
               onChange={onChange}
             />
           </DetailContent>
           <EditBox>
-            <EditBtn onClick={handleEdit} id={postInfo.id}>
+            <EditBtn onClick={handleEdit} id={postInfo?.id}>
               저장
             </EditBtn>
             <DeleteBtn
