@@ -19,6 +19,7 @@ import {
   type Timestamp
 } from "firebase/firestore"
 import { db } from "./firebase"
+
 interface Post {
   id: string
   postBoard: string
@@ -58,6 +59,13 @@ interface usersinfo {
   profileImg: string
 }
 
+interface follow {
+  id: string
+  followuserEmail: string
+  userEmail: string
+  followers: string[]
+}
+
 const getPost = async (postId: string): Promise<Post> => {
   let data = {}
   const postRef = doc(db, "posts", postId)
@@ -80,6 +88,7 @@ const getPost = async (postId: string): Promise<Post> => {
   console.log(data)
   return data as Post
 }
+
 const getPosts = async (): Promise<Post[]> => {
   const q = query(collection(db, "posts"), orderBy("postTime", "desc"))
   const querySnapshot = await getDocs(q)
@@ -94,6 +103,7 @@ const getPosts = async (): Promise<Post[]> => {
   console.log(posts)
   return posts
 }
+
 const getMyLikePosts = async (postIds: string[]): Promise<Post[]> => {
   return await Promise.all(
     postIds.map(async (postId: string) => {
@@ -107,6 +117,7 @@ const getMyLikePosts = async (postIds: string[]): Promise<Post[]> => {
     })
   )
 }
+
 const getComments = async (): Promise<Comment[]> => {
   const q = query(collection(db, "comments"))
   const querySnapshot = await getDocs(q)
@@ -120,6 +131,7 @@ const getComments = async (): Promise<Comment[]> => {
   })
   return comments
 }
+
 const getLikes = async (): Promise<like[]> => {
   const q = query(collection(db, "likes"))
   const querySnapshot = await getDocs(q)
@@ -133,6 +145,7 @@ const getLikes = async (): Promise<like[]> => {
   })
   return likes
 }
+
 const getUserLikes = async (userId: string | null): Promise<like[]> => {
   const q = query(collection(db, "likes"), where("userId", "==", userId))
   const querySnapshot = await getDocs(q)
@@ -146,6 +159,7 @@ const getUserLikes = async (userId: string | null): Promise<like[]> => {
   })
   return likes
 }
+
 const getUserLikesPost = async (userId: string | null) => {
   const likes = await getUserLikes(userId)
   const postIds = likes.map((like) => like.postId)
@@ -390,6 +404,82 @@ function formatDate(date: {
   return `${year}.${month}.${day}`
 }
 
+const addfollow = async (followuserEmail: string, userEmail: string) => {
+  try {
+    await addDoc(collection(db, "follow"), {
+      followuserEmail,
+      userEmail
+    })
+    console.log("팔로우 등록 성공")
+  } catch (error) {
+    console.error("팔로우 등록 실패:", error)
+    // 적절한 오류 처리 추가
+  }
+}
+
+const deletefollow = async (followDOCId: string) => {
+  await deleteDoc(doc(db, "follow", followDOCId))
+}
+
+const setfollow: any = async (
+  set: boolean,
+  followuserEmail: string,
+  userEmail: string
+) => {
+  if (!set) {
+    await addfollow(followuserEmail, userEmail)
+  } else {
+    let docId = ""
+    const q = query(
+      collection(db, "follow"),
+      where("followuserEmail", "==", followuserEmail),
+      where("userEmail", "==", userEmail)
+    )
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((doc: DocumentSnapshot) => {
+      if (doc.id !== null) {
+        docId = doc.id
+      }
+    })
+    await deletefollow(docId)
+  }
+}
+
+const getfollow = async (): Promise<follow[]> => {
+  const q = query(collection(db, "follow"))
+  const querySnapshot = await getDocs(q)
+  const follower: follow[] = []
+  querySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    follower.push(data as follow) // 형 변환을 통해 타입 일치화
+  })
+  return follower
+}
+
+const findfollow: any = async (followuserEmail: string, followId: string) => {
+  const q = query(
+    collection(db, "follow"),
+    where("followuserEmail", "==", followuserEmail),
+    where("followId", "==", followId)
+  )
+
+  try {
+    const querySnapshot = await getDocs(q)
+
+    if (querySnapshot !== null) {
+      return true
+    } else {
+      return false
+    }
+  } catch (error) {
+    console.error("Firestore 오류:", error)
+    throw error
+  }
+}
+
 export {
   getPost,
   getPosts,
@@ -405,5 +495,8 @@ export {
   getUserLikesPost,
   getusersinfo,
   getusersinfos,
-  formatDate
+  formatDate,
+  setfollow,
+  getfollow,
+  findfollow
 }
