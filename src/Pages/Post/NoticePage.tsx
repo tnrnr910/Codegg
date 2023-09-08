@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
+import Buttons from "../../Components/Buttons"
 
 function NoticePage() {
   const navigate = useNavigate()
@@ -64,15 +65,15 @@ function NoticePage() {
             </BodyDiv>
           </Body>
           <WriteBtnBox>
-            <WriteBtn
+            <Buttons
               onClick={() => {
                 navigate("/WritePage/Notice")
               }}
             >
               글쓰기
-            </WriteBtn>
+            </Buttons>
           </WriteBtnBox>
-          <div> 페이지 네이션</div>
+          {/* <Pagination>페이지네이션</Pagination> */}
         </StyledBox>
       </StyledContainer>
     </>
@@ -186,17 +187,7 @@ const ListCategory = styled.div`
 const WriteBtnBox = styled.div`
   display: flex;
   justify-content: flex-end;
+  margin: 2rem 0 1rem 0;
 `
-const WriteBtn = styled.button`
-  font-size: 14px;
-  font-weight: bold;
-  width: 64px;
-  height: 28px;
-  border-radius: 4;
-  margin: 7px 12px 12px 7px;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  background-color: #0c356a;
-  cursor: pointer;
-`
+
+// const Pagination = styled.div``

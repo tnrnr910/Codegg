@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
+import Buttons from "../../Components/Buttons"
 
 function TipPage() {
   const navigate = useNavigate()
@@ -209,15 +210,15 @@ function TipPage() {
             </BodyDiv>
           </Body>
           <WtiteBtnBox>
-            <WriteBtn
+            <Buttons
               onClick={() => {
                 navigate("/WritePage/tips")
               }}
             >
               글쓰기
-            </WriteBtn>
+            </Buttons>
           </WtiteBtnBox>
-          <div> 페이지 네이션</div>
+          {/* <Pagination>페이지네이션</Pagination> */}
         </StyledBox>
       </StyledContainer>
     </>
@@ -389,16 +390,5 @@ const WtiteBtnBox = styled.div`
   display: flex;
   justify-content: flex-end;
 `
-const WriteBtn = styled.button`
-  font-size: 14px;
-  font-weight: bold;
-  width: 64px;
-  height: 28px;
-  border-radius: 4;
-  margin: 7px 12px 12px 7px;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  background-color: #0c356a;
-  cursor: pointer;
-`
+
+// const Pagination = styled.div``
