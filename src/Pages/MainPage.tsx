@@ -42,10 +42,7 @@ function MainPage() {
   return (
     <>
       <Banner>
-        <img
-          src="https://i.postimg.cc/65pxBtZD/banner2.png"
-          alt="main-banner"
-        />
+        <img src={require("../asset/img/vanner1.png")} alt="main-banner" />
       </Banner>
       <Container>
         <SideRanking />
