@@ -7,9 +7,9 @@ import "moment/locale/ko"
 import { PiSiren } from "react-icons/pi"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
-import { useParams } from "react-router-dom"
-import { useQuery } from "react-query"
-import { getPosts } from "../axios/api"
+import { useNavigate, useParams } from "react-router-dom"
+
+import { getPost } from "../axios/api"
 import {
   addDoc,
   collection,
@@ -18,7 +18,9 @@ import {
   getDocs,
   query,
   orderBy,
-  updateDoc
+  updateDoc,
+  type Timestamp,
+  increment
 } from "firebase/firestore"
 import { db, auth } from "../axios/firebase"
 import Swal from "sweetalert2"
@@ -37,14 +39,35 @@ interface CommentInterface {
   id?: string
 }
 
+interface Post {
+  id: string
+  postBoard: string
+  postCategory: string
+  postContent: string
+  postTitle: string
+  postDisplayName: string
+  postUserEmail: string
+  postTime: Timestamp
+  likes: number
+  comments: number
+}
+
 function Comments() {
+  const navigate = useNavigate()
   const { id } = useParams()
+  const [postData, setPostData] = useState<Post>()
 
-  const { isLoading, data } = useQuery("posts", getPosts)
-
-  const postData = data?.find(function (data) {
-    return data.id === id
-  })
+  // 댓글 조회
+  useEffect(() => {
+    if (id !== undefined) {
+      void getPost(id).then((dummyData: any) => {
+        setPostData(dummyData)
+      })
+    } else {
+      navigate(-1)
+    }
+    void fetchComments()
+  }, [])
 
   const [inputText, setInputText] = useState("")
   const [inputEditText, setInputEditText] = useState("")
@@ -96,11 +119,6 @@ function Comments() {
     setInputEditText(e.target.value)
   }
 
-  // 댓글 조회
-  useEffect(() => {
-    void fetchComments()
-  }, [])
-
   // 댓글 등록
   async function addComment(event: any) {
     event.preventDefault()
@@ -119,6 +137,9 @@ function Comments() {
 
     setInputText("")
     await addDoc(collection(db, "comments"), newComment) // await가 batching처리 방해
+    await updateDoc(doc(collection(db, "posts"), id), {
+      likes: increment(1)
+    })
     await fetchComments()
   }
 
@@ -147,9 +168,9 @@ function Comments() {
         })
       }
     })
-  }
-  if (isLoading) {
-    return <div>로딩중입니다..</div>
+    await updateDoc(doc(collection(db, "posts"), id), {
+      likes: increment(-1)
+    })
   }
 
   // 댓글 수정 버튼 클릭 시
@@ -176,10 +197,6 @@ function Comments() {
     await Swal.fire("수정 완료", "정상적으로 수정되었습니다.")
     await fetchComments()
     setInputEditText("")
-  }
-
-  if (isLoading) {
-    return <div>로딩중입니다..</div>
   }
 
   return (

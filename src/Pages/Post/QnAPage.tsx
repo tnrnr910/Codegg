@@ -3,7 +3,8 @@ import SideRanking from "../../Components/SideRanking"
 import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
-import { getPosts } from "../../axios/api"
+import { getPosts, formatDate } from "../../axios/api"
+import { type Timestamp } from "firebase/firestore"
 import Buttons from "../../Components/Buttons"
 
 function QnAPage() {
@@ -158,23 +159,31 @@ function QnAPage() {
                     .map(
                       (info: {
                         id: string
+                        postTime: Timestamp
                         postTitle: string
                         postCategory: string
+                        likes: number
+                        comments: number
                       }) => {
                         return (
                           <ListContainer key={info.id}>
-                            <ListDiv
+                            <StyledPost
                               onClick={() => {
                                 navigate(`/detailPage/${info.id}`)
                               }}
                             >
-                              <ListCategory> {info.postCategory}</ListCategory>
-                              {info.postTitle}
-                            </ListDiv>
-                            <ListBox>
-                              <div>좋아요</div>
-                              <div>댓글수</div>
-                            </ListBox>
+                              <StyledPostCategory>
+                                {info.postCategory}
+                              </StyledPostCategory>
+                              <StyledPostTitle>
+                                {info.postTitle}
+                              </StyledPostTitle>
+                              <TimeAndLikeAndCommentBox>
+                                <p>{formatDate(info.postTime.toDate())}</p>
+                                <StyledNumber>{info.likes}</StyledNumber>
+                                <StyledNumber>{info.comments}</StyledNumber>
+                              </TimeAndLikeAndCommentBox>
+                            </StyledPost>
                           </ListContainer>
                         )
                       }
@@ -195,23 +204,31 @@ function QnAPage() {
                     .map(
                       (info: {
                         id: string
+                        postTime: Timestamp
                         postTitle: string
                         postCategory: string
+                        likes: number
+                        comments: number
                       }) => {
                         return (
                           <ListContainer key={info.id}>
-                            <ListDiv
+                            <StyledPost
                               onClick={() => {
                                 navigate(`/detailPage/${info.id}`)
                               }}
                             >
-                              <ListCategory> {info.postCategory}</ListCategory>
-                              {info.postTitle}
-                            </ListDiv>
-                            <ListBox>
-                              <div>좋아요</div>
-                              <div>댓글수</div>
-                            </ListBox>
+                              <StyledPostCategory>
+                                {info.postCategory}
+                              </StyledPostCategory>
+                              <StyledPostTitle>
+                                {info.postTitle}
+                              </StyledPostTitle>
+                              <TimeAndLikeAndCommentBox>
+                                <p>{formatDate(info.postTime.toDate())}</p>
+                                <StyledNumber>{info.likes}</StyledNumber>
+                                <StyledNumber>{info.comments}</StyledNumber>
+                              </TimeAndLikeAndCommentBox>
+                            </StyledPost>
                           </ListContainer>
                         )
                       }
@@ -237,6 +254,43 @@ function QnAPage() {
 }
 
 export default QnAPage
+
+const StyledPostTitle = styled.p`
+  width: 500px;
+  justify-content: left;
+  padding-top: 3px;
+`
+
+const StyledNumber = styled.p`
+  margin-right: 20px;
+`
+
+const StyledPost = styled.div`
+  display: flex;
+  justify-content: space-between;
+  border: 0.0625rem solid #ffffff;
+  margin-bottom: 1.25rem;
+  background-color: #ffffff;
+  height: 20px;
+  width: 100%;
+`
+
+const StyledPostCategory = styled.td`
+  border: solid #e7e7e7 1px;
+  padding: 3px 3px 3px 3px;
+  color: #9f9f9f;
+  display: flex;
+  width: 45px;
+  justify-content: center;
+`
+
+const TimeAndLikeAndCommentBox = styled.td`
+  display: flex;
+  justify-content: space-between;
+  float: right;
+  width: 255px;
+  margin-right: 24px;
+`
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -282,6 +336,7 @@ const StyledPostTitlePostName = styled.span`
   width: 31.25rem;
   text-align: center;
   font-size: 0.875rem;
+  margin-left: 38px;
 `
 
 const StyledPostTitlePostDay = styled.span`
@@ -385,15 +440,6 @@ const ListHeadCategory = styled.div`
   border: solid #0c356a 1px;
   padding: 3px 3px 3px 3px;
   color: #0c356a;
-`
-const ListCategory = styled.div`
-  border: solid #e7e7e7 1px;
-  padding: 3px 3px 3px 3px;
-  color: #9f9f9f;
-`
-
-const ListBox = styled.div`
-  display: flex;
 `
 
 const WtiteBtnBox = styled.div`

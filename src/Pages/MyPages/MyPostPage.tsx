@@ -1,4 +1,10 @@
-import { query, collection, where, getDocs } from "firebase/firestore"
+import {
+  query,
+  collection,
+  where,
+  getDocs,
+  type Timestamp
+} from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
@@ -9,11 +15,11 @@ import { BiSearch } from "react-icons/bi"
 
 interface Post {
   id: string
-  title: string
-  content: string
-  category: string
-  date: string
-  board: string
+  postBoard: string
+  postCategory: string
+  postContent: string
+  postTitle: string
+  postTime: Timestamp
   likes: number
   comments: number
 }
@@ -33,6 +39,18 @@ const MyPostPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = "/MyPostPage"
+
+  // formatDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환합니다.
+  function formatDate(date: {
+    getFullYear: () => any
+    getMonth: () => number
+    getDate: () => any
+  }) {
+    const year = date.getFullYear() // 연도
+    const month = String(date.getMonth() + 1).padStart(2, "0") // 월 (두 자릿수로 표시)
+    const day = String(date.getDate()).padStart(2, "0") // 일 (두 자릿수로 표시)
+    return `${year}.${month}.${day}`
+  }
 
   // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
@@ -65,11 +83,11 @@ const MyPostPage: React.FC = () => {
       if (doc != null) {
         const newPost: Post = {
           id: doc.id,
-          category: doc.data().postCategory,
-          title: doc.data().postTitle,
-          date: String(doc.data().postTime.toDate()),
-          content: doc.data().postContent,
-          board: doc.data().postBoard,
+          postCategory: doc.data().postCategory,
+          postTitle: doc.data().postTitle,
+          postTime: doc.data().postTime,
+          postContent: doc.data().postContent,
+          postBoard: doc.data().postBoard,
           likes: 0,
           comments: 0
         }
@@ -106,11 +124,11 @@ const MyPostPage: React.FC = () => {
         if (doc.data().postContent.includes(keyword)) {
           const newPost: Post = {
             id: doc.id,
-            category: doc.data().postCategory,
-            title: doc.data().postTitle,
-            date: String(doc.data().postTime.toDate()),
-            content: doc.data().postContent,
-            board: doc.data().postBoard,
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
             likes: 0,
             comments: 0
           }
@@ -122,7 +140,7 @@ const MyPostPage: React.FC = () => {
     })
     console.log(postsTemp)
     if (postCategory !== "카테고리") {
-      postsTemp.filter((post) => post.category === postCategory)
+      postsTemp.filter((post) => post.postCategory === postCategory)
     }
     return postsTemp
   }
@@ -139,6 +157,7 @@ const MyPostPage: React.FC = () => {
         setPosts(dummyData)
       }
     )
+    setSearchTerm("")
   }
 
   // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
@@ -149,6 +168,7 @@ const MyPostPage: React.FC = () => {
           setPosts(dummyData)
         }
       )
+      setSearchTerm("")
     }
   }
 
@@ -246,6 +266,7 @@ const MyPostPage: React.FC = () => {
               onClick={() => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
+                setSearchTerm("")
                 setCategorySelected("카테고리")
                 const list = GetPostData(tab.value)
 
@@ -316,16 +337,22 @@ const MyPostPage: React.FC = () => {
                         GoToDetailPage(post.id)
                       }}
                     >
-                      <StyledPostCategory>{post.category}</StyledPostCategory>
-                      <h3>{post.title}</h3>
-                      <p>작성 일자: {post.date.toString()}</p>
+                      <StyledPostCategory>
+                        {post.postCategory}
+                      </StyledPostCategory>
+                      <h3>{post.postTitle}</h3>
+                      <TimeAndLikeAndCommentBox>
+                        <p>{formatDate(post.postTime.toDate())}</p>
+                        <StyledNumber>{post.likes}</StyledNumber>
+                        <StyledNumber>{post.comments}</StyledNumber>
+                      </TimeAndLikeAndCommentBox>
                     </StyledPost>
                   ))
                 : posts
                     .filter(
                       (post) =>
                         categorySelected !== "카테고리" &&
-                        post.category === categorySelected
+                        post.postCategory === categorySelected
                       // (post) => {
                       //   categorySelected !== "카테고리" &&
                       //   post.category === categorySelected
@@ -339,9 +366,15 @@ const MyPostPage: React.FC = () => {
                           GoToDetailPage(post.id)
                         }}
                       >
-                        <StyledPostCategory>{post.category}</StyledPostCategory>
-                        <h3>{post.title}</h3>
-                        <p>작성 일자: {post.date}</p>
+                        <StyledPostCategory>
+                          {post.postCategory}
+                        </StyledPostCategory>
+                        <h3>{post.postTitle}</h3>
+                        <TimeAndLikeAndCommentBox>
+                          <p>{formatDate(post.postTime.toDate())}</p>
+                          <StyledNumber>{post.likes}</StyledNumber>
+                          <StyledNumber>{post.comments}</StyledNumber>
+                        </TimeAndLikeAndCommentBox>
                       </StyledPost>
                     ))}
             </StyledPostList>
@@ -351,6 +384,18 @@ const MyPostPage: React.FC = () => {
     </MyPostWrap>
   )
 }
+
+const StyledNumber = styled.p`
+  margin-right: 20px;
+`
+
+const TimeAndLikeAndCommentBox = styled.td`
+  display: flex;
+  justify-content: space-between;
+  float: right;
+  width: 255px;
+  margin-right: 24px;
+`
 
 const MyPostWrap = styled.div`
   display: flex;
@@ -467,27 +512,38 @@ const StyledButton = styled.button`
 `
 
 const StyledPostContainer = styled.div`
-  border: 0.0625rem solid #ccc;
-  background-color: #f8f8f8;
-  padding: 1.25rem;
+  font-size: 13px;
+  border: 0px solid;
+  background-color: white;
   margin-bottom: 1.25rem;
 `
 
-const StyledPostList = styled.ul`
+const StyledPostList = styled.table`
   list-style: none;
   padding: 0;
+  background-color: white;
+  border-color: white;
+  width: 100%;
 `
 
-const StyledPost = styled.li`
-  border: 0.0625rem solid #ccc;
-  padding: 1.25rem;
+const StyledPost = styled.tr`
+  display: flex;
+  justify-content: space-between;
+  border: 0.0625rem solid #ffffff;
   margin-bottom: 1.25rem;
-  background-color: #f8f8f8;
+  background-color: #ffffff;
+  height: 20px;
+  width: 100%;
 `
 
-const StyledPostCategory = styled.p`
-  font-weight: bold;
-  margin-bottom: 0.3125rem;
+const StyledPostCategory = styled.td`
+  border: solid #e7e7e7 1px;
+  padding: 3px 3px 3px 3px;
+  color: #9f9f9f;
+  display: flex;
+  width: 45px;
+  justify-content: center;
+  margin-left: 16px;
 `
 
 const StyledNumberBlue = styled.span`
@@ -543,6 +599,7 @@ const StyledPostTitlePostName = styled.span`
   width: 31.25rem;
   text-align: center;
   font-size: 0.875rem;
+  margin-left: 80px;
 `
 
 const StyledPostTitlePostDay = styled.span`

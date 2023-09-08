@@ -30,6 +30,7 @@ interface Post {
   postTime: Timestamp
   postUserEmail: string
   likes: number
+  comments: number
 }
 interface Comment {
   id: string
@@ -377,6 +378,18 @@ const getusersinfo: any = async (
   }
 }
 
+// formtDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
+function formatDate(date: {
+  getFullYear: () => any
+  getMonth: () => number
+  getDate: () => any
+}) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}.${month}.${day}`
+}
+
 export {
   getPost,
   getPosts,
@@ -391,5 +404,6 @@ export {
   getMyLikePosts,
   getUserLikesPost,
   getusersinfo,
-  getusersinfos
+  getusersinfos,
+  formatDate
 }
