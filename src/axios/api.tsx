@@ -63,7 +63,6 @@ interface follow {
   id: string
   followuserEmail: string
   userEmail: string
-  followers: string[]
 }
 
 const getPost = async (postId: string): Promise<Post> => {
@@ -477,6 +476,34 @@ const findfollow: any = async (followuserEmail: string, userEmail: string) => {
   }
 }
 
+const getfollowData: any = async (userEmail: string) => {
+  const q = query(collection(db, "follow"), where("userEmail", "==", userEmail))
+
+  console.log(userEmail)
+  const querySnapshot = await getDocs(q)
+
+  const followData: follow[] = []
+
+  if (!querySnapshot.empty) {
+    querySnapshot.forEach((followDoc) => {
+      const data: follow = {
+        id: followDoc.id,
+        followuserEmail: "",
+        userEmail: "",
+        ...followDoc.data()
+      }
+
+      followData.push(data)
+    })
+
+    console.log(followData)
+    return followData
+  } else {
+    console.log("사용자를 찾을 수 없습니다.")
+    return []
+  }
+}
+
 export {
   getPost,
   getPosts,
@@ -495,5 +522,6 @@ export {
   formatDate,
   setfollow,
   getfollow,
-  findfollow
+  findfollow,
+  getfollowData
 }

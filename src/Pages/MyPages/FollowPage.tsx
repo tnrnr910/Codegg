@@ -1,18 +1,22 @@
-import { query, collection, where, getDocs } from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
-import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
+import { getfollowData, getusersinfo } from "../../axios/api"
 
-interface Post {
+interface usersinfo {
   id: string
-  title: string
-  content: string
-  category: string
-  date: string
-  likes: number
-  comments: number
+  badgeImg: string
+  displayName: string
+  email: string
+  isAdmin: string
+  profileImg: string
+}
+
+interface followinfo {
+  id: string
+  followuserEmail: string
+  userEmail: string
 }
 
 interface TabOption {
@@ -24,7 +28,9 @@ const FollowPage: React.FC = () => {
   const auth = getAuth()
   const [activeTab, setActiveTab] = useState("questions")
   const [userId, setUserId] = useState<string | null>("")
-  const [posts, setPosts] = useState<Post[]>([])
+  const [userinfo, setUserinfo] = useState<followinfo>()
+  const [followuserinfo, setfollowUserinfo] = useState<usersinfo[]>([])
+  const [followuserEmail, setFollowuserEmail] = useState<string[]>([])
   const activeMenuItem = "/FollowPage"
 
   useEffect(() => {
@@ -32,39 +38,32 @@ const FollowPage: React.FC = () => {
       if (user !== null) {
         console.log(user.email)
         setUserId(user.email)
-        void GetPostData(activeTab)
+        void getfollowData(user.email).then((dummyData: any) => {
+          setUserinfo(dummyData)
+          const followuserEmails = dummyData.map(
+            (item: followinfo) => item.followuserEmail
+          )
+          setFollowuserEmail(followuserEmails)
+        })
+
+        Promise.all(followuserEmail.map((email: string) => getusersinfo(email)))
+          .then((data) => {
+            // userInfos 배열에 사용자 정보가 저장됨
+            console.log("데이터", data)
+
+            // userInfos를 useState를 통해 상태에 저장
+            setfollowUserinfo(data)
+          })
+          .catch((error) => {
+            console.error("사용자 정보 가져오기 오류:", error)
+          })
       }
     })
   }, [])
 
-  const GetPostData = async (postBoard: string) => {
-    setPosts([])
-    console.log(postBoard)
-    const dbPosts = query(
-      collection(db, "posts"),
-      where("postUserEmail", "==", userId),
-      where("postBoard", "==", postBoard)
-    )
-    const userSnapshot = await getDocs(dbPosts)
-
-    userSnapshot.forEach((doc: any) => {
-      if (doc != null) {
-        console.log(doc.data())
-        const newPost: Post = {
-          id: doc.id,
-          category: doc.data().postCategory,
-          title: doc.data().postTitle,
-          date: String(doc.data().postTime.toDate()),
-          content: doc.data().postContent,
-          likes: 0,
-          comments: 0
-        }
-        setPosts([...posts, newPost])
-      }
-      console.log(posts)
-    })
-  }
-
+  console.log(userId, userinfo)
+  console.log(followuserEmail)
+  console.log(followuserinfo)
   // 탭탭탭
   const tabOptions: TabOption[] = [
     { value: "Follow", label: "팔로우" },
@@ -84,13 +83,22 @@ const FollowPage: React.FC = () => {
               className={activeTab === tab.value ? "active" : ""}
               onClick={() => {
                 setActiveTab(tab.value)
-                void GetPostData(tab.value)
               }}
             >
               {tab.label}
             </StyledButton>
           ))}
         </StyledTabButtons>
+        <UserCardContainer>
+          {followuserinfo.map((user) => (
+            <UserCard key={user.id}>
+              <UserProfileImage src={user.profileImg} alt={user.displayName} />
+              <UserName>{user.displayName}</UserName>
+              <UserEmail>{user.email}</UserEmail>
+              {/* 여기에 추가 정보를 렌더링할 수 있습니다. */}
+            </UserCard>
+          ))}
+        </UserCardContainer>
       </StyledContainer>
     </MyPostWrap>
   )
@@ -139,6 +147,40 @@ const StyledButton = styled.button`
     background-color: ${(props) =>
       props.className === "active" ? "#f0f0f0" : "#e0e0e0"};
   }
+`
+
+const UserCardContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* 카드 간격 조절 */
+`
+
+const UserCard = styled.div`
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  width: 250px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`
+
+const UserProfileImage = styled.img`
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+`
+
+const UserName = styled.div`
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+`
+
+const UserEmail = styled.div`
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
 `
 
 export default FollowPage
