@@ -4,7 +4,7 @@ import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
-import Buttons from "../../Components/Buttons"
+// import Buttons from "../../Components/Buttons"
 import { type Timestamp } from "firebase/firestore"
 
 function NoticePage() {
@@ -65,13 +65,13 @@ function NoticePage() {
             </BodyDiv>
           </Body>
           <WriteBtnBox>
-            <Buttons
+            {/* <Buttons
               onClick={() => {
                 navigate("/WritePage/Notice")
               }}
             >
               글쓰기
-            </Buttons>
+            </Buttons> */}
           </WriteBtnBox>
           {/* <Pagination>페이지네이션</Pagination> */}
         </StyledBox>

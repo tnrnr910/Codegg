@@ -6,7 +6,7 @@ function SideRanking() {
     <>
       <RankedBox>
         <RankedTitle>Top Writers</RankedTitle>
-        <div></div>
+        <Img src={require("../asset/img/Top Writers.png")} />
       </RankedBox>
     </>
   )
@@ -28,4 +28,11 @@ const RankedTitle = styled.div`
   font-size: 15px;
   font-weight: bold;
   padding-bottom: 14px;
+  margin-top: 5px;
+`
+const Img = styled.img`
+  width: 16rem;
+  height: 16rem;
+  object-fit: cover;
+  margin-left: -7px;
 `
