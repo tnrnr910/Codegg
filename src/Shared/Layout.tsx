@@ -70,8 +70,8 @@ function Header() {
           onClick={() => {
             navigate("/")
           }}
-          src={require("../asset/img/logo.png")}
-          alt="로고"
+          src="img/codeggLogo.png"
+          alt="logo"
         />
         <Pagelist>
           <Stp
@@ -102,23 +102,23 @@ function Header() {
           >
             공지사항
           </Stp>
-          <Stp
+          {/* <Stp
             onClick={() => {
               navigate("/PointShopPage")
             }}
           >
             포인트 샵
-          </Stp>
-          <SearchInput>
-            <InputField
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchInputChange}
-              onKeyDown={handleEnterKeyPress}
-            />
-            <SearchIcon onClick={handleSearch} />
-          </SearchInput>
+          </Stp> */}
         </Pagelist>
+        <SearchInput>
+          <InputField
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchInputChange}
+            onKeyDown={handleEnterKeyPress}
+          />
+          <SearchIcon onClick={handleSearch} />
+        </SearchInput>
         <Authcontainer>
           {auth.currentUser == null ? (
             <>
@@ -163,14 +163,6 @@ function Footer() {
   return (
     <FooterContainer>
       <FooterBox>
-        <FooterBody>
-          <FooterBodyDiv>서비스 소개</FooterBodyDiv>
-          <FooterBodyDiv>이용약관</FooterBodyDiv>
-          <FooterBodyDiv>디렉토리</FooterBodyDiv>
-          <FooterBodyDiv>개인정보 처리 방침</FooterBodyDiv>
-          <FooterBodyDiv>Codegg 기업 서비스</FooterBodyDiv>
-          <FooterBodyDiv>신고 가이드</FooterBodyDiv>
-        </FooterBody>
         <FooterDiretor>
           <div>@2023 Codegg Project by Enjoy2</div>
           <div>@2023 Designed by seonyougPark</div>
@@ -186,31 +178,43 @@ function Footer() {
 
 function Layout() {
   return (
-    <>
+    <Wrapper>
       <Header />
       <StLayout>
         <Outlet />
       </StLayout>
       <Footer />
-    </>
+    </Wrapper>
   )
 }
 
 export default Layout
 
-const HeaderContainer = styled.div`
-  width: 100%;
-  background: #ffffff;
-  height: 3rem;
+const Wrapper = styled.div`
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+`
+
+const HeaderContainer = styled.div`
+  background: #ffffff;
+  border-bottom: 1px solid #dedede;
+  height: 4rem;
+  display: flex;
+  justify-content: space-evenly;
   align-items: center;
-  justify-content: center;
   color: black;
+  padding: 0 20rem;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 10;
 `
 const Logo = styled.img`
   width: 9rem;
-  height: 2.375rem;
-  margin-right: 3.6875rem;
+  height: 3rem;
+  margin-right: 3rem;
   cursor: pointer;
 `
 const Pagelist = styled.div`
@@ -225,8 +229,10 @@ const Stp = styled.p`
 const Authcontainer = styled.div`
   width: 15%;
   display: flex;
+  justify-content: end;
+  align-items: center;
   gap: 1.5rem;
-  margin-left: 6.25rem;
+  /* margin-left: 6.25rem; */
 `
 
 const StAuth = styled.div`
@@ -238,10 +244,11 @@ const FooterContainer = styled.div`
   display: flex;
   background: #ffffff;
   color: #e9e6d8;
-  align-items: center;
   justify-content: space-evenly;
+  align-items: center;
   font-size: 0.75rem;
   gap: 1rem;
+  border-top: 1px solid #dedede;
 `
 
 const FooterBox = styled.div`
@@ -249,21 +256,12 @@ const FooterBox = styled.div`
   flex-direction: column;
 `
 
-const FooterBody = styled.div`
-  display: flex;
-`
-
 const FooterDiretor = styled.div`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: #9f9f9f;
-  gap: 2.8125rem;
-  padding: 0.9375rem 0.625rem 0rem 0.625rem;
-`
-const FooterBodyDiv = styled.div`
-  font-size: 0.9375rem;
-  color: #9f9f9f;
-  border-right: solid #9f9f9f 1px;
-  padding: 0rem 0.625rem 0rem 0.625rem;
+  gap: 2rem;
 `
 
 const FooterBtnbox = styled.div`
@@ -282,14 +280,14 @@ const FooterBtnbody = styled.div`
 `
 
 const StLayout = styled.div`
-  color: black;
-  background-color: white;
+  /* color: black;
+  background-color: white; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 80vh;
+  /* min-height: 80vh; */
   height: auto;
-  padding: 0px;
+  /* padding: 0px; */
 `
 
 const SearchInput = styled.div`
@@ -297,7 +295,6 @@ const SearchInput = styled.div`
   align-items: center;
   width: 16.875rem;
   height: 2.5rem;
-  margin-right: 0.75rem 0rem 0.75rem 0rem;
   border: solid 1px #63717f;
   float: left;
   color: #63717f;

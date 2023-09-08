@@ -1,7 +1,28 @@
-import React from "react";
+import React from "react"
+import { styled } from "styled-components"
 
-function Buttons() {
-  return <div>Buttons</div>;
+interface ButtonsProps {
+  children: any
+  onClick: () => void
+  // 다른 필요한 props도 여기에 추가할 수 있습니다.
 }
 
-export default Buttons;
+function Buttons({ children, ...props }: ButtonsProps) {
+  return <WriteBtn {...props}>{children}</WriteBtn>
+}
+
+export default Buttons
+
+const WriteBtn = styled.button`
+  font-size: 14px;
+  font-weight: bold;
+  width: 64px;
+  height: 28px;
+  border-radius: 4px;
+  margin: 7px 12px 12px 7px;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: #0c356a;
+  cursor: pointer;
+`

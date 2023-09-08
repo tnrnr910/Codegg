@@ -5,6 +5,7 @@ import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts, formatDate } from "../../axios/api"
 import { type Timestamp } from "firebase/firestore"
+import Buttons from "../../Components/Buttons"
 
 function QnAPage() {
   const navigate = useNavigate()
@@ -75,6 +76,15 @@ function QnAPage() {
             selected={categorySelected === "파이썬"}
           >
             파이썬
+          </StyledCategoryItem>
+          <StyledCategoryItem
+            onClick={() => {
+              setCategorySelected("기타")
+              setCategoryOpen(false)
+            }}
+            selected={categorySelected === "기타"}
+          >
+            기타
           </StyledCategoryItem>
         </StyledCategoryList>
       </StyledCategoryDropdown>
@@ -228,14 +238,15 @@ function QnAPage() {
             </BodyDiv>
           </Body>
           <WtiteBtnBox>
-            <WriteBtn
+            <Buttons
               onClick={() => {
                 navigate("/WritePage/questions")
               }}
             >
               글쓰기
-            </WriteBtn>
+            </Buttons>
           </WtiteBtnBox>
+          {/* <Pagination>페이지네이션</Pagination> */}
         </StyledBox>
       </StyledContainer>
     </>
@@ -288,7 +299,8 @@ const StyledContainer = styled.div`
 
 const StyledBox = styled.div`
   width: 952px;
-  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
 `
 
 const StyledHead = styled.div`
@@ -403,7 +415,6 @@ const StyledCategoryButton = styled.button`
 
 const Body = styled.div`
   width: 100%;
-  height: 100%;
 `
 
 const BodyDiv = styled.div`
@@ -415,7 +426,6 @@ const ListContainer = styled.div`
   justify-content: space-between;
   height: 25px;
   align-items: center;
-  padding-top: 0px;
 `
 
 const ListDiv = styled.div`
@@ -435,17 +445,7 @@ const ListHeadCategory = styled.div`
 const WtiteBtnBox = styled.div`
   display: flex;
   justify-content: flex-end;
+  margin: 2rem 0 1rem 0;
 `
-const WriteBtn = styled.button`
-  font-size: 14px;
-  font-weight: bold;
-  width: 64px;
-  height: 28px;
-  border-radius: 4;
-  margin: 7px 12px 12px 7px;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  background-color: #0c356a;
-  cursor: pointer;
-`
+
+// const Pagination = styled.div``
