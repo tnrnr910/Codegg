@@ -1,24 +1,34 @@
 {
   "cSpell.words": [
+    "addfollow",
     "Authcontainer",
     "Btnbody",
     "Btnbox",
     "Changeinput",
+    "checkfollow",
     "Codegg",
     "CODEGG’s",
     "Commentdoby",
     "csvg",
+    "deletefollow",
     "Detailtitle",
     "Diretor",
     "easymde",
     "Editdetail",
+    "findfollow",
     "firestore",
+    "followuser",
+    "getfollow",
     "getusersinfo",
+    "getusersinfos",
     "Imgs",
+    "isfollow",
     "Navi",
     "Pagelist",
     "Pictur",
     "seonyoug",
+    "setfollow",
+    "setuserst",
     "Signin",
     "Signout",
     "Swal",
@@ -28,6 +38,7 @@
     "Userdisplay",
     "usersinfo",
     "usersinfoid",
-    "usersinfos"
+    "usersinfos",
+    "userst"
   ]
 }
