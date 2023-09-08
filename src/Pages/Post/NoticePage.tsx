@@ -5,6 +5,7 @@ import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
 import Buttons from "../../Components/Buttons"
+import { type Timestamp } from "firebase/firestore"
 
 function NoticePage() {
   const navigate = useNavigate()
@@ -40,8 +41,11 @@ function NoticePage() {
                   .map(
                     (info: {
                       id: string
+                      postTime: Timestamp
                       postTitle: string
                       postCategory: string
+                      likes: number
+                      comments: number
                     }) => {
                       return (
                         <ListContainer key={info.id}>
@@ -91,7 +95,8 @@ const StyledContainer = styled.div`
 
 const StyledBox = styled.div`
   width: 952px;
-  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
 `
 
 const StyledTitle = styled.div`
@@ -145,7 +150,6 @@ const StyledSearchContainer = styled.span`
 
 const Body = styled.div`
   width: 100%;
-  height: 100%;
 `
 
 const BodyDiv = styled.div`
@@ -155,9 +159,8 @@ const BodyDiv = styled.div`
 const ListContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  height: 40px;
+  height: 25px;
   align-items: center;
-  padding-top: 0px;
 `
 
 const ListDiv = styled.div`
