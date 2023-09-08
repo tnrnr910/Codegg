@@ -93,7 +93,8 @@ const Write: React.FC = () => {
             postTime: new Date(),
             postUserEmail: auth.currentUser?.email,
             postDisplayName: auth.currentUser?.displayName,
-            likes: 0
+            likes: 0,
+            comments: 0
           })
             .then(() => {
               alert("글 작성이 완료되었습니다.")

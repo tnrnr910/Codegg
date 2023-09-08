@@ -69,6 +69,7 @@ function MainPage() {
                     postTitle: string
                     postCategory: string
                     likes: number
+                    comments: number
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -86,7 +87,7 @@ function MainPage() {
                             {info.likes}
                           </LikeDiv>
                           <div>
-                            <FaRegComment size="16px" /> 0
+                            <FaRegComment size="16px" /> {info.comments}
                           </div>
                         </ListBox>
                       </ListContainer>
@@ -115,6 +116,7 @@ function MainPage() {
                     postTitle: string
                     postCategory: string
                     likes: number
+                    comments: number
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -132,7 +134,7 @@ function MainPage() {
                             {info.likes}
                           </LikeDiv>
                           <div>
-                            <FaRegComment size="16px" /> 0
+                            <FaRegComment size="16px" /> {info.comments}
                           </div>
                         </ListBox>
                       </ListContainer>
@@ -161,6 +163,7 @@ function MainPage() {
                     postTitle: string
                     postCategory: string
                     likes: number
+                    comments: number
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -178,7 +181,7 @@ function MainPage() {
                             {info.likes}
                           </LikeDiv>
                           <div>
-                            <FaRegComment size="16px" /> 0
+                            <FaRegComment size="16px" /> {info.comments}
                           </div>
                         </ListBox>
                       </ListContainer>
