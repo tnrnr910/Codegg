@@ -3,7 +3,7 @@ import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 // import { useQuery } from "react-query"
 import { getBoardPosts } from "../axios/api"
-// import SideRanking from "../Components/SideRanking"
+import SideRanking from "../Components/SideRanking"
 import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
 import BannerCarousel from "../Components/BannerCarousel"
@@ -44,7 +44,7 @@ function MainPage() {
     <>
       <BannerCarousel />
       <Container>
-        {/* <SideRanking /> */}
+        <SideRanking />
         <PostsContainer>
           <PostBox>
             <Title>
