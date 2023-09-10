@@ -32,6 +32,7 @@ function DetailPage() {
   const [likesCount, setLikesCount] = useState(0)
   const [commentsCount, setCommentsCount] = useState(0)
   const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
+  const [LikeBtnOne, setLikeBtnOne] = useState<boolean>(false)
 
   // post 정보를 하나만 가져오기
   useEffect(() => {
@@ -67,15 +68,22 @@ function DetailPage() {
 
   // 좋아요 버튼을 눌렀을 때 +/- 해주는 기능
   const clickLikeFn = () => {
+    if (LikeBtnOne) {
+      return
+    }
     const email = auth.currentUser?.email
 
     findLikes(email, id).then((bool: boolean) => {
       if (bool) {
         setCheckLikeBtn(true)
-        setLikes(true, email, id)
+        setLikes(true, email, id).then(() => {
+          setLikeBtnOne(false)
+        })
       } else {
         setCheckLikeBtn(false)
-        setLikes(false, email, id)
+        setLikes(false, email, id).then(() => {
+          setLikeBtnOne(false)
+        })
       }
     })
   }
@@ -118,7 +126,13 @@ function DetailPage() {
               <DeclarationBtn>
                 <PiSiren size="30px" />
               </DeclarationBtn>
-              <LikeBtn onClick={clickLikeFn}>
+              <LikeBtn
+                onClick={() => {
+                  setLikeBtnOne(true)
+                  clickLikeFn()
+                }}
+                disabled={LikeBtnOne}
+              >
                 {checkLikeBtn ? (
                   <AiOutlineLike size="30px" />
                 ) : (
@@ -244,12 +258,15 @@ const DetailUserInfo = styled.div`
   gap: 1rem;
   padding-right: 22px;
 `
-const DetailContent = styled.div`
+const DetailContent = styled.pre`
   width: 52rem;
   height: 19rem;
   border: solid #dadada 1px;
   border-radius: 7px;
   background-color: white;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow: auto;
 `
 const DetailContentBody = styled.div`
   font-size: 14px;

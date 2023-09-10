@@ -98,8 +98,29 @@ const MyLikePage: React.FC = () => {
         doc.data().postUserEmail === userId &&
         postBoard === doc.data().postBoard
       ) {
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (doc.data().postContent.includes(keyword)) {
+        if (
+          doc
+            .data()
+            .postContent.toLowerCase()
+            .includes(keyword.toLowerCase()) === true
+        ) {
+          const newPost: Post = {
+            id: doc.id,
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
+            likes: 0,
+            comments: 0
+          }
+          // setPosts([...posts, newPost])
+
+          postsTemp.push(newPost)
+        } else if (
+          doc.data().postTitle.toLowerCase().includes(keyword.toLowerCase()) ===
+          true
+        ) {
           const newPost: Post = {
             id: doc.id,
             postCategory: doc.data().postCategory,
@@ -368,7 +389,7 @@ const TimeAndLikeAndCommentBox = styled.td`
   justify-content: space-between;
   float: right;
   width: 255px;
-  margin-right: 24px;
+  margin-right: 23px;
 `
 
 const MyPostWrap = styled.div`
