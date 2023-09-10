@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
+    "addfollow",
     "Authcontainer",
     "Btnbody",
     "Btnbox",
@@ -13,7 +14,9 @@
     "easymde",
     "Editdetail",
     "firestore",
+    "followuser",
     "getusersinfo",
+    "getusersinfos",
     "Imgs",
     "Navi",
     "Pagelist",
