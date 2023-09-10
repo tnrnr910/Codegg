@@ -98,8 +98,6 @@ function MyLetterPage() {
                         setMessage(e.target.value)
                       }}
                     />
-
-                    {/* 보내기 버튼 */}
                     <SendButton onClick={sendMessage}>보내기</SendButton>
                   </ModalContent>
                 </ModalContainer>
@@ -111,6 +109,12 @@ function MyLetterPage() {
     </MyPostWrap>
   )
 }
+
+// 프로필 수정 시 사진 빈 값이면 기본이미지로 나오도록 변경 필요
+
+// 마이페이지에서 팔로워, 팔로우, 내가쓴글 가져오기
+
+// 쪽지 보내기 기능 만들기
 
 export default MyLetterPage
 
