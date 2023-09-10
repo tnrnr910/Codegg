@@ -142,21 +142,22 @@ function OpenProfile({ closeModal }: any) {
 export default OpenProfile
 
 export const Box = styled.div`
-  width: 100%;
-  font-size: 10px;
+  width: 96%;
+  font-size: 13px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   padding-top: 12px;
-  padding-left: 14px;
+  padding-bottom: 12px;
+  padding-left: 4%;
   gap: 11px;
 `
 
 export const ModalBox = styled.div`
   position: fixed;
   top: 0;
-  left: 0;
+  left: -40px;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0);
@@ -165,29 +166,31 @@ export const ModalBox = styled.div`
 
 export const ModalContents = styled.div`
   background-color: #fff;
-  width: 216px;
-  height: 300px;
+  width: 260px;
+  height: 360px;
   border-radius: 12px;
   margin-left: 70%;
   margin-top: 3%;
   display: flex;
   flex-direction: column;
+  border: 1px solid #d9d9d9;
 `
 
 const ModalHead = styled.div`
   width: 94%;
   height: 37px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
   padding-left: 14px;
+  padding-top: 7px;
   border-bottom: solid #d9d9d9 1px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 `
 const ModalBody = styled.div`
-  width: 216px;
-  height: 170px;
+  width: max;
+  height: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -201,27 +204,29 @@ const ProfileImage = styled.img`
   padding-bottom: 8px;
   border-radius: 50%;
   object-fit: cover;
+  margin: 12px;
 `
 
 const ProfileName = styled.div`
-  font-size: 12px;
+  font-size: 18px;
   font-weight: bold;
-  padding-bottom: 16px;
+  padding-bottom: 10px;
 `
 
 const ProfilePoint = styled.div`
-  font-size: 10px;
-  padding-bottom: 12px;
+  font-size: 12px;
+  padding: 10px;
 `
 
 const ProfileEdit = styled.button`
   width: 164px;
-  height: 24px;
-  font-size: 10px;
+  height: 26px;
+  font-size: 12px;
   color: #a4a4a4;
   border: solid #d9d9d9 1px;
   background-color: #ffffff;
   cursor: pointer;
+  margin: 10px;
 `
 const LogoutBtn = styled.div`
   cursor: pointer;

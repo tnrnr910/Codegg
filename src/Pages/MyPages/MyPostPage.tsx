@@ -120,8 +120,21 @@ const MyPostPage: React.FC = () => {
         doc.data().postUserEmail === userId &&
         postBoard === doc.data().postBoard
       ) {
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (doc.data().postContent.includes(keyword)) {
+        if (doc.data().postContent.includes(keyword) === true) {
+          const newPost: Post = {
+            id: doc.id,
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
+            likes: 0,
+            comments: 0
+          }
+          // setPosts([...posts, newPost])
+
+          postsTemp.push(newPost)
+        } else if (doc.data().postTitle.includes(keyword) === true) {
           const newPost: Post = {
             id: doc.id,
             postCategory: doc.data().postCategory,
@@ -340,7 +353,7 @@ const MyPostPage: React.FC = () => {
                       <StyledPostCategory>
                         {post.postCategory}
                       </StyledPostCategory>
-                      <h3>{post.postTitle}</h3>
+                      <StyledPostTitle>{post.postTitle}</StyledPostTitle>
                       <TimeAndLikeAndCommentBox>
                         <p>{formatDate(post.postTime.toDate())}</p>
                         <StyledNumber>{post.likes}</StyledNumber>
@@ -369,7 +382,7 @@ const MyPostPage: React.FC = () => {
                         <StyledPostCategory>
                           {post.postCategory}
                         </StyledPostCategory>
-                        <h3>{post.postTitle}</h3>
+                        <StyledPostTitle>{post.postTitle}</StyledPostTitle>
                         <TimeAndLikeAndCommentBox>
                           <p>{formatDate(post.postTime.toDate())}</p>
                           <StyledNumber>{post.likes}</StyledNumber>
@@ -385,6 +398,12 @@ const MyPostPage: React.FC = () => {
   )
 }
 
+const StyledPostTitle = styled.p`
+  width: 500px;
+  justify-content: left;
+  padding-top: 3px;
+`
+
 const StyledNumber = styled.p`
   margin-right: 20px;
 `
@@ -394,7 +413,7 @@ const TimeAndLikeAndCommentBox = styled.td`
   justify-content: space-between;
   float: right;
   width: 255px;
-  margin-right: 24px;
+  margin-right: 23px;
 `
 
 const MyPostWrap = styled.div`
