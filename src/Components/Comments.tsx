@@ -56,6 +56,7 @@ function Comments() {
   const navigate = useNavigate()
   const { id } = useParams()
   const [postData, setPostData] = useState<Post>()
+  const [activeAddBtn, setActiveAddBtn] = useState<boolean>(false)
 
   // 댓글 조회
   useEffect(() => {
@@ -121,6 +122,9 @@ function Comments() {
 
   // 댓글 등록
   async function addComment(event: any) {
+    if (activeAddBtn) {
+      return
+    }
     event.preventDefault()
     const newComment = {
       commentContent: inputText,
@@ -138,13 +142,15 @@ function Comments() {
     setInputText("")
     await addDoc(collection(db, "comments"), newComment) // await가 batching처리 방해
     await updateDoc(doc(collection(db, "posts"), id), {
-      likes: increment(1)
+      comments: increment(1)
+    }).then(() => {
+      setActiveAddBtn(false)
     })
     await fetchComments()
   }
 
   // 댓글 삭제
-  const deleteComment = async (id: string) => {
+  const deleteComment = async (commentId: string) => {
     await Swal.fire({
       title: "정말로 삭제하시겠습니까?",
       text: "삭제된 댓글은 복원할 수 없습니다.",
@@ -155,7 +161,7 @@ function Comments() {
       cancelButtonText: "취소"
     }).then((result) => {
       if (result.isConfirmed) {
-        void deleteDoc(doc(db, "comments", id))
+        void deleteDoc(doc(db, "comments", commentId))
         void Swal.fire({
           position: "center",
           title: "삭제 완료",
@@ -164,12 +170,12 @@ function Comments() {
           timer: 1000
         })
         setCommentsData((prev) => {
-          return prev.filter((element) => element.id !== id)
+          return prev.filter((element) => element.id !== commentId)
         })
       }
     })
     await updateDoc(doc(collection(db, "posts"), id), {
-      likes: increment(-1)
+      comments: increment(-1)
     })
   }
 
@@ -358,7 +364,15 @@ function Comments() {
               required
             />
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-            <button onClick={addComment}>등록</button>
+            <button
+              onClick={(e) => {
+                void addComment(e)
+                setActiveAddBtn(true)
+              }}
+              disabled={activeAddBtn}
+            >
+              등록
+            </button>
           </CommentWriteInputForm>
         </CommentWrite>
       ) : null}
