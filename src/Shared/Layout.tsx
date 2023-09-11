@@ -212,9 +212,9 @@ const HeaderContainer = styled.div`
   z-index: 10;
 `
 const Logo = styled.img`
-  width: 9rem;
-  height: 3rem;
-  margin-right: 3rem;
+  width: 9.2rem;
+  height: 2.5rem;
+  margin-right: 2.2rem;
   cursor: pointer;
 `
 const Pagelist = styled.div`
@@ -227,7 +227,7 @@ const Stp = styled.p`
   cursor: pointer;
 `
 const Authcontainer = styled.div`
-  width: 15%;
+  width: 25%;
   display: flex;
   justify-content: end;
   align-items: center;
