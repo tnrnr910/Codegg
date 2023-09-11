@@ -43,7 +43,6 @@ const OtherPostPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = `/OtherPostPage/${email}`
 
-  // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     if (email !== undefined) {
       void getusersinfo(email).then((dummyData: any) => {
@@ -52,7 +51,6 @@ const OtherPostPage: React.FC = () => {
     }
   }, [userstInfo?.email])
 
-  // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
   const GetPostData: any = async (postBoard: string) => {
     const postsTemp: Post[] = []
     const dbPosts = query(
@@ -73,7 +71,6 @@ const OtherPostPage: React.FC = () => {
           likes: 0,
           comments: 0
         }
-        // setPosts([...posts, newPost])
 
         postsTemp.push(newPost)
       }
@@ -82,8 +79,6 @@ const OtherPostPage: React.FC = () => {
     return postsTemp
   }
 
-  // 9월 1일자로 한거
-  // 파이어베이스에서 내가 쓴 게시글에서 단어 검색 해서 찾아내는 함수
   const GetFindPostData: any = async (
     postCategory: string,
     postBoard: string,
@@ -114,7 +109,6 @@ const OtherPostPage: React.FC = () => {
             likes: 0,
             comments: 0
           }
-          // setPosts([...posts, newPost])
 
           postsTemp.push(newPost)
         }
@@ -127,12 +121,10 @@ const OtherPostPage: React.FC = () => {
     return postsTemp
   }
 
-  // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
   const GoToDetailPage: any = (id: string) => {
     navigate(`/DetailPage/${id}`)
   }
 
-  // 돋보기 버튼 클릭시 작동하는 이벤트 함수
   const SearchIncludeWord: any = () => {
     GetFindPostData(categorySelected, activeTab, searchTerm).then(
       (dummyData: any) => {
@@ -141,7 +133,6 @@ const OtherPostPage: React.FC = () => {
     )
   }
 
-  // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
   const handleOnKeyPress = (e: any) => {
     if (e.key === "Enter") {
       GetFindPostData(categorySelected, activeTab, searchTerm).then(
@@ -152,22 +143,12 @@ const OtherPostPage: React.FC = () => {
     }
   }
 
-  // 탭탭탭
   const tabOptions: TabOption[] = [
     { value: "questions", label: "질의응답" },
     { value: "tips", label: "코딩 팁" },
     { value: "meetups", label: "모임" },
     { value: "comments", label: "댓글" }
   ]
-
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const filteredPosts = posts.filter((post) => {
-  //   return (
-  //     (post.category === activeTab || activeTab === "all") &&
-  //     (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       post.content.toLowerCase().includes(searchTerm.toLowerCase()))
-  //   )
-  // })
 
   function DropDown() {
     return (
@@ -236,7 +217,7 @@ const OtherPostPage: React.FC = () => {
     <MyPostWrap>
       <OtherPageMenuBar activeMenuItem={activeMenuItem} />
       <StyledContainer>
-        <StyledTitle>내가 쓴 글</StyledTitle>
+        <StyledTitle>{userstInfo?.displayName}님이 쓴 글</StyledTitle>
 
         <StyledTabButtons>
           {tabOptions.map((tab) => (

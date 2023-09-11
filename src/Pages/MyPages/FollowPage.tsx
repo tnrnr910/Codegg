@@ -2,7 +2,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
-import { getfollowData, getusersinfo } from "../../axios/api"
+import { getfollowData, getfollowerData, getusersinfo } from "../../axios/api"
 
 interface usersinfo {
   id: string
@@ -31,6 +31,8 @@ const FollowPage: React.FC = () => {
   const [userinfo, setUserinfo] = useState<followinfo>()
   const [followuserinfo, setfollowUserinfo] = useState<usersinfo[]>([])
   const [followuserEmail, setFollowuserEmail] = useState<string[]>([])
+  const [followerinfo, setfollowerInfo] = useState<usersinfo[]>([])
+  const [followerEmail, setFollowEmail] = useState<string[]>([])
   const activeMenuItem = "/FollowPage"
 
   useEffect(() => {
@@ -48,11 +50,25 @@ const FollowPage: React.FC = () => {
 
         Promise.all(followuserEmail.map((email: string) => getusersinfo(email)))
           .then((data) => {
-            // userInfos 배열에 사용자 정보가 저장됨
             console.log("데이터", data)
-
-            // userInfos를 useState를 통해 상태에 저장
             setfollowUserinfo(data)
+          })
+          .catch((error) => {
+            console.error("사용자 정보 가져오기 오류:", error)
+          })
+
+        void getfollowerData(user.email).then((dummyData: any) => {
+          setUserinfo(dummyData)
+          const followerEmails = dummyData.map(
+            (item: followinfo) => item.userEmail
+          )
+          setFollowEmail(followerEmails)
+        })
+
+        Promise.all(followerEmail.map((email: string) => getusersinfo(email)))
+          .then((data) => {
+            console.log("데이터", data)
+            setfollowerInfo(data)
           })
           .catch((error) => {
             console.error("사용자 정보 가져오기 오류:", error)
@@ -62,12 +78,10 @@ const FollowPage: React.FC = () => {
   }, [])
 
   console.log(userId, userinfo)
-  console.log(followuserEmail)
-  console.log(followuserinfo)
   // 탭탭탭
   const tabOptions: TabOption[] = [
-    { value: "Follow", label: "팔로우" },
-    { value: "Followers", label: "팔로워" }
+    { value: "Follow", label: "팔로우한 계정" },
+    { value: "Followers", label: "팔로워 계정" }
   ]
 
   return (
@@ -90,14 +104,27 @@ const FollowPage: React.FC = () => {
           ))}
         </StyledTabButtons>
         <UserCardContainer>
-          {followuserinfo.map((user) => (
-            <UserCard key={user.id}>
-              <UserProfileImage src={user.profileImg} alt={user.displayName} />
-              <UserName>{user.displayName}</UserName>
-              <UserEmail>{user.email}</UserEmail>
-              {/* 여기에 추가 정보를 렌더링할 수 있습니다. */}
-            </UserCard>
-          ))}
+          {activeTab === "Follow"
+            ? followuserinfo.map((user) => (
+                <UserCard key={user.id}>
+                  <UserProfileImage
+                    src={user.profileImg}
+                    alt={user.displayName}
+                  />
+                  <UserName>{user.displayName}</UserName>
+                </UserCard>
+              ))
+            : activeTab === "Followers"
+            ? followerinfo.map((user) => (
+                <UserCard key={user.id}>
+                  <UserProfileImage
+                    src={user.profileImg}
+                    alt={user.displayName}
+                  />
+                  <UserName>{user.displayName}</UserName>
+                </UserCard>
+              ))
+            : null}
         </UserCardContainer>
       </StyledContainer>
     </MyPostWrap>
@@ -157,11 +184,13 @@ const UserCardContainer = styled.div`
 
 const UserCard = styled.div`
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 20px;
-  width: 250px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `
 
 const UserProfileImage = styled.img`
@@ -175,12 +204,6 @@ const UserName = styled.div`
   font-size: 18px;
   font-weight: bold;
   margin-top: 10px;
-`
-
-const UserEmail = styled.div`
-  font-size: 14px;
-  color: #666;
-  margin-top: 5px;
 `
 
 export default FollowPage

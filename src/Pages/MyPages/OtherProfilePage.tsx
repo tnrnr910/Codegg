@@ -2,8 +2,14 @@ import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import { useParams } from "react-router"
 import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
-import { findfollow, getusersinfo, setfollow } from "../../axios/api"
-import { auth } from "../../axios/firebase"
+import {
+  findfollow,
+  findfollowNumber,
+  getusersinfo,
+  setfollow
+} from "../../axios/api"
+import { auth, db } from "../../axios/firebase"
+import { doc, onSnapshot } from "firebase/firestore"
 
 interface usersinfo {
   id: string
@@ -12,19 +18,34 @@ interface usersinfo {
   email: string
   isAdmin: string
   profileImg: string
+  follower: number
+  following: number
 }
 
 function OtherProfilePage() {
   const { email } = useParams()
   const activeMenuItem = `/OtherProfilePage/${email}`
   const [userstInfo, setuserstInfo] = useState<usersinfo>()
+  const [follower, setFollower] = useState<number>()
+  const [following, setFollowing] = useState<number>()
   const [isfollow, setIsfollow] = useState<boolean>(false)
 
   useEffect(() => {
     if (email !== undefined) {
+      findfollowNumber(email)
+
       void getusersinfo(email).then((dummyData: any) => {
         setuserstInfo(dummyData)
       })
+      if (userstInfo !== undefined) {
+        setFollower(userstInfo.follower)
+        setFollowing(userstInfo.following)
+
+        onSnapshot(doc(db, "usersinfo", userstInfo.id), (doc) => {
+          setFollower(doc?.data()?.follower)
+          setFollowing(doc?.data()?.following)
+        })
+      }
 
       if (auth.currentUser != null) {
         findfollow(email, auth.currentUser.email).then((bool: boolean) => {
@@ -81,8 +102,8 @@ function OtherProfilePage() {
             </ProfileImgs>
             <MyDataWrap>
               <MyData>
-                <Follower>팔로워 8</Follower>
-                <Following>팔로잉 15</Following>
+                <Follower>팔로워 {follower}</Follower>
+                <Following>팔로잉 {following}</Following>
                 <MyPost>작성글 32</MyPost>
               </MyData>
               <FollowBtn onClick={FollowHandler}>

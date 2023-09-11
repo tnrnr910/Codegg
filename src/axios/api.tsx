@@ -504,6 +504,115 @@ const getfollowData: any = async (userEmail: string) => {
   }
 }
 
+const getfollowerinfo: any = async (
+  email: string
+): Promise<usersinfo | undefined> => {
+  try {
+    const usersinfoQuery = query(
+      collection(db, "usersinfo"),
+      where("email", "==", email)
+    )
+    const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+
+    if (!usersinfoQuerySnapshot.empty) {
+      const userInfoDoc = usersinfoQuerySnapshot.docs[0]
+      const data: usersinfo = {
+        id: userInfoDoc.id,
+        badgeImg: "",
+        displayName: "",
+        email: "",
+        isAdmin: false,
+        profileImg: "",
+        ...userInfoDoc.data()
+      }
+
+      console.log(data)
+      return data
+    } else {
+      console.log("사용자를 찾을 수 없습니다.")
+      return undefined
+    }
+  } catch (error) {
+    console.error("사용자 데이터를 가져오는 중 오류 발생:", error)
+    throw error
+  }
+}
+
+const getfollowerData: any = async (followuserEmail: string) => {
+  const q = query(
+    collection(db, "follow"),
+    where("followuserEmail", "==", followuserEmail)
+  )
+
+  console.log(followuserEmail)
+  const querySnapshot = await getDocs(q)
+
+  const followData: follow[] = []
+
+  if (!querySnapshot.empty) {
+    querySnapshot.forEach((followDoc) => {
+      const data: follow = {
+        id: followDoc.id,
+        followuserEmail: "",
+        userEmail: "",
+        ...followDoc.data()
+      }
+
+      followData.push(data)
+    })
+
+    console.log(followData)
+    return followData
+  } else {
+    console.log("사용자를 찾을 수 없습니다.")
+    return []
+  }
+}
+
+const findfollowNumber: any = async (userEmail: string) => {
+  const userinfo = query(
+    collection(db, "usersinfo"),
+    where("email", "==", userEmail)
+  )
+  const follower = query(
+    collection(db, "follow"),
+    where("userEmail", "==", userEmail)
+  )
+
+  const following = query(
+    collection(db, "follow"),
+    where("followuserEmail", "==", userEmail)
+  )
+
+  const querySnapshotfollower = await getDocs(follower)
+  const querySnapshotfollowing = await getDocs(following)
+  const querySnapshotuserinfo = await getDocs(userinfo)
+
+  console.log(querySnapshotfollower.size)
+  console.log(querySnapshotfollowing.size)
+  console.log(querySnapshotuserinfo)
+
+  const follwerNum = querySnapshotfollower.size
+  const followingNum = querySnapshotfollowing.size
+
+  const firstDocument = querySnapshotuserinfo.docs[0]
+  if (firstDocument !== null) {
+    const userData = firstDocument.data()
+    console.log(userData)
+  } else {
+    console.log("No matching documents found.")
+  }
+  console.log(follwerNum)
+  console.log(followingNum)
+
+  await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
+    follower: follwerNum
+  })
+
+  await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
+    following: followingNum
+  })
+}
 export {
   getPost,
   getPosts,
@@ -523,5 +632,8 @@ export {
   setfollow,
   getfollow,
   findfollow,
-  getfollowData
+  getfollowData,
+  getfollowerinfo,
+  getfollowerData,
+  findfollowNumber
 }
