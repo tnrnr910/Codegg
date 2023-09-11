@@ -117,10 +117,6 @@ function TogetherPage() {
                           navigate(`/detailPage/${info.id}`)
                         }}
                       >
-                        <ListHeadCategory>
-                          {" "}
-                          {info.postCategory}
-                        </ListHeadCategory>
                         {info.postTitle}
                       </ListDiv>
                     </ListContainer>
@@ -276,6 +272,7 @@ const StyledPost = styled.div`
   background-color: #ffffff;
   height: 20px;
   width: 100%;
+  cursor: pointer;
 `
 
 const StyledPostCategory = styled.td`
@@ -437,12 +434,6 @@ const ListDiv = styled.div`
   align-items: center;
   gap: 4px;
   cursor: pointer;
-`
-const ListHeadCategory = styled.div`
-  font-size: 13px;
-  border: solid #0c356a 1px;
-  padding: 3px 3px 3px 3px;
-  color: #0c356a;
 `
 
 const WriteBtnBox = styled.div`

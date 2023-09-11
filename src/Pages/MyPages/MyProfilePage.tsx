@@ -75,7 +75,7 @@ export default MyProfilePage
 
 const ProfileWrap = styled.div`
   display: flex;
-  margin-top: 6.875rem;
+  margin-top: 2rem;
   justify-content: center;
 `
 const ProfileTap = styled.div`

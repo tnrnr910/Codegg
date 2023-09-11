@@ -278,6 +278,7 @@ const StyledPost = styled.div`
   background-color: #ffffff;
   height: 20px;
   width: 100%;
+  cursor: pointer;
 `
 
 const StyledPostCategory = styled.td`

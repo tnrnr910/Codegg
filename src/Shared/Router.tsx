@@ -16,7 +16,6 @@ import MyLetterPage from "../Pages/MyPages/MyLetterPage"
 import MyLikePage from "../Pages/MyPages/MyLikePage"
 import MyPostPage from "../Pages/MyPages/MyPostPage"
 import MyProfilePage from "../Pages/MyPages/MyProfilePage"
-import ProfilePage from "../Pages/MyPages/ProfilePage"
 import Layout from "./Layout"
 import EditMyProfilePage from "../Pages/MyPages/EditMyProfilePage"
 import EditDetailPage from "../Pages/EditDetailPage"
@@ -50,7 +49,6 @@ function Router(): any {
             element={<OtherProfilePage />}
           />
           <Route path="/OtherPostPage/:email" element={<OtherPostPage />} />
-          <Route path="/ProfilePage" element={<ProfilePage />} />
           <Route path="/EditMyProfilePage" element={<EditMyProfilePage />} />
           <Route path="/EditDetailPage/:id" element={<EditDetailPage />} />
         </Route>
