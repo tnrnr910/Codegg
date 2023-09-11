@@ -7,9 +7,18 @@ import { findLikes, getPost, setLikes } from "../axios/api"
 import Comments from "../Components/Comments"
 import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
-import { AiOutlineLike } from "react-icons/ai"
+import { AiOutlineLike, AiFillLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
-import { deleteDoc, doc, onSnapshot } from "firebase/firestore"
+import {
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  where,
+  collection,
+  getDocs,
+  type DocumentSnapshot
+} from "firebase/firestore"
 
 interface Post {
   id: string
@@ -75,12 +84,12 @@ function DetailPage() {
 
     findLikes(email, id).then((bool: boolean) => {
       if (bool) {
-        setCheckLikeBtn(true)
+        setCheckLikeBtn(false)
         setLikes(true, email, id).then(() => {
           setLikeBtnOne(false)
         })
       } else {
-        setCheckLikeBtn(false)
+        setCheckLikeBtn(true)
         setLikes(false, email, id).then(() => {
           setLikeBtnOne(false)
         })
@@ -107,6 +116,36 @@ function DetailPage() {
     ) {
       const idRef = doc(db, "posts", postInfo.id)
       await deleteDoc(idRef)
+      const qLikes = query(
+        collection(db, "likes"),
+        where("postId", "==", postInfo.id)
+      )
+      const querySnapshotLikes = await getDocs(qLikes)
+
+      const docIds: string[] = []
+      querySnapshotLikes.forEach((doc: DocumentSnapshot) => {
+        docIds.push(doc.id)
+      })
+      docIds.map(async (docId) => {
+        const idRef = doc(db, "likes", docId)
+        await deleteDoc(idRef)
+      })
+
+      const qComments = query(
+        collection(db, "comments"),
+        where("postId", "==", postInfo.id)
+      )
+      const querySnapshotComments = await getDocs(qComments)
+
+      const docIdsComments: string[] = []
+      querySnapshotComments.forEach((doc: DocumentSnapshot) => {
+        docIdsComments.push(doc.id)
+      })
+      docIdsComments.map(async (docId) => {
+        const idRef = doc(db, "comments", docId)
+        await deleteDoc(idRef)
+      })
+
       navigate(-1)
     } else {
       alert("글 작성자가 아닙니다.")
@@ -134,7 +173,7 @@ function DetailPage() {
                 disabled={LikeBtnOne}
               >
                 {checkLikeBtn ? (
-                  <AiOutlineLike size="30px" />
+                  <AiFillLike size="30px" />
                 ) : (
                   <AiOutlineLike size="30px" />
                 )}

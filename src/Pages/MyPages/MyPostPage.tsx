@@ -1,10 +1,4 @@
-import {
-  query,
-  collection,
-  where,
-  getDocs,
-  type Timestamp
-} from "firebase/firestore"
+import { query, collection, where, getDocs } from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
@@ -12,6 +6,7 @@ import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { useNavigate } from "react-router"
 import { BiSearch } from "react-icons/bi"
+import { formatDate } from "../../Components/DateChange"
 
 interface Post {
   id: string
@@ -19,7 +14,7 @@ interface Post {
   postCategory: string
   postContent: string
   postTitle: string
-  postTime: Timestamp
+  postTime: number
   likes: number
   comments: number
 }
@@ -39,18 +34,6 @@ const MyPostPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = "/MyPostPage"
-
-  // formatDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환합니다.
-  function formatDate(date: {
-    getFullYear: () => any
-    getMonth: () => number
-    getDate: () => any
-  }) {
-    const year = date.getFullYear() // 연도
-    const month = String(date.getMonth() + 1).padStart(2, "0") // 월 (두 자릿수로 표시)
-    const day = String(date.getDate()).padStart(2, "0") // 일 (두 자릿수로 표시)
-    return `${year}.${month}.${day}`
-  }
 
   // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
@@ -88,8 +71,8 @@ const MyPostPage: React.FC = () => {
           postTime: doc.data().postTime,
           postContent: doc.data().postContent,
           postBoard: doc.data().postBoard,
-          likes: 0,
-          comments: 0
+          likes: doc.data().likes,
+          comments: doc.data().comments
         }
         // setPosts([...posts, newPost])
 
@@ -128,8 +111,8 @@ const MyPostPage: React.FC = () => {
             postTime: doc.data().postTime,
             postContent: doc.data().postContent,
             postBoard: doc.data().postBoard,
-            likes: 0,
-            comments: 0
+            likes: doc.data().likes,
+            comments: doc.data().comments
           }
           // setPosts([...posts, newPost])
 
@@ -142,8 +125,8 @@ const MyPostPage: React.FC = () => {
             postTime: doc.data().postTime,
             postContent: doc.data().postContent,
             postBoard: doc.data().postBoard,
-            likes: 0,
-            comments: 0
+            likes: doc.data().likes,
+            comments: doc.data().comments
           }
           // setPosts([...posts, newPost])
 
@@ -297,7 +280,12 @@ const MyPostPage: React.FC = () => {
         </StyledTabButtons>
         <NumberAndSearchBox>
           <NumberBox>
-            전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
+            전체
+            <StyledNumberBlue>
+              {" "}
+              {posts?.filter((post) => post.postBoard === activeTab)?.length}
+            </StyledNumberBlue>
+            개
           </NumberBox>
 
           <SelectAndSearchBox>
@@ -355,7 +343,7 @@ const MyPostPage: React.FC = () => {
                       </StyledPostCategory>
                       <StyledPostTitle>{post.postTitle}</StyledPostTitle>
                       <TimeAndLikeAndCommentBox>
-                        <p>{formatDate(post.postTime.toDate())}</p>
+                        <p>{formatDate(post.postTime)}</p>
                         <StyledNumber>{post.likes}</StyledNumber>
                         <StyledNumber>{post.comments}</StyledNumber>
                       </TimeAndLikeAndCommentBox>
@@ -384,7 +372,7 @@ const MyPostPage: React.FC = () => {
                         </StyledPostCategory>
                         <StyledPostTitle>{post.postTitle}</StyledPostTitle>
                         <TimeAndLikeAndCommentBox>
-                          <p>{formatDate(post.postTime.toDate())}</p>
+                          <p>{formatDate(post.postTime)}</p>
                           <StyledNumber>{post.likes}</StyledNumber>
                           <StyledNumber>{post.comments}</StyledNumber>
                         </TimeAndLikeAndCommentBox>
@@ -418,8 +406,9 @@ const TimeAndLikeAndCommentBox = styled.td`
 
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 6.875rem;
+  margin-top: 2rem;
   justify-content: center;
+  height: 780px;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
@@ -553,6 +542,7 @@ const StyledPost = styled.tr`
   background-color: #ffffff;
   height: 20px;
   width: 100%;
+  cursor: pointer;
 `
 
 const StyledPostCategory = styled.td`
