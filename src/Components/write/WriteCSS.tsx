@@ -1,5 +1,11 @@
 import styled from "styled-components"
 
+const StyledDropzone = styled.div`
+  height: 50px;
+  width: 100%;
+  text-align: center;
+`
+
 const StyledTitle = styled.div`
   font-size: 25px;
   height: 80px;
@@ -140,5 +146,6 @@ export {
   CancelButton,
   SubmitButton,
   StyledFileLabel,
-  FileBtnImg
+  FileBtnImg,
+  StyledDropzone
 }
