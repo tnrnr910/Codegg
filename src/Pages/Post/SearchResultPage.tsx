@@ -35,7 +35,7 @@ function SearchResultPage() {
                   </LeftContainer>
                   <RightContainer>
                     <NickName>{result.postDisplayName}</NickName>
-                    <div>{formatDate(result.postTime.seconds)}</div>
+                    <div>{formatDate(result.postTime)}</div>
                     <Likes>좋아요 수</Likes>
                     <div>댓글 수</div>
                   </RightContainer>
@@ -69,7 +69,7 @@ function SearchResultPage() {
                   </LeftContainer>
                   <RightContainer>
                     <NickName>{result.postDisplayName}</NickName>
-                    <div>{formatDate(result.postTime.seconds)}</div>
+                    <div>{formatDate(result.postTime)}</div>
                     <Likes>좋아요 수</Likes>
                     <div>댓글 수</div>
                   </RightContainer>
@@ -103,7 +103,7 @@ function SearchResultPage() {
                   </LeftContainer>
                   <RightContainer>
                     <NickName>{result.postDisplayName}</NickName>
-                    <div>{formatDate(result.postTime.seconds)}</div>
+                    <div>{formatDate(result.postTime)}</div>
                     <Likes>좋아요 수</Likes>
                     <div>댓글 수</div>
                   </RightContainer>

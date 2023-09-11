@@ -104,7 +104,7 @@ function OpenProfile({ closeModal }: any) {
             }
           />
           <ProfileName>{auth.currentUser?.displayName}</ProfileName>
-          <ProfilePoint>보유 포인트 : 10,000P</ProfilePoint>
+          <ProfilePoint>보유 포인트 : 0P</ProfilePoint>
           <ProfileEdit
             onClick={() => {
               navigate("/MyProfilePage")
