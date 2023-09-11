@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import React, { useEffect, useState } from "react"
 // import { useQuery } from "react-query"
@@ -6,14 +7,7 @@ import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { BiSearch } from "react-icons/bi"
 import { useNavigate } from "react-router"
 import { getUserLikesPost } from "../../axios/api"
-import { db } from "../../axios/firebase"
-import {
-  getDocs,
-  query,
-  where,
-  collection,
-  type Timestamp
-} from "firebase/firestore"
+import { type Timestamp } from "firebase/firestore"
 
 interface TabOption {
   value: string
@@ -83,58 +77,37 @@ const MyLikePage: React.FC = () => {
   const GetFindPostData: any = async (
     postCategory: string,
     postBoard: string,
-    keyword: string
+    keyword: string,
+    getPosts: Post[]
   ) => {
     const postsTemp: Post[] = []
-    const dbPosts = query(
-      collection(db, "posts"),
-      where("postUserEmail", "==", userId),
-      where("postBoard", "==", postBoard)
-    )
-    const userSnapshot = await getDocs(dbPosts)
-    userSnapshot.forEach((doc: any) => {
-      if (
-        doc != null &&
-        doc.data().postUserEmail === userId &&
-        postBoard === doc.data().postBoard
-      ) {
-        if (
-          doc
-            .data()
-            .postContent.toLowerCase()
-            .includes(keyword.toLowerCase()) === true
-        ) {
-          const newPost: Post = {
-            id: doc.id,
-            postCategory: doc.data().postCategory,
-            postTitle: doc.data().postTitle,
-            postTime: doc.data().postTime,
-            postContent: doc.data().postContent,
-            postBoard: doc.data().postBoard,
-            likes: 0,
-            comments: 0
-          }
-          // setPosts([...posts, newPost])
-
-          postsTemp.push(newPost)
-        } else if (
-          doc.data().postTitle.toLowerCase().includes(keyword.toLowerCase()) ===
-          true
-        ) {
-          const newPost: Post = {
-            id: doc.id,
-            postCategory: doc.data().postCategory,
-            postTitle: doc.data().postTitle,
-            postTime: doc.data().postTime,
-            postContent: doc.data().postContent,
-            postBoard: doc.data().postBoard,
-            likes: 0,
-            comments: 0
-          }
-          // setPosts([...posts, newPost])
-
-          postsTemp.push(newPost)
+    console.log(getPosts)
+    getPosts?.map((post) => {
+      console.log(post)
+      if (post.postContent.includes(keyword)) {
+        const newPost: Post = {
+          id: post.id,
+          postCategory: post.postCategory,
+          postTitle: post.postTitle,
+          postTime: post.postTime,
+          postContent: post.postContent,
+          postBoard: post.postBoard,
+          likes: post.likes,
+          comments: post.comments
         }
+        postsTemp.push(newPost)
+      } else if (post.postTitle.includes(keyword)) {
+        const newPost: Post = {
+          id: post.id,
+          postCategory: post.postCategory,
+          postTitle: post.postTitle,
+          postTime: post.postTime,
+          postContent: post.postContent,
+          postBoard: post.postBoard,
+          likes: post.likes,
+          comments: post.comments
+        }
+        postsTemp.push(newPost)
       }
     })
     console.log(postsTemp)
@@ -151,7 +124,7 @@ const MyLikePage: React.FC = () => {
 
   // 돋보기 버튼 클릭시 작동하는 이벤트 함수
   const SearchIncludeWord: any = () => {
-    GetFindPostData(categorySelected, activeTab, searchTerm).then(
+    GetFindPostData(categorySelected, activeTab, searchTerm, posts).then(
       (dummyData: any) => {
         setPosts(dummyData)
       }
@@ -162,7 +135,7 @@ const MyLikePage: React.FC = () => {
   // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
   const handleOnKeyPress = (e: any) => {
     if (e.key === "Enter") {
-      GetFindPostData(categorySelected, activeTab, searchTerm).then(
+      GetFindPostData(categorySelected, activeTab, searchTerm, posts).then(
         (dummyData: any) => {
           setPosts(dummyData)
         }
@@ -175,8 +148,7 @@ const MyLikePage: React.FC = () => {
   const tabOptions: TabOption[] = [
     { value: "questions", label: "질의응답" },
     { value: "tips", label: "코딩 팁" },
-    { value: "meetups", label: "모임" },
-    { value: "comments", label: "댓글" }
+    { value: "meetups", label: "모임" }
   ]
 
   function DropDown() {
@@ -256,8 +228,8 @@ const MyLikePage: React.FC = () => {
               onClick={() => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
-                setCategorySelected("카테고리")
                 setSearchTerm("")
+                setCategorySelected("카테고리")
                 void getUserLikesPost(userId).then((dummyData: any) => {
                   setPosts(dummyData)
                 })
@@ -394,8 +366,9 @@ const TimeAndLikeAndCommentBox = styled.td`
 
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 6.875rem;
+  margin-top: 3rem;
   justify-content: center;
+  height: 1000px;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
@@ -529,6 +502,7 @@ const StyledPost = styled.tr`
   background-color: #ffffff;
   height: 20px;
   width: 100%;
+  cursor: pointer;
 `
 
 const StyledPostCategory = styled.td`

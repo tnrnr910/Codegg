@@ -112,21 +112,13 @@ function TipPage() {
                 }) => {
                   return (
                     <ListContainer key={info.id}>
-                      <StyledPost
+                      <ListDiv
                         onClick={() => {
                           navigate(`/detailPage/${info.id}`)
                         }}
                       >
-                        <StyledPostCategory>
-                          {info.postCategory}
-                        </StyledPostCategory>
-                        <h3>{info.postTitle}</h3>
-                        <TimeAndLikeAndCommentBox>
-                          <p>{formatDate(info.postTime.toDate())}</p>
-                          <StyledNumber>{info.likes}</StyledNumber>
-                          <StyledNumber>{info.comments}</StyledNumber>
-                        </TimeAndLikeAndCommentBox>
-                      </StyledPost>
+                        {info.postTitle}
+                      </ListDiv>
                     </ListContainer>
                   )
                 }
@@ -278,6 +270,7 @@ const StyledPost = styled.div`
   background-color: #ffffff;
   height: 20px;
   width: 100%;
+  cursor: pointer;
 `
 
 const StyledPostCategory = styled.td`
@@ -431,6 +424,14 @@ const ListContainer = styled.div`
   justify-content: space-between;
   height: 25px;
   align-items: center;
+`
+
+const ListDiv = styled.div`
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 `
 
 const WriteBtnBox = styled.div`
