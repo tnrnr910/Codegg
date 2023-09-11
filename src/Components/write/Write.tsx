@@ -96,7 +96,7 @@ const Write: React.FC = () => {
             postContent: content,
             postImgUrl: imageUrl ?? null,
             postBoard: board,
-            postTime: new Date(),
+            postTime: new Date().getTime(),
             postUserEmail: auth.currentUser?.email,
             postDisplayName: auth.currentUser?.displayName,
             likes: 0,

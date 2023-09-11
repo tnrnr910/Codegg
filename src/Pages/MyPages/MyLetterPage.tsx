@@ -1,13 +1,28 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import styled from "styled-components"
+import { db, auth } from "../../axios/firebase"
+import { addDoc, collection, query, where, getDocs } from "firebase/firestore"
+import { formatDate } from "../../Components/DateChange"
+
+interface Message {
+  id: string
+  sender: string
+  content: string
+  createdAt: number
+  read: boolean
+}
 
 function MyLetterPage() {
   const activeMenuItem = "/MyLetterPage"
+  const user = auth.currentUser
+
+  const displayName = user?.displayName
+
+  const [receivedMessages, setReceivedMessages] = useState<Message[]>([])
 
   const [isModalOpen, setModalOpen] = useState(false)
 
-  // 받는 사람 및 쪽지 내용 입력값 상태 관리
   const [recipient, setRecipient] = useState("")
   const [message, setMessage] = useState("")
 
@@ -20,9 +35,45 @@ function MyLetterPage() {
   }
 
   const sendMessage = () => {
-    // 메시지 전송 로직
-    closeModal()
+    addDoc(collection(db, "messages"), {
+      sender: displayName,
+      recipient,
+      content: message,
+      createdAt: new Date().getTime(),
+      read: false
+    })
+      .then(() => {
+        closeModal()
+      })
+      .catch((error: any) => {
+        console.error("메시지 저장 중 오류 발생:", error)
+      })
   }
+
+  const fetchMessages = async () => {
+    console.log("Fetching messages...")
+    const q = query(
+      collection(db, "messages"),
+      where("recipient", "==", displayName)
+    )
+    const querySnapshot = await getDocs(q)
+    const messages: Message[] = []
+    querySnapshot.forEach((doc) => {
+      const data = doc.data()
+      messages.push({
+        id: doc.id,
+        sender: data.sender,
+        content: data.content,
+        createdAt: data.createdAt,
+        read: data.read
+      })
+    })
+    setReceivedMessages(messages)
+  }
+
+  useEffect(() => {
+    void fetchMessages()
+  }, [])
 
   return (
     <MyPostWrap>
@@ -50,28 +101,19 @@ function MyLetterPage() {
           </RightContainer>
         </StyledPostTitleBox>
         <div>
-          <StyledPost>
-            <LeftContainer>
-              <StyledPostCategory>ㅁ</StyledPostCategory>
-              <Sender>홍길동</Sender>
-              <LetterContent>쪽지 내용</LetterContent>
-            </LeftContainer>
-            <RightContainer>
-              <Day>작성 일자</Day>
-              <div>읽음 상태</div>
-            </RightContainer>
-          </StyledPost>
-          <StyledPost>
-            <LeftContainer>
-              <StyledPostCategory>ㅁ</StyledPostCategory>
-              <Sender>홍길동</Sender>
-              <LetterContent>쪽지 내용</LetterContent>
-            </LeftContainer>
-            <RightContainer>
-              <Day>작성 일자</Day>
-              <div>읽음 상태</div>
-            </RightContainer>
-          </StyledPost>
+          {receivedMessages.map((message) => (
+            <StyledPost key={message.id}>
+              <LeftContainer>
+                <StyledPostCategory>ㅁ</StyledPostCategory>
+                <Sender>{message.sender}</Sender>
+                <LetterContent>{message.content}</LetterContent>
+              </LeftContainer>
+              <RightContainer>
+                <Day>{formatDate(message.createdAt)}</Day>
+                <div>{message.read ? "읽음" : "안 읽음"}</div>
+              </RightContainer>
+            </StyledPost>
+          ))}
           <Buttons>
             <DelButton>삭제</DelButton>
             <SendButton onClick={openModal}>쪽지 보내기</SendButton>
@@ -98,8 +140,6 @@ function MyLetterPage() {
                         setMessage(e.target.value)
                       }}
                     />
-
-                    {/* 보내기 버튼 */}
                     <SendButton onClick={sendMessage}>보내기</SendButton>
                   </ModalContent>
                 </ModalContainer>
@@ -111,6 +151,12 @@ function MyLetterPage() {
     </MyPostWrap>
   )
 }
+
+// 프로필 수정 시 사진 빈 값이면 기본이미지로 나오도록 변경 필요
+
+// 마이페이지에서 팔로워, 팔로우, 내가쓴글 가져오기
+
+// 쪽지 보내기 기능 만들기
 
 export default MyLetterPage
 
