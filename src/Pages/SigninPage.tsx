@@ -19,6 +19,7 @@ import {
   browserSessionPersistence
 } from "firebase/auth"
 import { addDoc, collection } from "firebase/firestore"
+import { useSelector } from "react-redux"
 
 // 유효성검사 스키마
 const schema = yup.object({
@@ -48,14 +49,28 @@ type FormData = yup.InferType<typeof schema>
 function SigninPage() {
   const navigate = useNavigate()
 
+  interface RootState {
+    initialStates: {
+      signupTap: boolean
+    }
+  }
+
+  // 뒤로가기 방지
+  const preventGoBack = () => {
+    history.pushState(null, "", location.href)
+  }
+
   // Tab Menu 중 현재 어떤 Tab이 선택되어 있는지 확인하기 위한 currentTab 상태와 currentTab을 갱신하는 함수가 존재해야 하고, 초기값은 0.
   const [currentTab, setCurrentTab] = useState(0)
+  const signupTap = useSelector(
+    (state: RootState) => state.initialStates.signupTap
+  )
 
   // Tab Menu 이름
   const menuArr = [{ name: "로그인" }, { name: "회원가입" }]
 
-  // 현재 선택된 Tab Menu 가 갱신되는 함수()
-  const selectMenuHandler = (index: any) => {
+  // 현재 선택된 Tab Menu 가 갱신되는 함수
+  const selectMenuHandler = (index: number) => {
     // parameter로 현재 선택한 인덱스 값을 전달해야 하며, 이벤트 객체(event)는 쓰지 않는다
     setCurrentTab(index)
   }
@@ -71,6 +86,14 @@ function SigninPage() {
   } = useForm<FormData>({
     resolver: yupResolver(schema)
   })
+
+  // 헤더에서 '로그인'을 클릭하면 '로그인 탭'이 활성화되고 '회원가입'을 클릭하면 회원가입 탭이 활성화됨
+  useEffect(() => {
+    const tapHandler = () => {
+      signupTap ? setCurrentTab(1) : setCurrentTab(0)
+    }
+    tapHandler()
+  }, [signupTap])
 
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
@@ -107,10 +130,10 @@ function SigninPage() {
   }
 
   // 회원가입 성공 시 실행되는 함수
-  // (회원정보 등록 후 로그아웃 등)
   const loggedInSignUp = async () => {
     if (auth.currentUser != null) {
-      // awit : 프로미스가 품고있는 값을 바깥으로 끄집어냄 + 프로미스가 리졸빙 될 때까지 기다림
+      // await : 프로미스가 품고있는 값을 바깥으로 끄집어냄 + 프로미스가 리졸빙 될 때까지 기다림
+      // 회원정보 등록 후 로그아웃
       await updateProfile(auth.currentUser, {
         displayName: displayNameWatch,
         photoURL: "https://i.ibb.co/K5B1hKZ/blank-profile.png"
@@ -125,8 +148,11 @@ function SigninPage() {
         displayName: displayNameWatch,
         email: emailWatch,
         isAdmin: false,
-        profileImg: "https://i.ibb.co/K5B1hKZ/blank-profile.png"
+        profileImg: "https://i.ibb.co/K5B1hKZ/blank-profile.png",
+        Follower: 0,
+        Following: 0
       })
+      // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)
       // await 뒤에는 프로미스만 올 수 있음
       reset()
@@ -161,6 +187,12 @@ function SigninPage() {
         timer: 1000
       })
       navigate("/")
+      // 뒤로가기 방지 및 alert
+      history.pushState(null, "", location.href)
+      window.addEventListener("popstate", preventGoBack)
+      return () => {
+        window.removeEventListener("popstate", preventGoBack)
+      }
     } catch (error) {
       console.error("signInError", error)
       void Swal.fire({
@@ -178,77 +210,78 @@ function SigninPage() {
   const confirmPasswordWatch = watch("confirmPassword")
 
   return (
-    <SigninSignoutContainer>
-      <TabBox>
-        <TabMenu>
-          {menuArr.map((el, index) => (
-            <li
-              key={el.name}
-              className={index === currentTab ? "submenu focused" : "submenu"}
-              onClick={() => {
-                selectMenuHandler(index)
-                reset()
-              }}
-            >
-              {el.name}
-            </li>
-          ))}
-        </TabMenu>
-        <Desc>
-          {currentTab === 0 ? (
-            // 로그인 탭 영역
-            <TapContents>
-              <SigninButton style={{ backgroundColor: "#ffffff" }}>
-                <FcGoogle size="20px" />
-                Sign In with Google
-              </SigninButton>
-              <p>또는 이메일 로그인</p>
-              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-              <form onSubmit={handleSubmit(onSubmitSignin)}>
-                <SigninInput>
-                  <label>이메일</label>
-                  <input
-                    type="email"
-                    value={emailWatch}
-                    placeholder="이메일을 입력해 주세요."
-                    {...register("email")}
-                  ></input>
-                  {/* {errors.email != null && <span>This field is required</span>} */}
-                  <p>{errors.email?.message}</p>
-                </SigninInput>
-                <SigninInput>
-                  <label>비밀번호</label>
-                  <input
-                    type="password"
-                    value={passwordWatch}
-                    placeholder="비밀번호를 입력해 주세요."
-                    // 레지스터가 react-hook-form과 연결해줌
-                    {...register("password")}
-                  ></input>
-                  <p>{errors.password?.message}</p>
-                </SigninInput>
-                <SigninButton
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#fff",
-                    fontSize: "1.25rem"
-                  }}
-                >
-                  로그인
+    <SigninSignoutBackground>
+      <SigninSignoutContainer>
+        <TabBox>
+          <TabMenu>
+            {menuArr.map((el, index) => (
+              <li
+                key={el.name}
+                className={index === currentTab ? "submenu focused" : "submenu"}
+                onClick={() => {
+                  selectMenuHandler(index)
+                  reset()
+                }}
+              >
+                {el.name}
+              </li>
+            ))}
+          </TabMenu>
+          <Desc>
+            {currentTab === 0 ? (
+              // 로그인 탭 영역
+              <TapContents>
+                <SigninButton style={{ backgroundColor: "#ffffff" }}>
+                  <FcGoogle size="20px" />
+                  Sign In with Google
                 </SigninButton>
-              </form>
-              <OtherTap>
-                <span>아직 회원이 아니신가요?</span>
-                <span
-                  onClick={() => {
-                    selectMenuHandler(1)
-                    reset()
-                  }}
-                >
-                  회원가입
-                </span>
-              </OtherTap>
-              {/* <button
+                <p>또는 이메일 로그인</p>
+                {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+                <form onSubmit={handleSubmit(onSubmitSignin)}>
+                  <SigninInput>
+                    <label>이메일</label>
+                    <input
+                      type="email"
+                      value={emailWatch}
+                      placeholder="이메일을 입력해 주세요."
+                      {...register("email")}
+                    ></input>
+                    {/* {errors.email != null && <span>This field is required</span>} */}
+                    <p>{errors.email?.message}</p>
+                  </SigninInput>
+                  <SigninInput>
+                    <label>비밀번호</label>
+                    <input
+                      type="password"
+                      value={passwordWatch}
+                      placeholder="비밀번호를 입력해 주세요."
+                      // 레지스터가 react-hook-form과 연결해줌
+                      {...register("password")}
+                    ></input>
+                    <p>{errors.password?.message}</p>
+                  </SigninInput>
+                  <SigninButton
+                    style={{
+                      backgroundColor: "#0C356A",
+                      color: "#fff",
+                      fontSize: "1.25rem"
+                    }}
+                  >
+                    로그인
+                  </SigninButton>
+                </form>
+                <OtherTap>
+                  <span>아직 회원이 아니신가요?</span>
+                  <span
+                    onClick={() => {
+                      selectMenuHandler(1)
+                      reset()
+                    }}
+                  >
+                    회원가입
+                  </span>
+                </OtherTap>
+                {/* <button
                 onClick={() => {
                   if (currentUser != null) {
                     console.log("current user", currentUser)
@@ -260,89 +293,83 @@ function SigninPage() {
               >
                 현재유저
               </button> */}
-            </TapContents>
-          ) : (
-            // 회원가입 탭 영역
-            <TapContents>
-              {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-              <form onSubmit={handleSubmit(onSubmitSignup)}>
-                <SigninInput>
-                  <label>이메일</label>
-                  <input
-                    type="email"
-                    value={emailWatch}
-                    placeholder="이메일을 입력해 주세요."
-                    {...register("email")}
-                  ></input>
-                  {/* {errors.email != null && <span>This field is required</span>} */}
-                  <p>{errors.email?.message}</p>
-                </SigninInput>
-                <SigninInput>
-                  <label>닉네임</label>
-                  <input
-                    type="text"
-                    value={displayNameWatch}
-                    placeholder="닉네임을 입력해 주세요."
-                    {...register("displayName")}
-                  ></input>
-                  <p>{errors.displayName?.message}</p>
-                </SigninInput>
-                <SigninInput>
-                  <label>비밀번호</label>
-                  <input
-                    type="password"
-                    value={passwordWatch}
-                    placeholder="비밀번호를 입력해 주세요."
-                    // 레지스터가 react-hook-form과 연결해줌
-                    {...register("password")}
-                  ></input>
-                  <p>{errors.password?.message}</p>
-                </SigninInput>
-                <SigninInput>
-                  <label>비밀번호 확인</label>
+              </TapContents>
+            ) : (
+              // 회원가입 탭 영역
+              <TapContents>
+                {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+                <form onSubmit={handleSubmit(onSubmitSignup)}>
+                  <SigninInput>
+                    <label>이메일</label>
+                    <input
+                      type="email"
+                      value={emailWatch}
+                      placeholder="이메일을 입력해 주세요."
+                      {...register("email")}
+                    ></input>
+                    {/* {errors.email != null && <span>This field is required</span>} */}
+                    <p>{errors.email?.message}</p>
+                  </SigninInput>
+                  <SigninInput>
+                    <label>닉네임</label>
+                    <input
+                      type="text"
+                      value={displayNameWatch}
+                      placeholder="닉네임을 입력해 주세요."
+                      {...register("displayName")}
+                    ></input>
+                    <p>{errors.displayName?.message}</p>
+                  </SigninInput>
+                  <SigninInput>
+                    <label>비밀번호</label>
+                    <input
+                      type="password"
+                      value={passwordWatch}
+                      placeholder="비밀번호를 입력해 주세요."
+                      // 레지스터가 react-hook-form과 연결해줌
+                      {...register("password")}
+                    ></input>
+                    <p>{errors.password?.message}</p>
+                  </SigninInput>
+                  <SigninInput>
+                    <label>비밀번호 확인</label>
 
-                  <input
-                    type="password"
-                    value={confirmPasswordWatch}
-                    placeholder="비밀번호를 확인해 주세요."
-                    {...register("confirmPassword")}
-                  ></input>
-                  <p>{errors.confirmPassword?.message}</p>
-                </SigninInput>
-                <CheckLabel htmlFor="check">
-                  <input type="checkbox" id="check" />
-                  <p>
-                    I agree with CODEGG’s Terms of Service, Privacy Policy, and
-                    Default Notification Settings.
-                  </p>
-                </CheckLabel>
-                <SigninButton
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#fff",
-                    fontSize: "1.25rem"
-                  }}
-                >
-                  회원가입
-                </SigninButton>
-              </form>
-              <OtherTap>
-                <span>이미 회원이신가요?</span>
-                <span
-                  onClick={() => {
-                    selectMenuHandler(0)
-                    reset()
-                    // getValues()
-                  }}
-                >
-                  로그인
-                </span>
-              </OtherTap>
-            </TapContents>
-          )}
-        </Desc>
-      </TabBox>
-    </SigninSignoutContainer>
+                    <input
+                      type="password"
+                      value={confirmPasswordWatch}
+                      placeholder="비밀번호를 확인해 주세요."
+                      {...register("confirmPassword")}
+                    ></input>
+                    <p>{errors.confirmPassword?.message}</p>
+                  </SigninInput>
+                  <SigninButton
+                    style={{
+                      backgroundColor: "#0C356A",
+                      color: "#fff",
+                      fontSize: "1.25rem"
+                    }}
+                  >
+                    회원가입
+                  </SigninButton>
+                </form>
+                <OtherTap>
+                  <span>이미 회원이신가요?</span>
+                  <span
+                    onClick={() => {
+                      selectMenuHandler(0)
+                      reset()
+                      // getValues()
+                    }}
+                  >
+                    로그인
+                  </span>
+                </OtherTap>
+              </TapContents>
+            )}
+          </Desc>
+        </TabBox>
+      </SigninSignoutContainer>
+    </SigninSignoutBackground>
   )
 }
 
@@ -350,13 +377,20 @@ export default SigninPage
 
 // Styled-Component 라이브러리를 활용해 CSS를 구현.
 
-const SigninSignoutContainer = styled.div`
-  width: 100vw;
-  display: flex;
-  justify-content: end;
+const SigninSignoutBackground = styled.div`
+  width: 100%;
+  height: 56rem;
   background: url(https://i.postimg.cc/TwNqmVkj/background-signin1.png)
     no-repeat center;
   background-size: cover;
+  display: flex;
+  align-items: center;
+`
+
+const SigninSignoutContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: end;
 `
 
 const TabBox = styled.div`
@@ -480,34 +514,6 @@ const SigninInput = styled.div`
     font-weight: 500;
     font-size: 0.8rem;
     margin-top: 0.5rem;
-  }
-`
-
-const CheckLabel = styled.label`
-  display: flex;
-  align-items: center;
-  user-select: none;
-  gap: 1rem;
-  color: #999999;
-
-  // 체크박스가 체크되기 전 스타일
-  & > input {
-    appearance: none;
-    width: 2rem;
-    height: 1.3rem;
-    border: 1px solid #dadada;
-    border-radius: 0.2rem;
-    margin: 0;
-  }
-
-  // 체크박스가 체크된 후 스타일
-  & > input:checked {
-    border-color: transparent;
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
-    background-size: 100% 100%;
-    background-position: 50%;
-    background-repeat: no-repeat;
-    background-color: #0c356a;
   }
 `
 
