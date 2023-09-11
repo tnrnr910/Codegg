@@ -7,13 +7,8 @@ import { BiSearch } from "react-icons/bi"
 import { useNavigate } from "react-router"
 import { getUserLikesPost } from "../../axios/api"
 import { db } from "../../axios/firebase"
-import {
-  getDocs,
-  query,
-  where,
-  collection,
-  type Timestamp
-} from "firebase/firestore"
+import { getDocs, query, where, collection } from "firebase/firestore"
+import { formatDate } from "../../Components/DateChange"
 
 interface TabOption {
   value: string
@@ -26,7 +21,7 @@ interface Post {
   postCategory: string
   postContent: string
   postTitle: string
-  postTime: Timestamp
+  postTime: number
   likes: number
   comments: number
 }
@@ -59,20 +54,6 @@ const MyLikePage: React.FC = () => {
   //   async () => await getUserLikesPost(userId),
   //   { enabled: userId !== null } // 값이 있으면 true
   // )
-
-  // formtDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
-  function formatDate(date: {
-    getFullYear: () => any
-    getMonth: () => number
-    getDate: () => any
-  }) {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
-    return `${year}.${month}.${day}`
-  }
-
-  console.log(posts)
 
   // if (isLoading) {
   //   return <div>로딩중입니다..</div>
@@ -334,7 +315,7 @@ const MyLikePage: React.FC = () => {
                         </StyledPostCategory>
                         <StyledPostTitle>{post.postTitle}</StyledPostTitle>
                         <TimeAndLikeAndCommentBox>
-                          <p>{formatDate(post.postTime.toDate())}</p>
+                          <p>{formatDate(post.postTime)}</p>
                           <StyledNumber>{post.likes}</StyledNumber>
                           <StyledNumber>{post.comments}</StyledNumber>
                         </TimeAndLikeAndCommentBox>
@@ -360,7 +341,7 @@ const MyLikePage: React.FC = () => {
 
                         <StyledPostTitle>{post.postTitle}</StyledPostTitle>
                         <TimeAndLikeAndCommentBox>
-                          <p>{post.postTime.toDate().toDateString()}</p>
+                          <p>{post.postTime}</p>
                           <StyledNumber>{post.likes}</StyledNumber>
                           <StyledNumber>{post.comments}</StyledNumber>
                         </TimeAndLikeAndCommentBox>

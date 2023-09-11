@@ -3,8 +3,8 @@ import SIdeRanking from "../../Components/SideRanking"
 import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
-import { getPosts, formatDate } from "../../axios/api"
-import { type Timestamp } from "firebase/firestore"
+import { getPosts } from "../../axios/api"
+import { formatDate } from "../../Components/DateChange"
 import Buttons from "../../Components/Buttons"
 
 function TipPage() {
@@ -104,7 +104,7 @@ function TipPage() {
               .map(
                 (info: {
                   id: string
-                  postTime: Timestamp
+                  postTime: number
                   postTitle: string
                   postCategory: string
                   likes: number
@@ -122,7 +122,7 @@ function TipPage() {
                         </StyledPostCategory>
                         <h3>{info.postTitle}</h3>
                         <TimeAndLikeAndCommentBox>
-                          <p>{formatDate(info.postTime.toDate())}</p>
+                          <p>{formatDate(info.postTime)}</p>
                           <StyledNumber>{info.likes}</StyledNumber>
                           <StyledNumber>{info.comments}</StyledNumber>
                         </TimeAndLikeAndCommentBox>
@@ -165,7 +165,7 @@ function TipPage() {
                     .map(
                       (info: {
                         id: string
-                        postTime: Timestamp
+                        postTime: number
                         postTitle: string
                         postCategory: string
                         likes: number
@@ -185,7 +185,7 @@ function TipPage() {
                                 {info.postTitle}
                               </StyledPostTitle>
                               <TimeAndLikeAndCommentBox>
-                                <p>{formatDate(info.postTime.toDate())}</p>
+                                <p>{formatDate(info.postTime)}</p>
                                 <StyledNumber>{info.likes}</StyledNumber>
                                 <StyledNumber>{info.comments}</StyledNumber>
                               </TimeAndLikeAndCommentBox>
@@ -209,7 +209,7 @@ function TipPage() {
                     .map(
                       (info: {
                         id: string
-                        postTime: Timestamp
+                        postTime: number
                         postTitle: string
                         postCategory: string
                         likes: number
@@ -229,7 +229,7 @@ function TipPage() {
                                 {info.postTitle}
                               </StyledPostTitle>
                               <TimeAndLikeAndCommentBox>
-                                <p>{formatDate(info.postTime.toDate())}</p>
+                                <p>{formatDate(info.postTime)}</p>
                                 <StyledNumber>{info.likes}</StyledNumber>
                                 <StyledNumber>{info.comments}</StyledNumber>
                               </TimeAndLikeAndCommentBox>
