@@ -12,11 +12,14 @@ import {
   doc
 } from "firebase/firestore"
 import { formatDate } from "../../Components/DateChange"
+import { getusersinfos } from "../../axios/api"
 
 interface Message {
   id: string
   sender: string
   recipient: string
+  recipientEmail: string
+  senderEmail: any
   content: string
   createdAt: number
   read: boolean
@@ -30,6 +33,7 @@ function MyLetterPage() {
   const [receivedMessages, setReceivedMessages] = useState<Message[]>([])
   const [recipient, setRecipient] = useState("")
   const [message, setMessage] = useState("")
+  const [recipientEmail, setRecipientEmail] = useState("")
 
   const [messageType, setMessageType] = useState<"received" | "sent">(
     "received"
@@ -81,6 +85,8 @@ function MyLetterPage() {
     addDoc(collection(db, "messages"), {
       sender: displayName,
       recipient,
+      recipientEmail,
+      senderEmail: user?.email,
       content: message,
       createdAt: new Date().getTime(),
       read: false
@@ -94,41 +100,62 @@ function MyLetterPage() {
   }
 
   const fetchMessages = async () => {
-    console.log("Fetching messages...")
-
     let q
 
     if (messageType === "received") {
       q = query(
         collection(db, "messages"),
-        where("recipient", "==", displayName)
+        where("recipientEmail", "==", user?.email)
       )
     } else if (messageType === "sent") {
-      q = query(collection(db, "messages"), where("sender", "==", displayName))
+      q = query(
+        collection(db, "messages"),
+        where("senderEmail", "==", user?.email)
+      )
     }
 
-    if (q != null) {
-      const querySnapshot = await getDocs(q)
-      const messages: Message[] = []
+    try {
+      if (q != null) {
+        const querySnapshot = await getDocs(q)
+        const messages: Message[] = []
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data()
-        messages.push({
-          id: doc.id,
-          sender: data.sender as string,
-          recipient: data.recipient as string,
-          content: data.content as string,
-          createdAt: data.createdAt as number,
-          read: data.read as boolean
+        querySnapshot.forEach((doc) => {
+          const data = doc.data()
+          messages.push({
+            id: doc.id,
+            sender: data.sender as string,
+            recipient: data.recipient as string,
+            recipientEmail: data.recipient as string,
+            senderEmail: user?.email,
+            content: data.content as string,
+            createdAt: data.createdAt as number,
+            read: data.read as boolean
+          })
         })
-      })
-      setReceivedMessages(messages)
+        setReceivedMessages(messages)
+      }
+    } catch (error) {
+      console.error("쪽지 가져오기 중 오류 발생:", error)
     }
   }
 
   useEffect(() => {
     void fetchMessages()
-  }, [messageType])
+
+    if (recipient.length > 0) {
+      getusersinfos().then((users: any[]) => {
+        const recipientUser = users.find(
+          (user) => user.displayName === recipient
+        )
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (recipientUser) {
+          setRecipientEmail(recipientUser.email)
+        } else {
+          console.error("받는 사람을 찾을 수 없습니다.")
+        }
+      })
+    }
+  }, [messageType, recipient])
 
   return (
     <MyPostWrap>
@@ -170,32 +197,26 @@ function MyLetterPage() {
           </RightContainer>
         </StyledPostTitleBox>
         <div>
-          {receivedMessages
-            .filter((message) =>
-              messageType === "received"
-                ? message.recipient === displayName
-                : message.sender === displayName
-            )
-            .map((message) => (
-              <StyledPost key={message.id}>
-                <LeftContainer>
-                  <input
-                    className="your-checkbox-class"
-                    type="checkbox"
-                    checked={selectedMessages.includes(message.id)}
-                    onChange={() => {
-                      handleCheckboxChange(message.id)
-                    }}
-                  />
-                  <Sender>{message.sender}</Sender>
-                  <LetterContent>{message.content}</LetterContent>
-                </LeftContainer>
-                <RightContainer>
-                  <Day>{formatDate(message.createdAt)}</Day>
-                  <div>{message.read ? "읽음" : "안 읽음"}</div>
-                </RightContainer>
-              </StyledPost>
-            ))}
+          {receivedMessages.map((message) => (
+            <StyledPost key={message.id}>
+              <LeftContainer>
+                <input
+                  className="your-checkbox-class"
+                  type="checkbox"
+                  checked={selectedMessages.includes(message.id)}
+                  onChange={() => {
+                    handleCheckboxChange(message.id)
+                  }}
+                />
+                <Sender>{message.sender}</Sender>
+                <LetterContent>{message.content}</LetterContent>
+              </LeftContainer>
+              <RightContainer>
+                <Day>{formatDate(message.createdAt)}</Day>
+                <div>{message.read ? "읽음" : "안 읽음"}</div>
+              </RightContainer>
+            </StyledPost>
+          ))}
           <Buttons>
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
             <DelButton onClick={deleteSelectedMessages}>삭제</DelButton>
