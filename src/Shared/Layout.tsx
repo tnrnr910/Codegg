@@ -74,7 +74,7 @@ function Header() {
 
   // 회원가입 클릭 시
   const handleSignupClick = () => {
-    dispatch(SET_SIGNUP_TAP(true)) // signupTap 상태를 false로 변경
+    dispatch(SET_SIGNUP_TAP(true)) // signupTap 상태를 true로 변경
     navigate("/SigninPage") // SigninPage로 이동
   }
   // 로그인 클릭 시
@@ -152,7 +152,7 @@ function Header() {
                   navigate("/MyProfilePage")
                 }}
               >
-                {auth.currentUser?.displayName}님.안녕하세요.
+                {auth.currentUser?.displayName}
               </StAuth>
               <ProfilePicture
                 onClick={openModal}
