@@ -11,7 +11,7 @@ import {
 import { auth, db } from "../../axios/firebase"
 import { doc, onSnapshot } from "firebase/firestore"
 
-interface usersinfo {
+interface userInfo {
   id: string
   badgeImg: string
   displayName: string
@@ -25,22 +25,22 @@ interface usersinfo {
 function OtherProfilePage() {
   const { email } = useParams()
   const activeMenuItem = `/OtherProfilePage/${email}`
-  const [userstInfo, setuserstInfo] = useState<usersinfo>()
+  const [userstInfo, setuserstInfo] = useState<userInfo>()
   const [follower, setFollower] = useState<number>()
   const [following, setFollowing] = useState<number>()
   const [isfollow, setIsfollow] = useState<boolean>(false)
-  const userEmail = email
+  const userId = auth.currentUser?.email
 
+  console.log("유저 이메일", email)
+  console.log("사용자 이메일", userId)
   useEffect(() => {
-    console.log("유저 이메일", userEmail)
-    if (userEmail !== undefined) {
-      void getusersinfo(userEmail).then((userinfoData: any) => {
+    if (email !== undefined) {
+      void getusersinfo(email).then((userinfoData: any) => {
         setuserstInfo(userinfoData)
-        console.log(userinfoData)
       })
 
       if (userstInfo !== undefined) {
-        findfollowNumber(userEmail)
+        findfollowNumber(email)
         setFollower(userstInfo.follower)
         setFollowing(userstInfo.following)
 
@@ -51,7 +51,7 @@ function OtherProfilePage() {
       }
 
       if (auth.currentUser != null) {
-        findfollow(userEmail, auth.currentUser.email).then((bool: boolean) => {
+        findfollow(email, userId).then((bool: boolean) => {
           if (bool) {
             setIsfollow(true)
           } else {
@@ -62,6 +62,8 @@ function OtherProfilePage() {
     }
     console.log(isfollow)
   }, [])
+
+  console.log(userstInfo)
 
   const FollowHandler = () => {
     if (auth.currentUser != null && auth.currentUser.email !== email) {
