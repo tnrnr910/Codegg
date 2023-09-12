@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import styled from "styled-components"
 import { db, auth } from "../../axios/firebase"
-import { addDoc, collection, query, where, getDocs } from "firebase/firestore"
+import {
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  writeBatch,
+  doc
+} from "firebase/firestore"
 import { formatDate } from "../../Components/DateChange"
 
 interface Message {
@@ -28,6 +36,37 @@ function MyLetterPage() {
   )
   const handleTabClick = (type: "received" | "sent") => {
     setMessageType(type)
+  }
+
+  const [selectedMessages, setSelectedMessages] = useState<string[]>([])
+  const handleCheckboxChange = (messageId: string) => {
+    if (selectedMessages.includes(messageId)) {
+      setSelectedMessages((prevState) =>
+        prevState.filter((id) => id !== messageId)
+      )
+    } else {
+      setSelectedMessages((prevState) => [...prevState, messageId])
+    }
+  }
+  const deleteSelectedMessages = async () => {
+    if (selectedMessages.length === 0) {
+      return
+    }
+
+    const batch = writeBatch(db)
+
+    selectedMessages.forEach((messageId) => {
+      const messageRef = doc(db, "messages", messageId)
+      batch.delete(messageRef)
+    })
+
+    try {
+      await batch.commit()
+      setSelectedMessages([])
+      await fetchMessages()
+    } catch (error) {
+      console.error("쪽지 삭제 중 오류 발생:", error)
+    }
   }
 
   const [isModalOpen, setModalOpen] = useState(false)
@@ -140,7 +179,13 @@ function MyLetterPage() {
             .map((message) => (
               <StyledPost key={message.id}>
                 <LeftContainer>
-                  <StyledPostCategory>ㅁ</StyledPostCategory>
+                  <StyledCheckbox
+                    className="your-checkbox-class"
+                    checked={selectedMessages.includes(message.id)}
+                    onChange={() => {
+                      handleCheckboxChange(message.id)
+                    }}
+                  />
                   <Sender>{message.sender}</Sender>
                   <LetterContent>{message.content}</LetterContent>
                 </LeftContainer>
@@ -151,7 +196,8 @@ function MyLetterPage() {
               </StyledPost>
             ))}
           <Buttons>
-            <DelButton>삭제</DelButton>
+            {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+            <DelButton onClick={deleteSelectedMessages}>삭제</DelButton>
             <SendButton onClick={openModal}>쪽지 보내기</SendButton>
             {isModalOpen && (
               <ModalOverlay>
@@ -374,3 +420,4 @@ const Textarea = styled.textarea`
   padding: 10px;
   margin-bottom: 10px;
 `
+const StyledCheckbox = styled.input<{ checked: boolean }>``
