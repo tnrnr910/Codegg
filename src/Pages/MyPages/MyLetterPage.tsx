@@ -8,6 +8,7 @@ import { formatDate } from "../../Components/DateChange"
 interface Message {
   id: string
   sender: string
+  recipient: string
   content: string
   createdAt: number
   read: boolean
@@ -16,20 +17,23 @@ interface Message {
 function MyLetterPage() {
   const activeMenuItem = "/MyLetterPage"
   const user = auth.currentUser
-
   const displayName = user?.displayName
 
   const [receivedMessages, setReceivedMessages] = useState<Message[]>([])
-
-  const [isModalOpen, setModalOpen] = useState(false)
-
   const [recipient, setRecipient] = useState("")
   const [message, setMessage] = useState("")
 
+  const [messageType, setMessageType] = useState<"received" | "sent">(
+    "received"
+  )
+  const handleTabClick = (type: "received" | "sent") => {
+    setMessageType(type)
+  }
+
+  const [isModalOpen, setModalOpen] = useState(false)
   const openModal = () => {
     setModalOpen(true)
   }
-
   const closeModal = () => {
     setModalOpen(false)
   }
@@ -52,28 +56,40 @@ function MyLetterPage() {
 
   const fetchMessages = async () => {
     console.log("Fetching messages...")
-    const q = query(
-      collection(db, "messages"),
-      where("recipient", "==", displayName)
-    )
-    const querySnapshot = await getDocs(q)
-    const messages: Message[] = []
-    querySnapshot.forEach((doc) => {
-      const data = doc.data()
-      messages.push({
-        id: doc.id,
-        sender: data.sender,
-        content: data.content,
-        createdAt: data.createdAt,
-        read: data.read
+
+    let q
+
+    if (messageType === "received") {
+      q = query(
+        collection(db, "messages"),
+        where("recipient", "==", displayName)
+      )
+    } else if (messageType === "sent") {
+      q = query(collection(db, "messages"), where("sender", "==", displayName))
+    }
+
+    if (q != null) {
+      const querySnapshot = await getDocs(q)
+      const messages: Message[] = []
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data()
+        messages.push({
+          id: doc.id,
+          sender: data.sender as string,
+          recipient: data.recipient as string,
+          content: data.content as string,
+          createdAt: data.createdAt as number,
+          read: data.read as boolean
+        })
       })
-    })
-    setReceivedMessages(messages)
+      setReceivedMessages(messages)
+    }
   }
 
   useEffect(() => {
     void fetchMessages()
-  }, [])
+  }, [messageType])
 
   return (
     <MyPostWrap>
@@ -81,8 +97,22 @@ function MyLetterPage() {
       <StyledContainer>
         <StyledTitle>쪽지함</StyledTitle>
         <StyledTabButtons>
-          <StyledButton>받은 쪽지</StyledButton>
-          <StyledButton>보낸 쪽지</StyledButton>
+          <StyledButton
+            onClick={() => {
+              handleTabClick("received")
+            }}
+            className={messageType === "received" ? "active" : ""}
+          >
+            받은 쪽지
+          </StyledButton>
+          <StyledButton
+            onClick={() => {
+              handleTabClick("sent")
+            }}
+            className={messageType === "sent" ? "active" : ""}
+          >
+            보낸 쪽지
+          </StyledButton>
         </StyledTabButtons>
         <NumberAndSearchBox>
           <NumberBox>
@@ -101,19 +131,25 @@ function MyLetterPage() {
           </RightContainer>
         </StyledPostTitleBox>
         <div>
-          {receivedMessages.map((message) => (
-            <StyledPost key={message.id}>
-              <LeftContainer>
-                <StyledPostCategory>ㅁ</StyledPostCategory>
-                <Sender>{message.sender}</Sender>
-                <LetterContent>{message.content}</LetterContent>
-              </LeftContainer>
-              <RightContainer>
-                <Day>{formatDate(message.createdAt)}</Day>
-                <div>{message.read ? "읽음" : "안 읽음"}</div>
-              </RightContainer>
-            </StyledPost>
-          ))}
+          {receivedMessages
+            .filter((message) =>
+              messageType === "received"
+                ? message.recipient === displayName
+                : message.sender === displayName
+            )
+            .map((message) => (
+              <StyledPost key={message.id}>
+                <LeftContainer>
+                  <StyledPostCategory>ㅁ</StyledPostCategory>
+                  <Sender>{message.sender}</Sender>
+                  <LetterContent>{message.content}</LetterContent>
+                </LeftContainer>
+                <RightContainer>
+                  <Day>{formatDate(message.createdAt)}</Day>
+                  <div>{message.read ? "읽음" : "안 읽음"}</div>
+                </RightContainer>
+              </StyledPost>
+            ))}
           <Buttons>
             <DelButton>삭제</DelButton>
             <SendButton onClick={openModal}>쪽지 보내기</SendButton>
@@ -152,12 +188,6 @@ function MyLetterPage() {
   )
 }
 
-// 프로필 수정 시 사진 빈 값이면 기본이미지로 나오도록 변경 필요
-
-// 마이페이지에서 팔로워, 팔로우, 내가쓴글 가져오기
-
-// 쪽지 보내기 기능 만들기
-
 export default MyLetterPage
 
 const MyPostWrap = styled.div`
@@ -169,13 +199,11 @@ const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
 `
-
 const StyledTitle = styled.div`
   margin-bottom: 3.125rem;
   font-size: 1.5625rem;
   font-weight: bold;
 `
-
 const StyledTabButtons = styled.div`
   background-color: #f4f4f4;
   height: 3.125rem;
@@ -184,7 +212,6 @@ const StyledTabButtons = styled.div`
   margin-bottom: 1.25rem;
   border-radius: 0.625rem 0.625rem 0 0;
 `
-
 const StyledButton = styled.button`
   border-radius: ${(props) =>
     props.children === "질의응답" ? "0.5625rem 0 0 0" : ""};
@@ -212,30 +239,25 @@ const StyledPost = styled.li`
   margin-bottom: 10px;
   padding: 10px;
 `
-
 const StyledPostCategory = styled.div`
   font-weight: bold;
   margin-bottom: 0.3125rem;
 `
-
 const StyledNumberBlue = styled.span`
   color: #0c356a;
   font-weight: bold;
   margin-left: 5px;
 `
-
 const NumberAndSearchBox = styled.div`
   position: relative;
   height: 3.75rem;
   width: 100%;
 `
-
 const NumberBox = styled.span`
   position: absolute;
   margin-top: 0.8125rem;
   margin-left: 1.25rem;
 `
-
 const StyledPostTitleBox = styled.div`
   display: flex;
   justify-content: space-between;
@@ -307,7 +329,6 @@ const ModalOverlay = styled.div`
   background: rgba(0, 0, 0, 0.7);
   z-index: 100;
 `
-
 const ModalContainer = styled.div`
   background: white;
   width: 32.875rem;
@@ -315,7 +336,6 @@ const ModalContainer = styled.div`
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 `
-
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -326,19 +346,16 @@ const ModalHeader = styled.div`
   border-radius: 10px 10px 0 0;
   color: white;
 `
-
 const ModalTitle = styled.h2`
   font-weight: bold;
   margin-left: 10px;
 `
-
 const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
   color: white;
 `
-
 const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -346,13 +363,11 @@ const ModalContent = styled.div`
   margin-top: 20px;
   padding: 5px;
 `
-
 const Input = styled.input`
   width: 29.875rem;
   padding: 10px;
   margin-bottom: 10px;
 `
-
 const Textarea = styled.textarea`
   width: 29.875rem;
   height: 23.4375rem;
