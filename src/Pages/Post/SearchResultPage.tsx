@@ -2,12 +2,17 @@ import React from "react"
 import { styled } from "styled-components"
 import { useSelector } from "react-redux"
 import { formatDate } from "../../Components/DateChange"
+
 interface RootState {
-  searchResults: any[]
+  search: {
+    searchResults: any[]
+  }
 }
 
 function SearchResultPage() {
-  const searchResults = useSelector((state: RootState) => state.searchResults)
+  const searchResults = useSelector(
+    (state: RootState) => state.search.searchResults
+  )
   return (
     <SearchWrap>
       <QnA>
