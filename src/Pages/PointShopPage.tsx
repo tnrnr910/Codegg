@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React, { useState } from "react"
 import styled from "styled-components"
 
 function PointShopPage() {
   const [userPoints, setUserPoints] = useState(1000)
   const [selectedItem, setSelectedItem] = useState("")
+  const [pageTitle, setPageTitle] = useState("기본 타이틀")
 
   const items = [
     { name: "Font A", price: 100 },
@@ -15,6 +17,8 @@ function PointShopPage() {
     if (userPoints >= item.price) {
       setSelectedItem(item.name)
       setUserPoints(userPoints - item.price)
+      // 여기에서 페이지 타이틀을 변경합니다. 예를 들어, 선택한 아이템 이름으로 변경합니다.
+      setPageTitle(item.name)
     } else {
       alert("포인트가 부족합니다.")
     }
@@ -39,11 +43,12 @@ function PointShopPage() {
           </Item>
         ))}
       </ul>
+
+      {/* 선택한 폰트를 페이지 타이틀에 적용 */}
+      <PageTitle>{pageTitle}</PageTitle>
     </div>
   )
 }
-
-// 스타일 컴포넌트를 기능 코드 아래로 배치합니다.
 
 const Item = styled.li`
   display: flex;
@@ -69,6 +74,10 @@ const Button = styled.button`
     background-color: #ccc;
     cursor: not-allowed;
   }
+`
+
+const PageTitle = styled.h2`
+  font-family: ${(props) => props.theme.pageFont || "Arial, sans-serif"};
 `
 
 export default PointShopPage
