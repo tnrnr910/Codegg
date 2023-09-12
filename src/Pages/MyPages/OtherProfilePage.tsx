@@ -36,7 +36,7 @@ function OtherProfilePage() {
   useEffect(() => {
     if (email !== undefined) {
       void getusersinfo(email).then((userinfoData: any) => {
-        setuserstInfo(userinfoData)
+        setuserstInfo(userinfoData[0])
         if (userstInfo !== undefined) {
           findfollowNumber(email)
           setFollower(userstInfo.follower)
@@ -62,16 +62,18 @@ function OtherProfilePage() {
   }, [])
 
   console.log("상세페이지유저정보", userstInfo)
+  console.log(isfollow)
+  console.log(auth.currentUser?.email)
 
   const FollowHandler = () => {
-    if (auth.currentUser != null && auth.currentUser.email !== email) {
-      findfollow(email, auth.currentUser.email).then((bool: boolean) => {
+    if (auth.currentUser != null && userId !== email) {
+      findfollow(email, userId).then((bool: boolean) => {
         if (!bool) {
+          setfollow(false, email, userId)
           setIsfollow(true)
-          setfollow(false, userstInfo?.email, auth.currentUser?.email)
         } else {
+          setfollow(true, email, userId)
           setIsfollow(false)
-          setfollow(true, userstInfo?.email, auth.currentUser?.email)
         }
       })
     }
