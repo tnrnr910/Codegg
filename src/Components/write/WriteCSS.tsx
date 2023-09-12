@@ -15,7 +15,7 @@ const StyledForm = styled.form`
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
-  height: 740px;
+  min-height: 740px;
   width: 926px; // 주어진 너비를 적용
   // height: 683px; // 주어진 높이를 적용
   /* height: 1200px;
@@ -85,12 +85,13 @@ const StyledInputFile = styled.input`
 `
 
 const UploadIcon = styled.label`
-  margin-top: 20px;
   width: 834px;
-  height: 50px;
+  height: 250px;
   background: #ffffff url("/WritePictureIcon.png") no-repeat center;
   border: 1px solid #dadada;
   border-radius: 7px;
+  text-align: center;
+  margin-bottom: 20px;
 `
 
 const CancelButton = styled(StyledButton)`
@@ -123,15 +124,18 @@ const SubmitButton = styled(StyledButton)`
 const StyledFileLabel = styled.label`
   position: relative;
   width: 50px;
-  margin-bottom: 30px;
+  margin: 10px;
 `
 
 const FileBtnImg = styled.img`
-  position: absolute;
   width: 25px;
   height: 20px;
-  left: -380px;
-  top: -37px;
+`
+
+const DropzoneP = styled.p`
+  width: 100%;
+  margin-bottom: 10px;
+  margin-top: 10px;
 `
 
 export {
@@ -147,5 +151,6 @@ export {
   SubmitButton,
   StyledFileLabel,
   FileBtnImg,
-  StyledDropzone
+  StyledDropzone,
+  DropzoneP
 }

@@ -294,7 +294,7 @@ const getPostData: any = async (
   })
   return posts
 }
-const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
+const getSearchedDataTTTT = async (searchKeyword: string): Promise<Post[]> => {
   const searchResults: Post[] = []
   const keywords = searchKeyword.split(" ")
   for (const keyword of keywords) {
@@ -339,6 +339,32 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
       console.error("에러 발생: ", error)
     }
   }
+  return searchResults
+}
+
+const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
+  const searchResults: Post[] = []
+  const keyword = searchKeyword.split(" ")
+  const dbPosts = query(collection(db, "posts"), orderBy("postTime", "desc"))
+  const userSnapshot = await getDocs(dbPosts)
+  userSnapshot.forEach((doc: any) => {
+    if (doc.data().postContent.includes(keyword) === true) {
+      const newPost: Post = {
+        id: doc.id,
+        ...doc.data()
+      }
+      // setPosts([...posts, newPost])
+
+      searchResults.push(newPost)
+    } else if (doc.data().postTitle.includes(keyword) === true) {
+      const newPost: Post = {
+        id: doc.id,
+        ...doc.data()
+      }
+
+      searchResults.push(newPost)
+    }
+  })
   return searchResults
 }
 
@@ -596,5 +622,6 @@ export {
   getfollowData,
   getfollowerInfo,
   getfollowerData,
-  findfollowNumber
+  findfollowNumber,
+  getSearchedDataTTTT
 }

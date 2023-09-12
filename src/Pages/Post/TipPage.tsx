@@ -105,7 +105,7 @@ function TipPage() {
                 (info: {
                   id: string
                   postTime: number
-                  postTitle: string
+                  postTitle: number
                   postCategory: string
                   likes: number
                   comments: number
@@ -118,7 +118,6 @@ function TipPage() {
                         }}
                       >
                         <StyledPostCategory>
-                          {" "}
                           {info.postCategory}
                         </StyledPostCategory>
                         <h3>{info.postTitle}</h3>
@@ -300,8 +299,10 @@ const TimeAndLikeAndCommentBox = styled.td`
 `
 
 const StyledContainer = styled.div`
+  margin-top: 4rem;
   width: 100%;
   display: flex;
+  height: 800px;
 `
 
 const StyledBox = styled.div`
@@ -439,3 +440,5 @@ const WriteBtnBox = styled.div`
   display: flex;
   justify-content: flex-end;
 `
+
+// const Pagination = styled.div``

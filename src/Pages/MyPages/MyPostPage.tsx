@@ -1,4 +1,11 @@
-import { query, collection, where, getDocs } from "firebase/firestore"
+import {
+  query,
+  collection,
+  where,
+  getDocs,
+  doc,
+  getDoc
+} from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
@@ -39,7 +46,6 @@ const MyPostPage: React.FC = () => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
-        console.log(user.email)
         setUserId(user.email)
         setCategorySelected("카테고리")
         const list = GetPostData(activeTab)
@@ -79,8 +85,35 @@ const MyPostPage: React.FC = () => {
         postsTemp.push(newPost)
       }
     })
-    console.log(postsTemp)
     return postsTemp
+  }
+
+  // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
+  const GetCommentData: any = async (userId: string) => {
+    const postIds: string[] = []
+    const dbComments = query(
+      collection(db, "comments"),
+      where("commentUserEmail", "==", userId)
+    )
+    const userSnapshotComments = await getDocs(dbComments)
+    userSnapshotComments.forEach((doc: any) => {
+      if (doc != null) {
+        postIds.push(doc.data().postId)
+      }
+    })
+
+    return await Promise.all(
+      postIds.map(async (postId: string) => {
+        const postRef = doc(db, "posts", postId)
+        const postSnap = await getDoc(postRef)
+        const data = {
+          id: postSnap.id,
+          ...postSnap.data()
+        }
+        console.log(data)
+        return data as Post
+      })
+    )
   }
 
   // 9월 1일자로 한거
@@ -264,14 +297,15 @@ const MyPostPage: React.FC = () => {
                 setCategoryOpen(false)
                 setSearchTerm("")
                 setCategorySelected("카테고리")
-                const list = GetPostData(tab.value)
-
-                const getData = () => {
-                  list.then((dummyData: any) => {
+                if (tab.value === "comments") {
+                  GetCommentData(userId).then((dummyData: any) => {
+                    setPosts(dummyData) // 내가 쓴 글 댓글
+                  })
+                } else {
+                  GetPostData(tab.value).then((dummyData: any) => {
                     setPosts(dummyData)
                   })
                 }
-                getData()
               }}
             >
               {tab.label}
@@ -283,7 +317,9 @@ const MyPostPage: React.FC = () => {
             전체
             <StyledNumberBlue>
               {" "}
-              {posts?.filter((post) => post.postBoard === activeTab)?.length}
+              {activeTab === "comments"
+                ? posts?.length
+                : posts?.filter((post) => post.postBoard === activeTab)?.length}
             </StyledNumberBlue>
             개
           </NumberBox>
