@@ -8,11 +8,11 @@ import ProfilePicture from "../Components/ProfilePicture"
 import OpenProfile from "../Components/OpenProfile"
 import { getSearchedData } from "../axios/api"
 import { useDispatch, useSelector } from "react-redux"
-import { SET_SIGNUP_TAP } from "../redux/store"
+import { SET_SEARCH_RESULTS, SET_SIGNUP_TAP } from "../redux/store"
 
 interface RootState {
-  initialStates: {
-    searchResults: string[]
+  search: {
+    searchResults: any[]
   }
 }
 function Header() {
@@ -24,12 +24,12 @@ function Header() {
   const [searchTerm, setSearchTerm] = useState("")
 
   const searchResults = useSelector(
-    (state: RootState) => state.initialStates.searchResults
+    (state: RootState) => state.search.searchResults
   )
 
   console.log(
     "test:",
-    useSelector((state: RootState) => state.initialStates)
+    useSelector((state: RootState) => state.search)
   )
   useEffect(() => {
     console.log(auth.currentUser)
@@ -62,7 +62,7 @@ function Header() {
   const handleSearch = () => {
     getSearchedData(searchTerm)
       .then((searchResults) => {
-        dispatch({ type: "SET_SEARCH_RESULTS", payload: searchResults })
+        dispatch({ type: SET_SEARCH_RESULTS, payload: searchResults })
         navigate("/SearchResultPage")
       })
       .catch((error) => {
