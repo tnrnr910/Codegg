@@ -294,6 +294,7 @@ const getPostData: any = async (
   })
   return posts
 }
+
 const getSearchedDataTTTT = async (searchKeyword: string): Promise<Post[]> => {
   const searchResults: Post[] = []
   const keywords = searchKeyword.split(" ")
@@ -600,6 +601,7 @@ const findfollowNumber: any = async (userEmail: string) => {
     following: followingNum
   })
 }
+
 export {
   getPost,
   getPosts,
