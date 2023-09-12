@@ -50,7 +50,7 @@ function SigninPage() {
   const navigate = useNavigate()
 
   interface RootState {
-    initialStates: {
+    search: {
       signupTap: boolean
     }
   }
@@ -65,9 +65,7 @@ function SigninPage() {
 
   // Tab Menu 중 현재 어떤 Tab이 선택되어 있는지 확인하기 위한 currentTab 상태와 currentTab을 갱신하는 함수가 존재해야 하고, 초기값은 0.
   const [currentTab, setCurrentTab] = useState(0)
-  const signupTap = useSelector(
-    (state: RootState) => state.initialStates.signupTap
-  )
+  const signupTap = useSelector((state: RootState) => state.search.signupTap)
 
   // Tab Menu 이름
   const menuArr = [{ name: "로그인" }, { name: "회원가입" }]
