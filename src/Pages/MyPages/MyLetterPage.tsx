@@ -179,8 +179,9 @@ function MyLetterPage() {
             .map((message) => (
               <StyledPost key={message.id}>
                 <LeftContainer>
-                  <StyledCheckbox
+                  <input
                     className="your-checkbox-class"
+                    type="checkbox"
                     checked={selectedMessages.includes(message.id)}
                     onChange={() => {
                       handleCheckboxChange(message.id)
@@ -327,7 +328,7 @@ const Sender = styled.div`
   margin-left: 5px;
 `
 const LetterContent = styled.div`
-  margin-left: 5px;
+  margin-left: 7.3125rem;
 `
 const RightContainer = styled.div`
   flex: 1;
@@ -420,4 +421,3 @@ const Textarea = styled.textarea`
   padding: 10px;
   margin-bottom: 10px;
 `
-const StyledCheckbox = styled.input<{ checked: boolean }>``
