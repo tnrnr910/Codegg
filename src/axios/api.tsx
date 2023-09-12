@@ -374,11 +374,10 @@ const getusersinfo = async (email: string): Promise<usersinfo[]> => {
     }
     usersinfoes.push(data as usersinfo)
   })
-  console.log(usersinfoes)
   return usersinfoes
 }
 
-// formtDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
+// formatDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
 function formatDate(date: {
   getFullYear: () => any
   getMonth: () => number
@@ -490,7 +489,7 @@ const getfollowData: any = async (userEmail: string) => {
   }
 }
 
-const getfollowerinfo = async (email: string): Promise<usersinfo[]> => {
+const getfollowerInfo = async (email: string): Promise<usersinfo[]> => {
   const usersinfoes: usersinfo[] = []
   const usersinfoQuery = query(
     collection(db, "usersinfo"),
@@ -595,7 +594,7 @@ export {
   getfollow,
   findfollow,
   getfollowData,
-  getfollowerinfo,
+  getfollowerInfo,
   getfollowerData,
   findfollowNumber
 }

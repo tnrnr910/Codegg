@@ -3,8 +3,8 @@ import SideRanking from "../../Components/SideRanking"
 import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
-import { getPosts, formatDate } from "../../axios/api"
-import { type Timestamp } from "firebase/firestore"
+import { getPosts } from "../../axios/api"
+import { formatDate } from "../../Components/DateChange"
 import Buttons from "../../Components/Buttons"
 
 function QnAPage() {
@@ -104,7 +104,7 @@ function QnAPage() {
               .map(
                 (info: {
                   id: string
-                  postTime: Timestamp
+                  postTime: number
                   postTitle: string
                   postCategory: string
                   likes: number
@@ -117,10 +117,6 @@ function QnAPage() {
                           navigate(`/detailPage/${info.id}`)
                         }}
                       >
-                        <ListHeadCategory>
-                          {" "}
-                          {info.postCategory}
-                        </ListHeadCategory>
                         {info.postTitle}
                       </ListDiv>
                     </ListContainer>
@@ -162,7 +158,7 @@ function QnAPage() {
                     .map(
                       (info: {
                         id: string
-                        postTime: Timestamp
+                        postTime: number
                         postTitle: string
                         postCategory: string
                         likes: number
@@ -182,7 +178,7 @@ function QnAPage() {
                                 {info.postTitle}
                               </StyledPostTitle>
                               <TimeAndLikeAndCommentBox>
-                                <p>{formatDate(info.postTime.toDate())}</p>
+                                <p>{formatDate(info.postTime)}</p>
                                 <StyledNumber>{info.likes}</StyledNumber>
                                 <StyledNumber>{info.comments}</StyledNumber>
                               </TimeAndLikeAndCommentBox>
@@ -207,7 +203,7 @@ function QnAPage() {
                     .map(
                       (info: {
                         id: string
-                        postTime: Timestamp
+                        postTime: number
                         postTitle: string
                         postCategory: string
                         likes: number
@@ -227,7 +223,7 @@ function QnAPage() {
                                 {info.postTitle}
                               </StyledPostTitle>
                               <TimeAndLikeAndCommentBox>
-                                <p>{formatDate(info.postTime.toDate())}</p>
+                                <p>{formatDate(info.postTime)}</p>
                                 <StyledNumber>{info.likes}</StyledNumber>
                                 <StyledNumber>{info.comments}</StyledNumber>
                               </TimeAndLikeAndCommentBox>
@@ -276,6 +272,7 @@ const StyledPost = styled.div`
   background-color: #ffffff;
   height: 20px;
   width: 100%;
+  cursor: pointer;
 `
 
 const StyledPostCategory = styled.td`
@@ -296,8 +293,10 @@ const TimeAndLikeAndCommentBox = styled.td`
 `
 
 const StyledContainer = styled.div`
+  margin-top: 4rem;
   width: 100%;
   display: flex;
+  height: 800px;
 `
 
 const StyledBox = styled.div`
@@ -437,12 +436,6 @@ const ListDiv = styled.div`
   align-items: center;
   gap: 4px;
   cursor: pointer;
-`
-const ListHeadCategory = styled.div`
-  font-size: 13px;
-  border: solid #0c356a 1px;
-  padding: 3px 3px 3px 3px;
-  color: #0c356a;
 `
 
 const WriteBtnBox = styled.div`

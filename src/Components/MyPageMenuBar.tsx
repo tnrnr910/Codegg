@@ -69,7 +69,7 @@ export default MyPageMenuBar
 const MenuBarWrap = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 18.625rem;
+  margin-left: 10rem;
   margin-right: 0.4rem;
   margin-top: 1.875rem;
   width: 9.8125rem;

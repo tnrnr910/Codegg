@@ -29,18 +29,20 @@ function OtherProfilePage() {
   const [follower, setFollower] = useState<number>()
   const [following, setFollowing] = useState<number>()
   const [isfollow, setIsfollow] = useState<boolean>(false)
+  const userEmail = email
 
   useEffect(() => {
-    if (email !== undefined) {
-      void getusersinfo(email).then((dummyData: any) => {
-        setuserstInfo(dummyData)
+    console.log("유저 이메일", userEmail)
+    if (userEmail !== undefined) {
+      void getusersinfo(userEmail).then((userinfoData: any) => {
+        setuserstInfo(userinfoData)
+        console.log(userinfoData)
       })
 
       if (userstInfo !== undefined) {
-        findfollowNumber(email)
-
-        setFollower(userstInfo?.follower)
-        setFollowing(userstInfo?.following)
+        findfollowNumber(userEmail)
+        setFollower(userstInfo.follower)
+        setFollowing(userstInfo.following)
 
         onSnapshot(doc(db, "usersinfo", userstInfo.id), (doc) => {
           setFollower(doc?.data()?.follower)
@@ -48,10 +50,8 @@ function OtherProfilePage() {
         })
       }
 
-      console.log(follower, following)
-
       if (auth.currentUser != null) {
-        findfollow(email, auth.currentUser.email).then((bool: boolean) => {
+        findfollow(userEmail, auth.currentUser.email).then((bool: boolean) => {
           if (bool) {
             setIsfollow(true)
           } else {
@@ -60,12 +60,11 @@ function OtherProfilePage() {
         })
       }
     }
+    console.log(isfollow)
   }, [])
 
-  console.log(isfollow)
-
   const FollowHandler = () => {
-    if (auth.currentUser != null) {
+    if (auth.currentUser != null && auth.currentUser.email !== email) {
       findfollow(email, auth.currentUser.email).then((bool: boolean) => {
         if (!bool) {
           setIsfollow(true)

@@ -20,6 +20,7 @@ import {
 } from "./WriteCSS"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useNavigate, useParams } from "react-router"
+import Dropzone from "react-dropzone"
 
 const Write: React.FC = () => {
   const { board } = useParams()
@@ -35,7 +36,7 @@ const Write: React.FC = () => {
       if (user !== null) {
         console.log(user.email)
       } else {
-        navigate("/")
+        navigate(-1)
       }
     })
   }, [])
@@ -53,6 +54,10 @@ const Write: React.FC = () => {
     if (file !== undefined) {
       setImageFile(file) // 파일 선택 시 상태에 저장
     }
+  }
+
+  const cancelBtn = () => {
+    navigate(-1)
   }
 
   const handleSubmitPost = (e: React.FormEvent<HTMLFormElement>) => {
@@ -78,6 +83,7 @@ const Write: React.FC = () => {
     } else {
       savePost(null) // 사진 없이 포스트 저장
     }
+    navigate(-1)
   }
 
   function savePost(imageUrl: string | null) {
@@ -90,15 +96,14 @@ const Write: React.FC = () => {
             postContent: content,
             postImgUrl: imageUrl ?? null,
             postBoard: board,
-            postTime: new Date(),
+            postTime: new Date().getTime(),
             postUserEmail: auth.currentUser?.email,
             postDisplayName: auth.currentUser?.displayName,
             likes: 0,
             comments: 0
           })
             .then(() => {
-              alert("글 작성이 완료되었습니다.")
-              navigate("/")
+              // alert("글 작성이 완료되었습니다.")
             })
             .catch((e) => {
               console.error("글 작성에 실패했습니다.:", e)
@@ -154,18 +159,50 @@ const Write: React.FC = () => {
             document.getElementById("file-upload")?.click()
           }}
         />
+        <Dropzone
+          onDrop={(acceptedFiles) => {
+            // 파일이 드롭존에 드롭되면 이벤트 핸들러 실행
+            console.log(acceptedFiles)
+            if (acceptedFiles.length > 0) {
+              // 파일이 선택된 경우
+              setImageFile(acceptedFiles[0]) // 첫 번째 파일을 상태에 저장
+            }
+          }}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <section>
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <p>파일을 드래그 앤 드롭하거나 클릭하여 업로드하세요.</p>
+              </div>
+            </section>
+          )}
+        </Dropzone>
+
+        {/* 이미지 미리보기 */}
+        {imageFile != null && (
+          <img
+            src={URL.createObjectURL(imageFile)}
+            alt="미리보기 이미지"
+            style={{ maxWidth: "100%", maxHeight: "100px" }} // 이미지 크기 조절 가능
+          />
+        )}
+
         <StyledFileLabel htmlFor="file-upload">
           <StyledInputFile
             id="file-upload"
             name="fifle-upload"
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/jpg"
             onChange={handleImageUpload}
           />
           <FileBtnImg src="/WritePicturIcon.png" alt="업로드 파일" />
         </StyledFileLabel>
+
         <div>
-          <CancelButton type="button">Cancel</CancelButton>
+          <CancelButton type="button" onClick={cancelBtn}>
+            Cancel
+          </CancelButton>
           <SubmitButton type="submit">Submit</SubmitButton>
         </div>
       </StyledForm>

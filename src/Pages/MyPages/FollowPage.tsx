@@ -4,7 +4,7 @@ import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import {
   getfollowData,
   getfollowerData,
-  getfollowerinfo,
+  getfollowerInfo,
   getusersinfo
 } from "../../axios/api"
 import { useNavigate } from "react-router"
@@ -35,33 +35,26 @@ interface TabOption {
 const FollowPage: React.FC = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("Follow")
-  console.log(activeTab)
   const [followuserinfo, setfollowUserinfo] = useState<usersinfo[]>([])
   const [followerinfo, setfollowerInfo] = useState<usersinfo[]>([])
   const activeMenuItem = "/FollowPage"
 
   useEffect(() => {
-    console.log("로그인정보", auth.currentUser)
     if (auth.currentUser !== null) {
-      console.log(auth.currentUser.email)
       void getfollowData(auth.currentUser?.email).then((followData: any) => {
         const followuserEmail = followData.map(
           (item: followinfo) => item.followuserEmail
         )
-        console.log(followuserEmail)
         if (followuserEmail !== undefined) {
           const userInfopromises: any[] = []
 
           followuserEmail.forEach((item: string) => {
             const userInfoPromise = getusersinfo(item)
-            console.log(userInfoPromise)
             userInfopromises.push(userInfoPromise)
           })
           Promise.all(userInfopromises)
             .then((userInfos) => {
-              console.log(userInfos)
               const userInfoes = userInfos.flat(Infinity)
-              console.log(userInfoes)
               setfollowUserinfo(userInfoes)
             })
             .catch((error) => {
@@ -75,23 +68,17 @@ const FollowPage: React.FC = () => {
           const followerEmail = followerData.map(
             (item: followinfo) => item.userEmail
           )
-          console.log(followerEmail)
 
           if (followerEmail !== undefined) {
-            console.log(followerEmail)
-
             const followerInfopromises: any[] = []
 
             followerEmail.forEach((item: string) => {
-              const followerInfoPromise = getfollowerinfo(item)
-              console.log(followerInfoPromise)
+              const followerInfoPromise = getfollowerInfo(item)
               followerInfopromises.push(followerInfoPromise)
             })
             Promise.all(followerInfopromises)
               .then((followerInfos) => {
-                console.log(followerInfos)
                 const followerInfoes = followerInfos.flat(Infinity)
-                console.log(followerInfoes)
                 setfollowerInfo(followerInfoes)
               })
               .catch((error) => {
@@ -100,9 +87,6 @@ const FollowPage: React.FC = () => {
           }
         }
       )
-    }
-    return () => {
-      console.log("umount")
     }
   }, [])
   // 탭탭탭
