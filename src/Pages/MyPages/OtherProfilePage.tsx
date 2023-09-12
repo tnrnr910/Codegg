@@ -2,32 +2,55 @@ import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import { useParams } from "react-router"
 import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
-import { findfollow, getusersinfo, setfollow } from "../../axios/api"
-import { auth } from "../../axios/firebase"
+import {
+  findfollow,
+  findfollowNumber,
+  getusersinfo,
+  setfollow
+} from "../../axios/api"
+import { auth, db } from "../../axios/firebase"
+import { doc, onSnapshot } from "firebase/firestore"
 
-interface usersinfo {
+interface userInfo {
   id: string
   badgeImg: string
   displayName: string
   email: string
   isAdmin: string
   profileImg: string
+  follower: number
+  following: number
 }
 
 function OtherProfilePage() {
   const { email } = useParams()
   const activeMenuItem = `/OtherProfilePage/${email}`
-  const [userstInfo, setuserstInfo] = useState<usersinfo>()
+  const [userstInfo, setuserstInfo] = useState<userInfo>()
+  const [follower, setFollower] = useState<number>()
+  const [following, setFollowing] = useState<number>()
   const [isfollow, setIsfollow] = useState<boolean>(false)
+  const userId = auth.currentUser?.email
 
+  console.log("유저 이메일", email)
+  console.log("사용자 이메일", userId)
   useEffect(() => {
     if (email !== undefined) {
-      void getusersinfo(email).then((dummyData: any) => {
-        setuserstInfo(dummyData)
+      void getusersinfo(email).then((userinfoData: any) => {
+        setuserstInfo(userinfoData)
+        if (userstInfo !== undefined) {
+          findfollowNumber(email)
+          setFollower(userstInfo.follower)
+          setFollowing(userstInfo.following)
+        }
+      })
+
+      onSnapshot(doc(db, "usersinfo", email), (doc) => {
+        setFollower(doc?.data()?.follower)
+        setFollowing(doc?.data()?.following)
       })
 
       if (auth.currentUser != null) {
-        findfollow(email, auth.currentUser.email).then((bool: boolean) => {
+        findfollow(email, userId).then((bool: boolean) => {
           if (bool) {
             setIsfollow(true)
           } else {
@@ -38,10 +61,10 @@ function OtherProfilePage() {
     }
   }, [])
 
-  console.log(isfollow)
+  console.log("상세페이지유저정보", userstInfo)
 
   const FollowHandler = () => {
-    if (auth.currentUser != null) {
+    if (auth.currentUser != null && auth.currentUser.email !== email) {
       findfollow(email, auth.currentUser.email).then((bool: boolean) => {
         if (!bool) {
           setIsfollow(true)
@@ -81,8 +104,8 @@ function OtherProfilePage() {
             </ProfileImgs>
             <MyDataWrap>
               <MyData>
-                <Follower>팔로워 8</Follower>
-                <Following>팔로잉 15</Following>
+                <Follower>팔로워 {follower}</Follower>
+                <Following>팔로잉 {following}</Following>
                 <MyPost>작성글 32</MyPost>
               </MyData>
               <FollowBtn onClick={FollowHandler}>

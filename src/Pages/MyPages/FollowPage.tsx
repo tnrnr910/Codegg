@@ -1,18 +1,30 @@
-import { query, collection, where, getDocs } from "firebase/firestore"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
-import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
+import {
+  getfollowData,
+  getfollowerData,
+  getfollowerInfo,
+  getusersinfo
+} from "../../axios/api"
+import { useNavigate } from "react-router"
+import { auth } from "../../axios/firebase"
 
-interface Post {
+interface usersinfo {
   id: string
-  title: string
-  content: string
-  category: string
-  date: string
-  likes: number
-  comments: number
+  badgeImg: string
+  displayName: string
+  email: string
+  isAdmin: string
+  profileImg: string
+  follower: number
+  following: number
+}
+
+interface followinfo {
+  id: string
+  followuserEmail: string
+  userEmail: string
 }
 
 interface TabOption {
@@ -21,54 +33,66 @@ interface TabOption {
 }
 
 const FollowPage: React.FC = () => {
-  const auth = getAuth()
-  const [activeTab, setActiveTab] = useState("questions")
-  const [userId, setUserId] = useState<string | null>("")
-  const [posts, setPosts] = useState<Post[]>([])
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState("Follow")
+  const [followuserinfo, setfollowUserinfo] = useState<usersinfo[]>([])
+  const [followerinfo, setfollowerInfo] = useState<usersinfo[]>([])
   const activeMenuItem = "/FollowPage"
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user !== null) {
-        console.log(user.email)
-        setUserId(user.email)
-        void GetPostData(activeTab)
-      }
-    })
-  }, [])
+    if (auth.currentUser !== null) {
+      void getfollowData(auth.currentUser?.email).then((followData: any) => {
+        const followuserEmail = followData.map(
+          (item: followinfo) => item.followuserEmail
+        )
+        if (followuserEmail !== undefined) {
+          const userInfopromises: any[] = []
 
-  const GetPostData = async (postBoard: string) => {
-    setPosts([])
-    console.log(postBoard)
-    const dbPosts = query(
-      collection(db, "posts"),
-      where("postUserEmail", "==", userId),
-      where("postBoard", "==", postBoard)
-    )
-    const userSnapshot = await getDocs(dbPosts)
-
-    userSnapshot.forEach((doc: any) => {
-      if (doc != null) {
-        console.log(doc.data())
-        const newPost: Post = {
-          id: doc.id,
-          category: doc.data().postCategory,
-          title: doc.data().postTitle,
-          date: String(doc.data().postTime.toDate()),
-          content: doc.data().postContent,
-          likes: 0,
-          comments: 0
+          followuserEmail.forEach((item: string) => {
+            const userInfoPromise = getusersinfo(item)
+            userInfopromises.push(userInfoPromise)
+          })
+          Promise.all(userInfopromises)
+            .then((userInfos) => {
+              const userInfoes = userInfos.flat(Infinity)
+              setfollowUserinfo(userInfoes)
+            })
+            .catch((error) => {
+              console.error(error)
+            })
         }
-        setPosts([...posts, newPost])
-      }
-      console.log(posts)
-    })
-  }
+      })
 
+      void getfollowerData(auth.currentUser?.email).then(
+        (followerData: any) => {
+          const followerEmail = followerData.map(
+            (item: followinfo) => item.userEmail
+          )
+
+          if (followerEmail !== undefined) {
+            const followerInfopromises: any[] = []
+
+            followerEmail.forEach((item: string) => {
+              const followerInfoPromise = getfollowerInfo(item)
+              followerInfopromises.push(followerInfoPromise)
+            })
+            Promise.all(followerInfopromises)
+              .then((followerInfos) => {
+                const followerInfoes = followerInfos.flat(Infinity)
+                setfollowerInfo(followerInfoes)
+              })
+              .catch((error) => {
+                console.error(error)
+              })
+          }
+        }
+      )
+    }
+  }, [])
   // 탭탭탭
   const tabOptions: TabOption[] = [
-    { value: "Follow", label: "팔로우" },
-    { value: "Followers", label: "팔로워" }
+    { value: "Follow", label: "팔로우한 계정" },
+    { value: "Followers", label: "팔로워 계정" }
   ]
 
   return (
@@ -84,13 +108,45 @@ const FollowPage: React.FC = () => {
               className={activeTab === tab.value ? "active" : ""}
               onClick={() => {
                 setActiveTab(tab.value)
-                void GetPostData(tab.value)
               }}
             >
               {tab.label}
             </StyledButton>
           ))}
         </StyledTabButtons>
+        <UserCardContainer>
+          {activeTab === "Follow"
+            ? followuserinfo.map((user) => (
+                <UserCard
+                  key={user.id}
+                  onClick={() => {
+                    navigate(`/OtherProfilePage/${user.email}`)
+                  }}
+                >
+                  <UserProfileImage
+                    src={user.profileImg}
+                    alt={user.displayName}
+                  />
+                  <UserName>{user.displayName}</UserName>
+                </UserCard>
+              ))
+            : activeTab === "Followers"
+            ? followerinfo.map((user) => (
+                <UserCard
+                  key={user.id}
+                  onClick={() => {
+                    navigate(`/OtherProfilePage/${user.email}`)
+                  }}
+                >
+                  <UserProfileImage
+                    src={user.profileImg}
+                    alt={user.displayName}
+                  />
+                  <UserName>{user.displayName}</UserName>
+                </UserCard>
+              ))
+            : null}
+        </UserCardContainer>
       </StyledContainer>
     </MyPostWrap>
   )
@@ -139,6 +195,37 @@ const StyledButton = styled.button`
     background-color: ${(props) =>
       props.className === "active" ? "#f0f0f0" : "#e0e0e0"};
   }
+`
+
+const UserCardContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* 카드 간격 조절 */
+`
+
+const UserCard = styled.div`
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+`
+
+const UserProfileImage = styled.img`
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+`
+
+const UserName = styled.div`
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
 `
 
 export default FollowPage
