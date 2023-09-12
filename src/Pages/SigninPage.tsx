@@ -5,6 +5,7 @@ import { FcGoogle } from "react-icons/fc"
 import Swal from "sweetalert2"
 import { SigninSignupBtns } from "../Components/Buttons"
 import { useSelector } from "react-redux"
+import { getusersinfos } from "../axios/api"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -22,6 +23,7 @@ import {
   browserSessionPersistence
 } from "firebase/auth"
 import { addDoc, collection } from "firebase/firestore"
+import { useQuery } from "react-query"
 
 // 유효성검사 스키마
 const schema = yup.object({
@@ -56,6 +58,8 @@ function SigninPage() {
       signupTap: boolean
     }
   }
+
+  const { data } = useQuery("usersinfo", getusersinfos)
 
   // 버튼 disable 초기값(중복클릭 방지용)
   const [disable, setDisable] = useState(false)
@@ -100,7 +104,11 @@ function SigninPage() {
 
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
-    console.log("disable0", disable)
+    // const usersinfo = data.find(function (item: any) {
+    //   return item.email === "1@gmail.com"
+    // })
+    console.log("usersinfodata", data)
+    // console.log("usersinfodata", usersinfo)
     setPersistence(auth, browserSessionPersistence) // 유저정보를 로컬스토리지에 넣는걸 도와줌
       .then(() => {
         console.log("Session persistence successfully set!")
@@ -156,7 +164,9 @@ function SigninPage() {
         isAdmin: false,
         profileImg: "https://i.ibb.co/K5B1hKZ/blank-profile.png",
         Follower: 0,
-        Following: 0
+        Following: 0,
+        totalPoint: 0,
+        currentPoint: 0
       })
       // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)
@@ -225,6 +235,7 @@ function SigninPage() {
         console.log(userdata)
         // 회원정보 등록
         if (auth.currentUser != null) {
+          // if (auth.currentUser.email === "devtest3864@gmail.com") {
           await updateProfile(auth.currentUser, {
             displayName: userdata.displayName,
             photoURL: userdata.photoURL
@@ -236,8 +247,11 @@ function SigninPage() {
             isAdmin: false,
             profileImg: userdata.photoURL,
             Follower: 0,
-            Following: 0
+            Following: 0,
+            totalPoint: 0,
+            currentPoint: 0
           })
+          // }
           void Swal.fire({
             position: "center",
             title: "정상적으로 로그인 되었습니다.",
