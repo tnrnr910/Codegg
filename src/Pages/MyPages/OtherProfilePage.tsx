@@ -37,18 +37,17 @@ function OtherProfilePage() {
     if (email !== undefined) {
       void getusersinfo(email).then((userinfoData: any) => {
         setuserstInfo(userinfoData)
+        if (userstInfo !== undefined) {
+          findfollowNumber(email)
+          setFollower(userstInfo.follower)
+          setFollowing(userstInfo.following)
+        }
       })
 
-      if (userstInfo !== undefined) {
-        findfollowNumber(email)
-        setFollower(userstInfo.follower)
-        setFollowing(userstInfo.following)
-
-        onSnapshot(doc(db, "usersinfo", userstInfo.id), (doc) => {
-          setFollower(doc?.data()?.follower)
-          setFollowing(doc?.data()?.following)
-        })
-      }
+      onSnapshot(doc(db, "usersinfo", email), (doc) => {
+        setFollower(doc?.data()?.follower)
+        setFollowing(doc?.data()?.following)
+      })
 
       if (auth.currentUser != null) {
         findfollow(email, userId).then((bool: boolean) => {
@@ -60,10 +59,9 @@ function OtherProfilePage() {
         })
       }
     }
-    console.log(isfollow)
   }, [])
 
-  console.log(userstInfo)
+  console.log("상세페이지유저정보", userstInfo)
 
   const FollowHandler = () => {
     if (auth.currentUser != null && auth.currentUser.email !== email) {
