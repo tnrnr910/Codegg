@@ -15,6 +15,7 @@
     "Editdetail",
     "firestore",
     "followerinfo",
+    "followeruser",
     "followeruserinfo",
     "followinfo",
     "followuser",

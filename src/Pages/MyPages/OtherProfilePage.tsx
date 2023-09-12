@@ -32,20 +32,23 @@ function OtherProfilePage() {
 
   useEffect(() => {
     if (email !== undefined) {
-      findfollowNumber(email)
-
       void getusersinfo(email).then((dummyData: any) => {
         setuserstInfo(dummyData)
       })
+
       if (userstInfo !== undefined) {
-        setFollower(userstInfo.follower)
-        setFollowing(userstInfo.following)
+        findfollowNumber(email)
+
+        setFollower(userstInfo?.follower)
+        setFollowing(userstInfo?.following)
 
         onSnapshot(doc(db, "usersinfo", userstInfo.id), (doc) => {
           setFollower(doc?.data()?.follower)
           setFollowing(doc?.data()?.following)
         })
       }
+
+      console.log(follower, following)
 
       if (auth.currentUser != null) {
         findfollow(email, auth.currentUser.email).then((bool: boolean) => {

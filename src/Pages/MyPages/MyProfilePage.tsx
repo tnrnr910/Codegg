@@ -13,8 +13,6 @@ function MyProfilePage() {
   const navigate = useNavigate()
   const activeMenuItem = "/MyProfilePage"
 
-  console.log(auth.currentUser?.photoURL)
-  console.log(auth.currentUser)
   return (
     <ProfileWrap>
       <MyPageMenuBar activeMenuItem={activeMenuItem} />

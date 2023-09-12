@@ -57,6 +57,8 @@ interface usersinfo {
   email: string
   isAdmin: boolean
   profileImg: string
+  follower: number
+  following: number
 }
 
 interface follow {
@@ -357,38 +359,23 @@ const getusersinfos: any = async (): Promise<usersinfo[]> => {
   return usersinfo
 }
 
-const getusersinfo: any = async (
-  email: string
-): Promise<usersinfo | undefined> => {
-  try {
-    const usersinfoQuery = query(
-      collection(db, "usersinfo"),
-      where("email", "==", email)
-    )
-    const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+const getusersinfo = async (email: string): Promise<usersinfo[]> => {
+  const usersinfoQuery = query(
+    collection(db, "usersinfo"),
+    where("email", "==", email)
+  )
+  const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+  const usersinfoes: usersinfo[] = []
 
-    if (!usersinfoQuerySnapshot.empty) {
-      const userInfoDoc = usersinfoQuerySnapshot.docs[0]
-      const data: usersinfo = {
-        id: userInfoDoc.id,
-        badgeImg: "",
-        displayName: "",
-        email: "",
-        isAdmin: false,
-        profileImg: "",
-        ...userInfoDoc.data()
-      }
-
-      console.log(data)
-      return data
-    } else {
-      console.log("사용자를 찾을 수 없습니다.")
-      return undefined
+  usersinfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
     }
-  } catch (error) {
-    console.error("사용자 데이터를 가져오는 중 오류 발생:", error)
-    throw error
-  }
+    usersinfoes.push(data as usersinfo)
+  })
+  console.log(usersinfoes)
+  return usersinfoes
 }
 
 // formtDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
@@ -479,7 +466,6 @@ const findfollow: any = async (followuserEmail: string, userEmail: string) => {
 const getfollowData: any = async (userEmail: string) => {
   const q = query(collection(db, "follow"), where("userEmail", "==", userEmail))
 
-  console.log(userEmail)
   const querySnapshot = await getDocs(q)
 
   const followData: follow[] = []
@@ -504,38 +490,25 @@ const getfollowData: any = async (userEmail: string) => {
   }
 }
 
-const getfollowerinfo: any = async (
-  email: string
-): Promise<usersinfo | undefined> => {
-  try {
-    const usersinfoQuery = query(
-      collection(db, "usersinfo"),
-      where("email", "==", email)
-    )
-    const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+const getfollowerinfo = async (email: string): Promise<usersinfo[]> => {
+  const usersinfoes: usersinfo[] = []
+  const usersinfoQuery = query(
+    collection(db, "usersinfo"),
+    where("email", "==", email)
+  )
+  const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
 
-    if (!usersinfoQuerySnapshot.empty) {
-      const userInfoDoc = usersinfoQuerySnapshot.docs[0]
-      const data: usersinfo = {
-        id: userInfoDoc.id,
-        badgeImg: "",
-        displayName: "",
-        email: "",
-        isAdmin: false,
-        profileImg: "",
-        ...userInfoDoc.data()
+  usersinfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
+    if (doc != null) {
+      const data = {
+        id: doc.id,
+        ...doc.data()
       }
-
-      console.log(data)
-      return data
-    } else {
-      console.log("사용자를 찾을 수 없습니다.")
-      return undefined
+      usersinfoes.push(data as usersinfo)
     }
-  } catch (error) {
-    console.error("사용자 데이터를 가져오는 중 오류 발생:", error)
-    throw error
-  }
+  })
+  console.log(usersinfoes)
+  return usersinfoes
 }
 
 const getfollowerData: any = async (followuserEmail: string) => {
@@ -543,8 +516,6 @@ const getfollowerData: any = async (followuserEmail: string) => {
     collection(db, "follow"),
     where("followuserEmail", "==", followuserEmail)
   )
-
-  console.log(followuserEmail)
   const querySnapshot = await getDocs(q)
 
   const followData: follow[] = []
@@ -588,20 +559,11 @@ const findfollowNumber: any = async (userEmail: string) => {
   const querySnapshotfollowing = await getDocs(following)
   const querySnapshotuserinfo = await getDocs(userinfo)
 
-  console.log(querySnapshotfollower.size)
-  console.log(querySnapshotfollowing.size)
-  console.log(querySnapshotuserinfo)
-
   const follwerNum = querySnapshotfollower.size
   const followingNum = querySnapshotfollowing.size
 
   const firstDocument = querySnapshotuserinfo.docs[0]
-  if (firstDocument !== null) {
-    const userData = firstDocument.data()
-    console.log(userData)
-  } else {
-    console.log("No matching documents found.")
-  }
+
   console.log(follwerNum)
   console.log(followingNum)
 

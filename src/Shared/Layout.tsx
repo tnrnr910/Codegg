@@ -23,7 +23,10 @@ function Header() {
 
   const dispatch = useDispatch()
 
+  // 로컬 스토리지에 필요한 로그인 정보를 저장을 해야 한다.
+
   useEffect(() => {
+    console.log(auth.currentUser)
     // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)

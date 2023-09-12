@@ -1,8 +1,14 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
-import { getfollowData, getfollowerData, getusersinfo } from "../../axios/api"
+import {
+  getfollowData,
+  getfollowerData,
+  getfollowerinfo,
+  getusersinfo
+} from "../../axios/api"
+import { useNavigate } from "react-router"
+import { auth } from "../../axios/firebase"
 
 interface usersinfo {
   id: string
@@ -11,6 +17,8 @@ interface usersinfo {
   email: string
   isAdmin: string
   profileImg: string
+  follower: number
+  following: number
 }
 
 interface followinfo {
@@ -25,59 +33,78 @@ interface TabOption {
 }
 
 const FollowPage: React.FC = () => {
-  const auth = getAuth()
-  const [activeTab, setActiveTab] = useState("questions")
-  const [userId, setUserId] = useState<string | null>("")
-  const [userinfo, setUserinfo] = useState<followinfo>()
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState("Follow")
+  console.log(activeTab)
   const [followuserinfo, setfollowUserinfo] = useState<usersinfo[]>([])
-  const [followuserEmail, setFollowuserEmail] = useState<string[]>([])
   const [followerinfo, setfollowerInfo] = useState<usersinfo[]>([])
-  const [followerEmail, setFollowEmail] = useState<string[]>([])
   const activeMenuItem = "/FollowPage"
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user !== null) {
-        console.log(user.email)
-        setUserId(user.email)
-        void getfollowData(user.email).then((dummyData: any) => {
-          setUserinfo(dummyData)
-          const followuserEmails = dummyData.map(
-            (item: followinfo) => item.followuserEmail
-          )
-          setFollowuserEmail(followuserEmails)
-        })
+    console.log("로그인정보", auth.currentUser)
+    if (auth.currentUser !== null) {
+      console.log(auth.currentUser.email)
+      void getfollowData(auth.currentUser?.email).then((followData: any) => {
+        const followuserEmail = followData.map(
+          (item: followinfo) => item.followuserEmail
+        )
+        console.log(followuserEmail)
+        if (followuserEmail !== undefined) {
+          const userInfopromises: any[] = []
 
-        Promise.all(followuserEmail.map((email: string) => getusersinfo(email)))
-          .then((data) => {
-            console.log("데이터", data)
-            setfollowUserinfo(data)
+          followuserEmail.forEach((item: string) => {
+            const userInfoPromise = getusersinfo(item)
+            console.log(userInfoPromise)
+            userInfopromises.push(userInfoPromise)
           })
-          .catch((error) => {
-            console.error("사용자 정보 가져오기 오류:", error)
-          })
+          Promise.all(userInfopromises)
+            .then((userInfos) => {
+              console.log(userInfos)
+              const userInfoes = userInfos.flat(Infinity)
+              console.log(userInfoes)
+              setfollowUserinfo(userInfoes)
+            })
+            .catch((error) => {
+              console.error(error)
+            })
+        }
+      })
 
-        void getfollowerData(user.email).then((dummyData: any) => {
-          setUserinfo(dummyData)
-          const followerEmails = dummyData.map(
+      void getfollowerData(auth.currentUser?.email).then(
+        (followerData: any) => {
+          const followerEmail = followerData.map(
             (item: followinfo) => item.userEmail
           )
-          setFollowEmail(followerEmails)
-        })
+          console.log(followerEmail)
 
-        Promise.all(followerEmail.map((email: string) => getusersinfo(email)))
-          .then((data) => {
-            console.log("데이터", data)
-            setfollowerInfo(data)
-          })
-          .catch((error) => {
-            console.error("사용자 정보 가져오기 오류:", error)
-          })
-      }
-    })
+          if (followerEmail !== undefined) {
+            console.log(followerEmail)
+
+            const followerInfopromises: any[] = []
+
+            followerEmail.forEach((item: string) => {
+              const followerInfoPromise = getfollowerinfo(item)
+              console.log(followerInfoPromise)
+              followerInfopromises.push(followerInfoPromise)
+            })
+            Promise.all(followerInfopromises)
+              .then((followerInfos) => {
+                console.log(followerInfos)
+                const followerInfoes = followerInfos.flat(Infinity)
+                console.log(followerInfoes)
+                setfollowerInfo(followerInfoes)
+              })
+              .catch((error) => {
+                console.error(error)
+              })
+          }
+        }
+      )
+    }
+    return () => {
+      console.log("umount")
+    }
   }, [])
-
-  console.log(userId, userinfo)
   // 탭탭탭
   const tabOptions: TabOption[] = [
     { value: "Follow", label: "팔로우한 계정" },
@@ -106,7 +133,12 @@ const FollowPage: React.FC = () => {
         <UserCardContainer>
           {activeTab === "Follow"
             ? followuserinfo.map((user) => (
-                <UserCard key={user.id}>
+                <UserCard
+                  key={user.id}
+                  onClick={() => {
+                    navigate(`/OtherProfilePage/${user.email}`)
+                  }}
+                >
                   <UserProfileImage
                     src={user.profileImg}
                     alt={user.displayName}
@@ -116,7 +148,12 @@ const FollowPage: React.FC = () => {
               ))
             : activeTab === "Followers"
             ? followerinfo.map((user) => (
-                <UserCard key={user.id}>
+                <UserCard
+                  key={user.id}
+                  onClick={() => {
+                    navigate(`/OtherProfilePage/${user.email}`)
+                  }}
+                >
                   <UserProfileImage
                     src={user.profileImg}
                     alt={user.displayName}
@@ -191,6 +228,7 @@ const UserCard = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 `
 
 const UserProfileImage = styled.img`
