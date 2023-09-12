@@ -48,6 +48,7 @@ const OtherPostPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
+  const [userId, setUserId] = useState<string | null>("")
   const [userstInfo, setuserstInfo] = useState<usersinfo>()
   const [posts, setPosts] = useState<Post[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -55,6 +56,7 @@ const OtherPostPage: React.FC = () => {
 
   useEffect(() => {
     if (email !== undefined) {
+      setUserId(email)
       setCategorySelected("카테고리")
       const list = GetPostData(activeTab)
       const getData = () => {
@@ -68,13 +70,13 @@ const OtherPostPage: React.FC = () => {
         setuserstInfo(dummyData[0])
       })
     }
-  }, [userstInfo?.email])
+  }, [userId])
 
   const GetPostData: any = async (postBoard: string) => {
     const postsTemp: Post[] = []
     const dbPosts = query(
       collection(db, "posts"),
-      where("postUserEmail", "==", userstInfo?.email),
+      where("postUserEmail", "==", userId),
       where("postBoard", "==", postBoard)
     )
     const userSnapshot = await getDocs(dbPosts)
@@ -126,21 +128,21 @@ const OtherPostPage: React.FC = () => {
   }
 
   const GetFindPostData: any = async (
-    postCategory: string,
     postBoard: string,
+    postCategory: string,
     keyword: string
   ) => {
     const postsTemp: Post[] = []
     const dbPosts = query(
       collection(db, "posts"),
-      where("postUserEmail", "==", userstInfo?.email),
+      where("postUserEmail", "==", userId),
       where("postBoard", "==", postBoard)
     )
     const userSnapshot = await getDocs(dbPosts)
     userSnapshot.forEach((doc: any) => {
       if (
         doc != null &&
-        doc.data().postUserEmail === userstInfo?.email &&
+        doc.data().postUserEmail === userId &&
         postBoard === doc.data().postBoard
       ) {
         if (doc.data().postContent.includes(keyword) === true) {
@@ -296,7 +298,7 @@ const OtherPostPage: React.FC = () => {
                 setSearchTerm("")
                 setCategorySelected("카테고리")
                 if (tab.value === "comments") {
-                  GetCommentData(userstInfo?.email).then((dummyData: any) => {
+                  GetCommentData(userId).then((dummyData: any) => {
                     setPosts(dummyData) // 내가 쓴 글 댓글
                   })
                 } else {
