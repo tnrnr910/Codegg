@@ -122,13 +122,13 @@ function Header() {
           >
             공지사항
           </Stp>
-          {/* <Stp
+          <Stp
             onClick={() => {
               navigate("/PointShopPage")
             }}
           >
             포인트 샵
-          </Stp> */}
+          </Stp>
         </Pagelist>
         <SearchInput>
           <InputField
