@@ -200,7 +200,17 @@ function DetailPage() {
             </DetailUserInfo>
           </DetailUser>
           <DetailContent>
-            <DetailContentBody>{postInfo?.postContent}</DetailContentBody>
+            <DetailContentBody>
+              {postInfo?.postContent}
+              <br />
+              <br />
+              <img
+                src={postInfo?.postImgUrl}
+                style={{ maxWidth: "100%", maxHeight: "200px" }} // 이미지 크기 조절 가능
+              />
+              <br />
+              <br />
+            </DetailContentBody>
           </DetailContent>
           <EditBox>
             <EditBtn onClick={editBtn}>수정</EditBtn>
@@ -236,7 +246,7 @@ const Container = styled.div`
 const DetailContainer = styled.div`
   display: flex;
   width: 58rem;
-  height: 32rem;
+  min-height: 32rem;
   gap: 1rem;
   flex-direction: column;
   justify-content: center;
@@ -244,6 +254,8 @@ const DetailContainer = styled.div`
   border: solid #dadada 1px;
   border-radius: 16px;
   background-color: #e0e0e0;
+  padding-top: 20px;
+  padding-bottom: 20px;
 `
 
 const Detailtitle = styled.div`
@@ -299,7 +311,7 @@ const DetailUserInfo = styled.div`
 `
 const DetailContent = styled.pre`
   width: 52rem;
-  height: 19rem;
+  min-height: 19rem;
   border: solid #dadada 1px;
   border-radius: 7px;
   background-color: white;
