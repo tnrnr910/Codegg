@@ -3,7 +3,7 @@ import styled from "styled-components"
 import { useNavigate } from "react-router"
 import { FcGoogle } from "react-icons/fc"
 import Swal from "sweetalert2"
-// import swal from "sweetalert"
+import { SigninSignupBtns } from "../Components/Buttons"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -55,6 +55,9 @@ function SigninPage() {
     }
   }
 
+  // 버튼 disable 초기값(중복클릭 방지용)
+  const [disable, setDisable] = useState(false)
+
   // 뒤로가기 방지
   const preventGoBack = () => {
     history.pushState(null, "", location.href)
@@ -97,6 +100,7 @@ function SigninPage() {
 
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
+    console.log("disable0", disable)
     setPersistence(auth, browserSessionPersistence)
       .then(() => {
         console.log("Session persistence successfully set!")
@@ -110,6 +114,7 @@ function SigninPage() {
   const onSubmitSignup: SubmitHandler<FormData> = () => {
     // event?.preventDefault()
     console.log(errors)
+    setDisable(true)
     // 유효성검사 통과 후 실행
     createUserWithEmailAndPassword(auth, emailWatch, passwordWatch)
       .then(async (userCredential: any) => {
@@ -126,6 +131,7 @@ function SigninPage() {
           text: "이미 사용중인 이메일입니다.",
           confirmButtonColor: "#0C356A"
         })
+        setDisable(false)
       })
   }
 
@@ -157,6 +163,7 @@ function SigninPage() {
       // await 뒤에는 프로미스만 올 수 있음
       reset()
       selectMenuHandler(0)
+      setDisable(false)
     } else {
       console.log("No user is signed in.") // 사용자가 로그인되어 있지 않은 경우
     }
@@ -165,6 +172,8 @@ function SigninPage() {
   // 로그인 버튼 클릭 시 실행
   const onSubmitSignin: SubmitHandler<FormData> = () => {
     console.log(errors)
+    setDisable(true)
+    console.log("disable1", disable)
     void signIn(event)
   }
 
@@ -187,6 +196,8 @@ function SigninPage() {
         timer: 1000
       })
       navigate("/")
+      setDisable(false)
+      console.log("disable2", disable)
       // 뒤로가기 방지 및 alert
       history.pushState(null, "", location.href)
       window.addEventListener("popstate", preventGoBack)
@@ -199,6 +210,8 @@ function SigninPage() {
         text: "이메일 혹은 비밀번호를 다시 입력해 주세요.",
         confirmButtonColor: "#0C356A"
       })
+      setDisable(false)
+      console.log("disable2", disable)
     }
   }
 
@@ -231,10 +244,16 @@ function SigninPage() {
             {currentTab === 0 ? (
               // 로그인 탭 영역
               <TapContents>
-                <SigninButton style={{ backgroundColor: "#ffffff" }}>
+                <SigninSignupBtns
+                  style={{
+                    backgroundColor: "#ffffff",
+                    color: "#000",
+                    fontSize: "0.9rem"
+                  }}
+                >
                   <FcGoogle size="20px" />
                   Sign In with Google
-                </SigninButton>
+                </SigninSignupBtns>
                 <p>또는 이메일 로그인</p>
                 {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
                 <form onSubmit={handleSubmit(onSubmitSignin)}>
@@ -260,15 +279,7 @@ function SigninPage() {
                     ></input>
                     <p>{errors.password?.message}</p>
                   </SigninInput>
-                  <SigninButton
-                    style={{
-                      backgroundColor: "#0C356A",
-                      color: "#fff",
-                      fontSize: "1.25rem"
-                    }}
-                  >
-                    로그인
-                  </SigninButton>
+                  <SigninSignupBtns disabled={disable}>로그인</SigninSignupBtns>
                 </form>
                 <OtherTap>
                   <span>아직 회원이 아니신가요?</span>
@@ -342,15 +353,9 @@ function SigninPage() {
                     ></input>
                     <p>{errors.confirmPassword?.message}</p>
                   </SigninInput>
-                  <SigninButton
-                    style={{
-                      backgroundColor: "#0C356A",
-                      color: "#fff",
-                      fontSize: "1.25rem"
-                    }}
-                  >
+                  <SigninSignupBtns disabled={disable}>
                     회원가입
-                  </SigninButton>
+                  </SigninSignupBtns>
                 </form>
                 <OtherTap>
                   <span>이미 회원이신가요?</span>
@@ -478,21 +483,6 @@ const TapContents = styled.div`
     font-size: 0;
     line-height: 1px;
   }
-`
-
-const SigninButton = styled.button`
-  width: 100%;
-  height: 3rem;
-
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem;
-  border: 1px solid #dadada;
-  border-radius: 4px;
-  gap: 0.5rem;
-  cursor: pointer;
 `
 
 const SigninInput = styled.div`
