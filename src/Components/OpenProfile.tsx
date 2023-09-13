@@ -4,7 +4,12 @@ import { useNavigate } from "react-router"
 import { styled } from "styled-components"
 import Swal from "sweetalert2"
 import { auth, db } from "../axios/firebase"
-import { deleteUser, onAuthStateChanged, signOut } from "firebase/auth"
+import {
+  GoogleAuthProvider,
+  deleteUser,
+  onAuthStateChanged,
+  signOut
+} from "firebase/auth"
 import { deleteDoc, doc } from "firebase/firestore"
 import { getusersinfos } from "../axios/api"
 import { useQuery } from "react-query"
@@ -23,15 +28,14 @@ function OpenProfile({ closeModal }: any) {
     // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
-      console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
+      console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리
     })
-    console.log("currentUser", currentUser)
   }, [])
+
   // 로그아웃 함수
   const logOut = (event: any) => {
     event.preventDefault()
     if (currentUser != null) {
-      // currentUser가 null이 아닌 경우에만 실행
       void signOut(auth)
       void Swal.fire({
         text: "정상적으로 로그아웃 되었습니다.",
@@ -62,16 +66,23 @@ function OpenProfile({ closeModal }: any) {
             const currentUserInfoData = usersinfoData.find((data: any) => {
               return data.email === currentUser.email
             })
-            await deleteDoc(doc(db, "usersinfo", currentUserInfoData?.id))
-            console.log({ currentUserInfoData })
-            // 현재 로그인한 사용자를 Authentication에서 삭제
-            await deleteUser(currentUser)
-            // 알림창 띄우고 홈페이지로 이동
-            await Swal.fire({
-              title: "탈퇴 완료",
-              text: "정상적으로 탈퇴되었습니다.",
-              confirmButtonColor: "#0C356A"
-            })
+            void currentUser
+              .getIdToken()
+              .then((idToken) => {
+                return GoogleAuthProvider.credential(idToken)
+              })
+              .then(async () => {
+                await deleteDoc(doc(db, "usersinfo", currentUserInfoData?.id))
+                // 현재 로그인한 사용자를 Authentication에서 삭제
+                await deleteUser(currentUser)
+                // 알림창 띄우고 홈페이지로 이동
+                await Swal.fire({
+                  title: "탈퇴 완료",
+                  text: "정상적으로 탈퇴되었습니다.",
+                  confirmButtonColor: "#0C356A"
+                })
+              })
+
             navigate("/")
             closeModal()
           }

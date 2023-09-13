@@ -4,6 +4,8 @@ import { useNavigate } from "react-router"
 import { FcGoogle } from "react-icons/fc"
 import Swal from "sweetalert2"
 import { SigninSignupBtns } from "../Components/Buttons"
+import { useSelector } from "react-redux"
+import { getusersinfos } from "../axios/api"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -11,6 +13,8 @@ import * as yup from "yup"
 
 import { auth, db } from "../axios/firebase"
 import {
+  GoogleAuthProvider,
+  signInWithPopup,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -19,7 +23,7 @@ import {
   browserSessionPersistence
 } from "firebase/auth"
 import { addDoc, collection } from "firebase/firestore"
-import { useSelector } from "react-redux"
+import { useQuery } from "react-query"
 
 // 유효성검사 스키마
 const schema = yup.object({
@@ -54,6 +58,9 @@ function SigninPage() {
       signupTap: boolean
     }
   }
+
+  const { data } = useQuery("usersinfo", getusersinfos)
+  const usersinfoData: any[] = data as any[]
 
   // 버튼 disable 초기값(중복클릭 방지용)
   const [disable, setDisable] = useState(false)
@@ -98,8 +105,7 @@ function SigninPage() {
 
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
-    console.log("disable0", disable)
-    setPersistence(auth, browserSessionPersistence)
+    setPersistence(auth, browserSessionPersistence) // 유저정보를 로컬스토리지에 넣는걸 도와줌
       .then(() => {
         console.log("Session persistence successfully set!")
       })
@@ -137,7 +143,7 @@ function SigninPage() {
   const loggedInSignUp = async () => {
     if (auth.currentUser != null) {
       // await : 프로미스가 품고있는 값을 바깥으로 끄집어냄 + 프로미스가 리졸빙 될 때까지 기다림
-      // 회원정보 등록 후 로그아웃
+      // 회원정보 등록
       await updateProfile(auth.currentUser, {
         displayName: displayNameWatch,
         photoURL: "https://i.ibb.co/K5B1hKZ/blank-profile.png"
@@ -154,7 +160,9 @@ function SigninPage() {
         isAdmin: false,
         profileImg: "https://i.ibb.co/K5B1hKZ/blank-profile.png",
         Follower: 0,
-        Following: 0
+        Following: 0,
+        totalPoint: 0,
+        currentPoint: 0
       })
       // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)
@@ -195,8 +203,7 @@ function SigninPage() {
       })
       navigate("/")
       setDisable(false)
-      console.log("disable2", disable)
-      // 뒤로가기 방지 및 alert
+      // 뒤로가기 방지
       history.pushState(null, "", location.href)
       window.addEventListener("popstate", preventGoBack)
       return () => {
@@ -209,8 +216,85 @@ function SigninPage() {
         confirmButtonColor: "#0C356A"
       })
       setDisable(false)
-      console.log("disable2", disable)
     }
+  }
+
+  // 구글로그인
+  function handleGoogleLogin() {
+    const provider = new GoogleAuthProvider() // provider 구글 설정
+    signInWithPopup(auth, provider) // 팝업창 띄워서 로그인
+      .then(async (data) => {
+        const userdata = data.user
+        console.log({ data })
+        console.log(userdata)
+        const usersinfo = usersinfoData.find(function (item: any) {
+          return item.email === userdata.email
+        })
+        console.log("usersinfodata", data)
+        console.log("usersinfo", usersinfo)
+        // 회원정보 등록
+        if (auth.currentUser != null && usersinfo === undefined) {
+          await updateProfile(auth.currentUser, {
+            displayName: userdata.displayName,
+            photoURL: userdata.photoURL
+          })
+          await addDoc(collection(db, "usersinfo"), {
+            badgeImg: "",
+            displayName: userdata.displayName,
+            email: userdata.email,
+            isAdmin: false,
+            profileImg: userdata.photoURL,
+            Follower: 0,
+            Following: 0,
+            totalPoint: 0,
+            currentPoint: 0
+          })
+          // }
+          void Swal.fire({
+            position: "center",
+            title: "정상적으로 로그인 되었습니다.",
+            text: "잠시 후 홈으로 이동합니다.",
+            showConfirmButton: false,
+            timer: 1000
+          })
+          navigate("/")
+          // 뒤로가기 방지
+          history.pushState(null, "", location.href)
+          window.addEventListener("popstate", preventGoBack)
+          return () => {
+            window.removeEventListener("popstate", preventGoBack)
+          }
+        } else {
+          void Swal.fire({
+            position: "center",
+            title: "정상적으로 로그인 되었습니다.",
+            text: "잠시 후 홈으로 이동합니다.",
+            showConfirmButton: false,
+            timer: 1000
+          })
+          navigate("/")
+          // 뒤로가기 방지
+          history.pushState(null, "", location.href)
+          window.addEventListener("popstate", preventGoBack)
+          return () => {
+            window.removeEventListener("popstate", preventGoBack)
+          }
+        }
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code
+        const errorMessage = error.message
+        // The email of the user's account used.
+        const email = error.customData.email
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error)
+        console.log([error])
+        console.log({ errorCode })
+        console.log({ errorMessage })
+        console.log({ email })
+        console.log({ credential })
+      })
   }
 
   // const onError = (error: any) => { console.log(error); }
@@ -243,6 +327,7 @@ function SigninPage() {
               // 로그인 탭 영역
               <TapContents>
                 <SigninSignupBtns
+                  onClick={handleGoogleLogin}
                   style={{
                     backgroundColor: "#ffffff",
                     color: "#000",
@@ -290,18 +375,6 @@ function SigninPage() {
                     회원가입
                   </span>
                 </OtherTap>
-                {/* <button
-                onClick={() => {
-                  if (currentUser != null) {
-                    console.log("current user", currentUser)
-                  } else {
-                    // No user is signed in.
-                    console.log("no current user")
-                  }
-                }}
-              >
-                현재유저
-              </button> */}
               </TapContents>
             ) : (
               // 회원가입 탭 영역
