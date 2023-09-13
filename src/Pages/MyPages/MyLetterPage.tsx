@@ -188,7 +188,7 @@ function MyLetterPage() {
         <StyledPostTitleBox>
           <LeftContainer>
             <StyledPostCategory>ㅁ</StyledPostCategory>
-            <StyledPostTitleCategory>보낸 사람</StyledPostTitleCategory>
+            <StyledPostTitleCategory>송/수신인</StyledPostTitleCategory>
             <LetterContent>내용</LetterContent>
           </LeftContainer>
           <RightContainer>
