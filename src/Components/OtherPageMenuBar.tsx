@@ -19,40 +19,45 @@ interface UserData {
   email: string
   isAdmin: string
   profileImg: string
+  follower: number
+  following: number
 }
 
 function OtherPageMenuBar({ activeMenuItem }: OtherPageMenuBarProps) {
   const { email } = useParams()
   const navigate = useNavigate()
   const [userstInfo, setuserstInfo] = useState<UserData>()
+  const userEmail = email
 
   const handleMenuItemClick = (path: string) => {
     navigate(path)
   }
 
   useEffect(() => {
-    if (email !== undefined) {
-      void getusersinfo(email).then((dummyData: any) => {
-        setuserstInfo(dummyData)
+    if (userEmail !== undefined) {
+      void getusersinfo(userEmail).then((userinfoData: any) => {
+        setuserstInfo(userinfoData[0])
       })
     }
   }, [])
+
+  console.log("유저정보", userstInfo)
 
   return (
     <MenuBarWrap>
       <MyPageHead>{userstInfo?.displayName}님 페이지</MyPageHead>
       <MenuItem
-        active={activeMenuItem === `/OtherProfilePage/${email}`}
+        active={activeMenuItem === `/OtherProfilePage/${userEmail}`}
         onClick={() => {
-          handleMenuItemClick(`/OtherProfilePage/${email}`)
+          handleMenuItemClick(`/OtherProfilePage/${userEmail}`)
         }}
       >
         {userstInfo?.displayName}님 프로필
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === `/OtherPostPage/${email}`}
+        active={activeMenuItem === `/OtherPostPage/${userEmail}`}
         onClick={() => {
-          handleMenuItemClick(`/OtherPostPage/${email}`)
+          handleMenuItemClick(`/OtherPostPage/${userEmail}`)
         }}
       >
         {userstInfo?.displayName}님이 쓴 글

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React, { useEffect, useState } from "react"
 // import ReactMarkdown from "react-markdown"
 import "easymde/dist/easymde.min.css"
 import { storage, db } from "../../axios/firebase"
-import { addDoc, collection } from "firebase/firestore"
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import {
   StyledTitle,
@@ -16,11 +18,13 @@ import {
   CancelButton,
   SubmitButton,
   StyledFileLabel,
+  DropzoneP,
   FileBtnImg
 } from "./WriteCSS"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useNavigate, useParams } from "react-router"
 import Dropzone from "react-dropzone"
+import { updatePoints } from "../updatePoints"
 
 const Write: React.FC = () => {
   const { board } = useParams()
@@ -60,37 +64,56 @@ const Write: React.FC = () => {
     navigate(-1)
   }
 
-  const handleSubmitPost = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault() // 페이지 리프레쉬 방지
+  const handleSubmitPost = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
-    if (imageFile !== null) {
-      // 이미지 파일이 선택된 경우
-      const fileRef = ref(storage, imageFile.name)
+    const userEmail = auth.currentUser?.email ?? ""
+    try {
+      let imageUrl: string | null = null
 
-      uploadBytesResumable(fileRef, imageFile)
-        .then((snapshot) => {
-          getDownloadURL(snapshot.ref)
-            .then((downloadURL) => {
-              savePost(downloadURL) // 사진 업로드 후 포스트 저장
+      if (imageFile) {
+        const fileRef = ref(storage, imageFile.name)
+        const snapshot = await uploadBytesResumable(fileRef, imageFile)
+        imageUrl = await getDownloadURL(snapshot.ref)
+      }
+
+      // eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression
+      await savePost(imageUrl)
+
+      if (auth.currentUser) {
+        const userQuery = query(
+          collection(db, "usersinfo"),
+          where("email", "==", auth.currentUser.email)
+        )
+
+        try {
+          const querySnapshot = await getDocs(userQuery)
+          if (!querySnapshot.empty) {
+            querySnapshot.forEach((doc) => {
+              const userInfo = doc.data()
+              const { currentPoint, totalPoint } = userInfo
+
+              void updatePoints(userEmail, currentPoint, totalPoint + 10)
             })
-            .catch((e) => {
-              console.log("error")
-            })
-        })
-        .catch((error) => {
-          console.error("Upload failed:", error)
-        })
-    } else {
-      savePost(null) // 사진 없이 포스트 저장
+          } else {
+            console.log("일치하는 문서를 찾을 수 없습니다.")
+          }
+        } catch (error) {
+          console.error("Firestore 쿼리 오류:", error)
+        }
+      }
+
+      navigate(-1)
+    } catch (error) {
+      console.error("포스트 저장 또는 포인트 업데이트 실패:", error)
     }
-    navigate(-1)
   }
 
   function savePost(imageUrl: string | null) {
     if (category !== "카테고리를 선택하세요") {
       if (title !== "") {
         if (content !== "") {
-          addDoc(collection(db, "posts"), {
+          const postData = {
             postCategory: category,
             postTitle: title,
             postContent: content,
@@ -101,13 +124,24 @@ const Write: React.FC = () => {
             postDisplayName: auth.currentUser?.displayName,
             likes: 0,
             comments: 0
-          })
-            .then(() => {
-              // alert("글 작성이 완료되었습니다.")
-            })
-            .catch((e) => {
-              console.error("글 작성에 실패했습니다.:", e)
-            })
+          }
+
+          try {
+            addDoc(collection(db, "posts"), postData)
+              .then(() => {
+                // 글 작성 성공 시의 코드
+                console.log("글 작성 성공")
+                navigate(-1)
+              })
+              .catch((e) => {
+                // 글 작성 실패 시의 코드
+                console.error("글 작성에 실패했습니다.:", e)
+                navigate(-1)
+              })
+          } catch (error) {
+            console.error("Firestore에 데이터 추가 중 오류 발생:", error)
+            navigate(-1)
+          }
         } else {
           alert("내용을 작성해 주세요")
         }
@@ -154,40 +188,6 @@ const Write: React.FC = () => {
           />
         </StyledLabel>
         {/* <ReactMarkdown>{content}</ReactMarkdown> */}
-        <UploadIcon
-          onClick={() => {
-            document.getElementById("file-upload")?.click()
-          }}
-        />
-        <Dropzone
-          onDrop={(acceptedFiles) => {
-            // 파일이 드롭존에 드롭되면 이벤트 핸들러 실행
-            console.log(acceptedFiles)
-            if (acceptedFiles.length > 0) {
-              // 파일이 선택된 경우
-              setImageFile(acceptedFiles[0]) // 첫 번째 파일을 상태에 저장
-            }
-          }}
-        >
-          {({ getRootProps, getInputProps }) => (
-            <section>
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                <p>파일을 드래그 앤 드롭하거나 클릭하여 업로드하세요.</p>
-              </div>
-            </section>
-          )}
-        </Dropzone>
-
-        {/* 이미지 미리보기 */}
-        {imageFile != null && (
-          <img
-            src={URL.createObjectURL(imageFile)}
-            alt="미리보기 이미지"
-            style={{ maxWidth: "100%", maxHeight: "100px" }} // 이미지 크기 조절 가능
-          />
-        )}
-
         <StyledFileLabel htmlFor="file-upload">
           <StyledInputFile
             id="file-upload"
@@ -198,6 +198,37 @@ const Write: React.FC = () => {
           />
           <FileBtnImg src="/WritePicturIcon.png" alt="업로드 파일" />
         </StyledFileLabel>
+        <UploadIcon>
+          <Dropzone
+            onDrop={(acceptedFiles) => {
+              // 파일이 드롭존에 드롭되면 이벤트 핸들러 실행
+              console.log(acceptedFiles)
+              if (acceptedFiles.length > 0) {
+                // 파일이 선택된 경우
+                setImageFile(acceptedFiles[0]) // 첫 번째 파일을 상태에 저장
+              }
+            }}
+          >
+            {({ getRootProps, getInputProps }) => (
+              <section>
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <DropzoneP>
+                    파일을 드래그 앤 드롭하거나 클릭하여 업로드하세요.
+                  </DropzoneP>
+                  {/* 이미지 미리보기 */}
+                  {imageFile != null && (
+                    <img
+                      src={URL.createObjectURL(imageFile)}
+                      alt="미리보기 이미지"
+                      style={{ maxWidth: "100%", maxHeight: "200px" }} // 이미지 크기 조절 가능
+                    />
+                  )}
+                </div>
+              </section>
+            )}
+          </Dropzone>
+        </UploadIcon>
 
         <div>
           <CancelButton type="button" onClick={cancelBtn}>

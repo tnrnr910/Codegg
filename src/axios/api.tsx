@@ -57,13 +57,16 @@ interface usersinfo {
   email: string
   isAdmin: boolean
   profileImg: string
+  follower: number
+  following: number
+  currentPoint: number
+  totalPoint: number
 }
 
 interface follow {
   id: string
   followuserEmail: string
   userEmail: string
-  followers: string[]
 }
 
 const getPost = async (postId: string): Promise<Post> => {
@@ -100,7 +103,6 @@ const getPosts = async (): Promise<Post[]> => {
     }
     posts.push(data as Post) // 형 변환을 통해 타입 일치화
   })
-  console.log(posts)
   return posts
 }
 
@@ -293,7 +295,8 @@ const getPostData: any = async (
   })
   return posts
 }
-const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
+
+const getSearchedDataTTTT = async (searchKeyword: string): Promise<Post[]> => {
   const searchResults: Post[] = []
   const keywords = searchKeyword.split(" ")
   for (const keyword of keywords) {
@@ -341,6 +344,32 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   return searchResults
 }
 
+const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
+  const searchResults: Post[] = []
+  const keyword = searchKeyword.split(" ")
+  const dbPosts = query(collection(db, "posts"), orderBy("postTime", "desc"))
+  const userSnapshot = await getDocs(dbPosts)
+  userSnapshot.forEach((doc: any) => {
+    if (doc.data().postContent.includes(keyword) === true) {
+      const newPost: Post = {
+        id: doc.id,
+        ...doc.data()
+      }
+      // setPosts([...posts, newPost])
+
+      searchResults.push(newPost)
+    } else if (doc.data().postTitle.includes(keyword) === true) {
+      const newPost: Post = {
+        id: doc.id,
+        ...doc.data()
+      }
+
+      searchResults.push(newPost)
+    }
+  })
+  return searchResults
+}
+
 const getusersinfos: any = async (): Promise<usersinfo[]> => {
   const docRef = query(collection(db, "usersinfo"))
   const docSnap = await getDocs(docRef)
@@ -358,41 +387,25 @@ const getusersinfos: any = async (): Promise<usersinfo[]> => {
   return usersinfo
 }
 
-const getusersinfo: any = async (
-  email: string
-): Promise<usersinfo | undefined> => {
-  try {
-    const usersinfoQuery = query(
-      collection(db, "usersinfo"),
-      where("email", "==", email)
-    )
-    const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+const getusersinfo = async (email: string): Promise<usersinfo[]> => {
+  const usersinfoQuery = query(
+    collection(db, "usersinfo"),
+    where("email", "==", email)
+  )
+  const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+  const usersinfoes: usersinfo[] = []
 
-    if (!usersinfoQuerySnapshot.empty) {
-      const userInfoDoc = usersinfoQuerySnapshot.docs[0]
-      const data: usersinfo = {
-        id: userInfoDoc.id,
-        badgeImg: "",
-        displayName: "",
-        email: "",
-        isAdmin: false,
-        profileImg: "",
-        ...userInfoDoc.data()
-      }
-
-      console.log(data)
-      return data
-    } else {
-      console.log("사용자를 찾을 수 없습니다.")
-      return undefined
+  usersinfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
     }
-  } catch (error) {
-    console.error("사용자 데이터를 가져오는 중 오류 발생:", error)
-    throw error
-  }
+    usersinfoes.push(data as usersinfo)
+  })
+  return usersinfoes
 }
 
-// formtDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
+// formatDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
 function formatDate(date: {
   getFullYear: () => any
   getMonth: () => number
@@ -477,6 +490,119 @@ const findfollow: any = async (followuserEmail: string, userEmail: string) => {
   }
 }
 
+const getfollowData: any = async (userEmail: string) => {
+  const q = query(collection(db, "follow"), where("userEmail", "==", userEmail))
+
+  const querySnapshot = await getDocs(q)
+
+  const followData: follow[] = []
+
+  if (!querySnapshot.empty) {
+    querySnapshot.forEach((followDoc) => {
+      const data: follow = {
+        id: followDoc.id,
+        followuserEmail: "",
+        userEmail: "",
+        ...followDoc.data()
+      }
+
+      followData.push(data)
+    })
+
+    console.log(followData)
+    return followData
+  } else {
+    console.log("사용자를 찾을 수 없습니다.")
+    return []
+  }
+}
+
+const getfollowerInfo = async (email: string): Promise<usersinfo[]> => {
+  const usersinfoes: usersinfo[] = []
+  const usersinfoQuery = query(
+    collection(db, "usersinfo"),
+    where("email", "==", email)
+  )
+  const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+
+  usersinfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
+    if (doc != null) {
+      const data = {
+        id: doc.id,
+        ...doc.data()
+      }
+      usersinfoes.push(data as usersinfo)
+    }
+  })
+  console.log(usersinfoes)
+  return usersinfoes
+}
+
+const getfollowerData: any = async (followuserEmail: string) => {
+  const q = query(
+    collection(db, "follow"),
+    where("followuserEmail", "==", followuserEmail)
+  )
+  const querySnapshot = await getDocs(q)
+
+  const followData: follow[] = []
+
+  if (!querySnapshot.empty) {
+    querySnapshot.forEach((followDoc) => {
+      const data: follow = {
+        id: followDoc.id,
+        followuserEmail: "",
+        userEmail: "",
+        ...followDoc.data()
+      }
+
+      followData.push(data)
+    })
+
+    console.log(followData)
+    return followData
+  } else {
+    console.log("사용자를 찾을 수 없습니다.")
+    return []
+  }
+}
+
+const findfollowNumber: any = async (userEmail: string) => {
+  const userinfo = query(
+    collection(db, "usersinfo"),
+    where("email", "==", userEmail)
+  )
+  const follower = query(
+    collection(db, "follow"),
+    where("userEmail", "==", userEmail)
+  )
+
+  const following = query(
+    collection(db, "follow"),
+    where("followuserEmail", "==", userEmail)
+  )
+
+  const querySnapshotfollower = await getDocs(follower)
+  const querySnapshotfollowing = await getDocs(following)
+  const querySnapshotuserinfo = await getDocs(userinfo)
+
+  const follwerNum = querySnapshotfollower.size
+  const followingNum = querySnapshotfollowing.size
+
+  const firstDocument = querySnapshotuserinfo.docs[0]
+
+  console.log(follwerNum)
+  console.log(followingNum)
+
+  await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
+    follower: follwerNum
+  })
+
+  await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
+    following: followingNum
+  })
+}
+
 export {
   getPost,
   getPosts,
@@ -495,5 +621,11 @@ export {
   formatDate,
   setfollow,
   getfollow,
-  findfollow
+  findfollow,
+  getfollowData,
+  getfollowerInfo,
+  getfollowerData,
+  findfollowNumber,
+  getSearchedDataTTTT
 }
+export type { usersinfo }

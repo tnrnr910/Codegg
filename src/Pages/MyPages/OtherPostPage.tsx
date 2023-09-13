@@ -1,4 +1,11 @@
-import { query, collection, where, getDocs } from "firebase/firestore"
+import {
+  query,
+  collection,
+  where,
+  getDocs,
+  doc,
+  getDoc
+} from "firebase/firestore"
 import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
@@ -6,14 +13,15 @@ import { useNavigate, useParams } from "react-router"
 import { BiSearch } from "react-icons/bi"
 import { getusersinfo } from "../../axios/api"
 import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
+import { formatDate } from "../../Components/DateChange"
 
 interface Post {
   id: string
-  title: string
-  content: string
-  category: string
-  date: string
-  board: string
+  postBoard: string
+  postCategory: string
+  postContent: string
+  postTitle: string
+  postTime: number
   likes: number
   comments: number
 }
@@ -30,6 +38,8 @@ interface usersinfo {
   email: string
   isAdmin: string
   profileImg: string
+  follower: number
+  following: number
 }
 
 const OtherPostPage: React.FC = () => {
@@ -38,26 +48,35 @@ const OtherPostPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
+  const [userId, setUserId] = useState<string | null>("")
   const [userstInfo, setuserstInfo] = useState<usersinfo>()
   const [posts, setPosts] = useState<Post[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = `/OtherPostPage/${email}`
 
-  // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     if (email !== undefined) {
+      setUserId(email)
+      setCategorySelected("카테고리")
+      const list = GetPostData(activeTab)
+      const getData = () => {
+        list.then((Data: any) => {
+          setPosts(Data)
+        })
+      }
+      getData()
+
       void getusersinfo(email).then((dummyData: any) => {
-        setuserstInfo(dummyData)
+        setuserstInfo(dummyData[0])
       })
     }
-  }, [userstInfo?.email])
+  }, [userId])
 
-  // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
   const GetPostData: any = async (postBoard: string) => {
     const postsTemp: Post[] = []
     const dbPosts = query(
       collection(db, "posts"),
-      where("postUserEmail", "==", userstInfo?.email),
+      where("postUserEmail", "==", userId),
       where("postBoard", "==", postBoard)
     )
     const userSnapshot = await getDocs(dbPosts)
@@ -65,54 +84,91 @@ const OtherPostPage: React.FC = () => {
       if (doc != null) {
         const newPost: Post = {
           id: doc.id,
-          category: doc.data().postCategory,
-          title: doc.data().postTitle,
-          date: String(doc.data().postTime.toDate()),
-          content: doc.data().postContent,
-          board: doc.data().postBoard,
-          likes: 0,
-          comments: 0
+          postCategory: doc.data().postCategory,
+          postTitle: doc.data().postTitle,
+          postTime: doc.data().postTime,
+          postContent: doc.data().postContent,
+          postBoard: doc.data().postBoard,
+          likes: doc.data().likes,
+          comments: doc.data().comments
         }
-        // setPosts([...posts, newPost])
-
         postsTemp.push(newPost)
       }
     })
-    console.log(postsTemp)
+
     return postsTemp
   }
 
-  // 9월 1일자로 한거
-  // 파이어베이스에서 내가 쓴 게시글에서 단어 검색 해서 찾아내는 함수
+  // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
+  const GetCommentData: any = async (userId: string) => {
+    const postIds: string[] = []
+    const dbComments = query(
+      collection(db, "comments"),
+      where("commentUserEmail", "==", userId)
+    )
+    const userSnapshotComments = await getDocs(dbComments)
+    userSnapshotComments.forEach((doc: any) => {
+      if (doc != null) {
+        postIds.push(doc.data().postId)
+      }
+    })
+
+    return await Promise.all(
+      postIds.map(async (postId: string) => {
+        const postRef = doc(db, "posts", postId)
+        const postSnap = await getDoc(postRef)
+        const data = {
+          id: postSnap.id,
+          ...postSnap.data()
+        }
+        console.log(data)
+        return data as Post
+      })
+    )
+  }
+
   const GetFindPostData: any = async (
-    postCategory: string,
     postBoard: string,
+    postCategory: string,
     keyword: string
   ) => {
     const postsTemp: Post[] = []
     const dbPosts = query(
       collection(db, "posts"),
-      where("postUserEmail", "==", userstInfo?.email),
+      where("postUserEmail", "==", userId),
       where("postBoard", "==", postBoard)
     )
     const userSnapshot = await getDocs(dbPosts)
     userSnapshot.forEach((doc: any) => {
       if (
         doc != null &&
-        doc.data().postUserEmail === userstInfo?.email &&
+        doc.data().postUserEmail === userId &&
         postBoard === doc.data().postBoard
       ) {
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (doc.data().postContent.includes(keyword)) {
+        if (doc.data().postContent.includes(keyword) === true) {
           const newPost: Post = {
             id: doc.id,
-            category: doc.data().postCategory,
-            title: doc.data().postTitle,
-            date: String(doc.data().postTime.toDate()),
-            content: doc.data().postContent,
-            board: doc.data().postBoard,
-            likes: 0,
-            comments: 0
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
+            likes: doc.data().likes,
+            comments: doc.data().comments
+          }
+          // setPosts([...posts, newPost])
+
+          postsTemp.push(newPost)
+        } else if (doc.data().postTitle.includes(keyword) === true) {
+          const newPost: Post = {
+            id: doc.id,
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
+            likes: doc.data().likes,
+            comments: doc.data().comments
           }
           // setPosts([...posts, newPost])
 
@@ -122,7 +178,7 @@ const OtherPostPage: React.FC = () => {
     })
     console.log(postsTemp)
     if (postCategory !== "카테고리") {
-      postsTemp.filter((post) => post.category === postCategory)
+      postsTemp.filter((post) => post.postCategory === postCategory)
     }
     return postsTemp
   }
@@ -139,6 +195,7 @@ const OtherPostPage: React.FC = () => {
         setPosts(dummyData)
       }
     )
+    setSearchTerm("")
   }
 
   // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
@@ -149,6 +206,7 @@ const OtherPostPage: React.FC = () => {
           setPosts(dummyData)
         }
       )
+      setSearchTerm("")
     }
   }
 
@@ -159,15 +217,6 @@ const OtherPostPage: React.FC = () => {
     { value: "meetups", label: "모임" },
     { value: "comments", label: "댓글" }
   ]
-
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const filteredPosts = posts.filter((post) => {
-  //   return (
-  //     (post.category === activeTab || activeTab === "all") &&
-  //     (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       post.content.toLowerCase().includes(searchTerm.toLowerCase()))
-  //   )
-  // })
 
   function DropDown() {
     return (
@@ -236,7 +285,7 @@ const OtherPostPage: React.FC = () => {
     <MyPostWrap>
       <OtherPageMenuBar activeMenuItem={activeMenuItem} />
       <StyledContainer>
-        <StyledTitle>내가 쓴 글</StyledTitle>
+        <StyledTitle>{userstInfo?.displayName}님이 쓴 글</StyledTitle>
 
         <StyledTabButtons>
           {tabOptions.map((tab) => (
@@ -246,15 +295,17 @@ const OtherPostPage: React.FC = () => {
               onClick={() => {
                 setActiveTab(tab.value)
                 setCategoryOpen(false)
+                setSearchTerm("")
                 setCategorySelected("카테고리")
-                const list = GetPostData(tab.value)
-
-                const getData = () => {
-                  list.then((dummyData: any) => {
+                if (tab.value === "comments") {
+                  GetCommentData(userId).then((dummyData: any) => {
+                    setPosts(dummyData) // 내가 쓴 글 댓글
+                  })
+                } else {
+                  GetPostData(tab.value).then((dummyData: any) => {
                     setPosts(dummyData)
                   })
                 }
-                getData()
               }}
             >
               {tab.label}
@@ -263,7 +314,14 @@ const OtherPostPage: React.FC = () => {
         </StyledTabButtons>
         <NumberAndSearchBox>
           <NumberBox>
-            전체<StyledNumberBlue> {posts.length}</StyledNumberBlue>개
+            전체
+            <StyledNumberBlue>
+              {" "}
+              {activeTab === "comments"
+                ? posts?.length
+                : posts?.filter((post) => post.postBoard === activeTab)?.length}
+            </StyledNumberBlue>
+            개
           </NumberBox>
 
           <SelectAndSearchBox>
@@ -316,16 +374,22 @@ const OtherPostPage: React.FC = () => {
                         GoToDetailPage(post.id)
                       }}
                     >
-                      <StyledPostCategory>{post.category}</StyledPostCategory>
-                      <h3>{post.title}</h3>
-                      <p>작성 일자: {post.date.toString()}</p>
+                      <StyledPostCategory>
+                        {post.postCategory}
+                      </StyledPostCategory>
+                      <StyledPostTitle>{post.postTitle}</StyledPostTitle>
+                      <TimeAndLikeAndCommentBox>
+                        <p>{formatDate(post.postTime)}</p>
+                        <StyledNumber>{post.likes}</StyledNumber>
+                        <StyledNumber>{post.comments}</StyledNumber>
+                      </TimeAndLikeAndCommentBox>
                     </StyledPost>
                   ))
                 : posts
                     .filter(
                       (post) =>
                         categorySelected !== "카테고리" &&
-                        post.category === categorySelected
+                        post.postCategory === categorySelected
                       // (post) => {
                       //   categorySelected !== "카테고리" &&
                       //   post.category === categorySelected
@@ -339,9 +403,15 @@ const OtherPostPage: React.FC = () => {
                           GoToDetailPage(post.id)
                         }}
                       >
-                        <StyledPostCategory>{post.category}</StyledPostCategory>
-                        <h3>{post.title}</h3>
-                        <p>작성 일자: {post.date}</p>
+                        <StyledPostCategory>
+                          {post.postCategory}
+                        </StyledPostCategory>
+                        <StyledPostTitle>{post.postTitle}</StyledPostTitle>
+                        <TimeAndLikeAndCommentBox>
+                          <p>{formatDate(post.postTime)}</p>
+                          <StyledNumber>{post.likes}</StyledNumber>
+                          <StyledNumber>{post.comments}</StyledNumber>
+                        </TimeAndLikeAndCommentBox>
                       </StyledPost>
                     ))}
             </StyledPostList>
@@ -578,6 +648,24 @@ const SearchWord = styled.span`
   margin-top: 12px;
   margin-left: 2.8rem;
   font-size: 0.875rem;
+`
+
+const StyledPostTitle = styled.p`
+  width: 500px;
+  justify-content: left;
+  padding-top: 3px;
+`
+
+const StyledNumber = styled.p`
+  margin-right: 20px;
+`
+
+const TimeAndLikeAndCommentBox = styled.td`
+  display: flex;
+  justify-content: space-between;
+  float: right;
+  width: 255px;
+  margin-right: 23px;
 `
 
 export default OtherPostPage

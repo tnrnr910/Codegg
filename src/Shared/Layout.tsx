@@ -8,26 +8,34 @@ import ProfilePicture from "../Components/ProfilePicture"
 import OpenProfile from "../Components/OpenProfile"
 import { getSearchedData } from "../axios/api"
 import { useDispatch, useSelector } from "react-redux"
+import { SET_SEARCH_RESULTS, SET_SIGNUP_TAP } from "../redux/store"
 
 interface RootState {
-  searchResults: any[]
+  search: {
+    searchResults: any[]
+  }
 }
 function Header() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
   const [searchTerm, setSearchTerm] = useState("")
 
-  const searchResults = useSelector((state: RootState) => state.searchResults)
+  const searchResults = useSelector(
+    (state: RootState) => state.search.searchResults
+  )
 
-  const dispatch = useDispatch()
-
+  console.log(
+    "test:",
+    useSelector((state: RootState) => state.search)
+  )
   useEffect(() => {
+    console.log(auth.currentUser)
     // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
-      // console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리합니다.
     })
     console.log("currentUser", currentUser)
   }, [])
@@ -54,7 +62,7 @@ function Header() {
   const handleSearch = () => {
     getSearchedData(searchTerm)
       .then((searchResults) => {
-        dispatch({ type: "SET_SEARCH_RESULTS", payload: searchResults })
+        dispatch({ type: SET_SEARCH_RESULTS, payload: searchResults })
         navigate("/SearchResultPage")
       })
       .catch((error) => {
@@ -63,6 +71,18 @@ function Header() {
   }
 
   useEffect(() => {}, [searchResults])
+
+  // 회원가입 클릭 시
+  const handleSignupClick = () => {
+    dispatch(SET_SIGNUP_TAP(true)) // signupTap 상태를 true로 변경
+    navigate("/SigninPage") // SigninPage로 이동
+  }
+  // 로그인 클릭 시
+  const handleSigninClick = () => {
+    dispatch(SET_SIGNUP_TAP(false)) // signupTap 상태를 false로 변경
+    navigate("/SigninPage") // SigninPage로 이동
+  }
+
   return (
     <>
       <HeaderContainer>
@@ -102,13 +122,13 @@ function Header() {
           >
             공지사항
           </Stp>
-          {/* <Stp
+          <Stp
             onClick={() => {
               navigate("/PointShopPage")
             }}
           >
             포인트 샵
-          </Stp> */}
+          </Stp>
         </Pagelist>
         <SearchInput>
           <InputField
@@ -122,20 +142,8 @@ function Header() {
         <Authcontainer>
           {auth.currentUser == null ? (
             <>
-              <StAuth
-                onClick={() => {
-                  navigate("/SigninPage")
-                }}
-              >
-                로그인
-              </StAuth>
-              <StAuth
-                onClick={() => {
-                  navigate("/SigninPage")
-                }}
-              >
-                회원가입
-              </StAuth>
+              <StAuth onClick={handleSigninClick}>로그인</StAuth>
+              <StAuth onClick={handleSignupClick}>회원가입</StAuth>
             </>
           ) : (
             <>
@@ -144,7 +152,7 @@ function Header() {
                   navigate("/MyProfilePage")
                 }}
               >
-                {auth.currentUser?.displayName}님.안녕하세요.
+                {auth.currentUser?.displayName}
               </StAuth>
               <ProfilePicture
                 onClick={openModal}
@@ -222,6 +230,7 @@ const Pagelist = styled.div`
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
+  white-space: nowrap;
 `
 const Stp = styled.p`
   cursor: pointer;
@@ -232,6 +241,7 @@ const Authcontainer = styled.div`
   justify-content: end;
   align-items: center;
   gap: 1.5rem;
+  white-space: nowrap;
   /* margin-left: 6.25rem; */
 `
 
