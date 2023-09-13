@@ -230,6 +230,7 @@ const Pagelist = styled.div`
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
+  white-space: nowrap;
 `
 const Stp = styled.p`
   cursor: pointer;
@@ -240,6 +241,7 @@ const Authcontainer = styled.div`
   justify-content: end;
   align-items: center;
   gap: 1.5rem;
+  white-space: nowrap;
   /* margin-left: 6.25rem; */
 `
 

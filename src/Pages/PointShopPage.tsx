@@ -10,6 +10,9 @@ interface ShopItem {
   style?: {
     color?: string
     fontWeight?: string
+    backgroundColor?: string
+    fontSize?: string
+    fontFamily?: string
   }
 }
 
@@ -29,13 +32,38 @@ const PointShopPage: React.FC = () => {
       id: 2,
       name: "게시글 타이틀 색상 변경 - 주황",
       price: 300,
-      style: { color: "orange" }
+      style: { color: "#orange" }
     },
-    { id: 3, name: "게시글 타이틀 색상 변경 - 빨강", price: 300 },
-    { id: 4, name: "게시글 타이틀 사이즈 변경 - 15pt", price: 200 },
-    { id: 5, name: "게시글 타이틀 색상 변경 - 초록", price: 100 },
-    { id: 6, name: "게시글 타이틀 색상 변경 - 파랑", price: 150 },
-    { id: 7, name: "게시글 타이틀 폰트 변경 - 나눔고딕", price: 200 }
+    {
+      id: 3,
+      name: "게시글 타이틀 색상 변경 - 빨강",
+      price: 300,
+      style: { color: "red" }
+    },
+    {
+      id: 4,
+      name: "게시글 타이틀 사이즈 변경 - 15pt",
+      price: 200,
+      style: { fontSize: "15pt" }
+    },
+    {
+      id: 5,
+      name: "게시글 타이틀 색상 변경 - 초록",
+      price: 100,
+      style: { color: "green" }
+    },
+    {
+      id: 6,
+      name: "게시글 타이틀 색상 변경 - 파랑",
+      price: 150,
+      style: { color: "blue" }
+    },
+    {
+      id: 7,
+      name: "게시글 타이틀 폰트 변경 - 나눔고딕",
+      price: 200,
+      style: { fontFamily: "Nanum Gothic" }
+    }
   ]
 
   const handleItemSelect = (item: ShopItem) => {
@@ -76,11 +104,17 @@ const PointShopPage: React.FC = () => {
         <p>보유 포인트: {userPoints}</p>
 
         <ItemList>
+          <PointListNameBox>
+            <ListName>효과</ListName> <ListPointName>필요 포인트</ListPointName>
+          </PointListNameBox>
+
+          {/* 본문 내용 */}
           {items.map((item) => (
             <Item
               key={item.id}
               onMouseEnter={toggleDescription}
               onMouseLeave={toggleDescription}
+              style={item.style}
             >
               <CheckBox
                 type="checkbox"
@@ -101,7 +135,7 @@ const PointShopPage: React.FC = () => {
           ))}
         </ItemList>
 
-        <ApplyButton onClick={applySelectedItems}>적용하기</ApplyButton>
+        <ApplyButton onClick={applySelectedItems}>구매하기</ApplyButton>
       </ShopContainer>
     </PointShopWrap>
   )
@@ -112,6 +146,30 @@ const PointShopWrap = styled.div`
   margin-top: 2rem;
   justify-content: center;
   height: 780px;
+`
+const PointListNameBox = styled.div`
+  width: 100%;
+  text-align: right;
+  height: 1.875rem;
+  margin-top: 0.625rem;
+  margin-bottom: 1.25rem;
+  border-top: 0.0625rem solid #dadada;
+  padding-top: 0.875rem;
+  border-bottom: 0.0625rem solid #333333;
+`
+
+const ListName = styled.div`
+  float: left;
+  width: 5.625rem;
+  text-align: center;
+  font-size: 0.875rem;
+`
+
+const ListPointName = styled.div`
+  display: inline-block;
+  width: 5.625rem;
+  text-align: center;
+  font-size: 0.875rem;
 `
 
 const ShopContainer = styled.div`
@@ -125,8 +183,10 @@ const ShopContainer = styled.div`
 `
 
 const ItemList = styled.ul`
-  list-style: none;
-  padding: 0;
+  width: 33rem;
+  text-align: center;
+  font-size: 0.875rem;
+  margin-left: 80px;
 `
 
 const Item = styled.li`
