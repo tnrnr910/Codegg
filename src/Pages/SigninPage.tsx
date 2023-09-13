@@ -60,6 +60,7 @@ function SigninPage() {
   }
 
   const { data } = useQuery("usersinfo", getusersinfos)
+  const usersinfoData: any[] = data as any[]
 
   // 버튼 disable 초기값(중복클릭 방지용)
   const [disable, setDisable] = useState(false)
@@ -104,11 +105,6 @@ function SigninPage() {
 
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
-    // const usersinfo = data.find(function (item: any) {
-    //   return item.email === "1@gmail.com"
-    // })
-    console.log("usersinfodata", data)
-    // console.log("usersinfodata", usersinfo)
     setPersistence(auth, browserSessionPersistence) // 유저정보를 로컬스토리지에 넣는걸 도와줌
       .then(() => {
         console.log("Session persistence successfully set!")
@@ -207,7 +203,6 @@ function SigninPage() {
       })
       navigate("/")
       setDisable(false)
-      console.log("disable2", disable)
       // 뒤로가기 방지 및 alert
       history.pushState(null, "", location.href)
       window.addEventListener("popstate", preventGoBack)
@@ -221,7 +216,6 @@ function SigninPage() {
         confirmButtonColor: "#0C356A"
       })
       setDisable(false)
-      console.log("disable2", disable)
     }
   }
 
@@ -233,9 +227,13 @@ function SigninPage() {
         const userdata = data.user
         console.log({ data })
         console.log(userdata)
+        const usersinfo = usersinfoData.find(function (item: any) {
+          return item.email === userdata.email
+        })
+        console.log("usersinfodata", data)
+        console.log("usersinfo", usersinfo)
         // 회원정보 등록
-        if (auth.currentUser != null) {
-          // if (auth.currentUser.email === "devtest3864@gmail.com") {
+        if (auth.currentUser != null && usersinfo === undefined) {
           await updateProfile(auth.currentUser, {
             displayName: userdata.displayName,
             photoURL: userdata.photoURL
@@ -260,7 +258,15 @@ function SigninPage() {
             timer: 1000
           })
           navigate("/")
-          console.log(data) // console에 UserCredentialImpl 출력
+        } else {
+          void Swal.fire({
+            position: "center",
+            title: "정상적으로 로그인 되었습니다.",
+            text: "잠시 후 홈으로 이동합니다.",
+            showConfirmButton: false,
+            timer: 1000
+          })
+          navigate("/")
         }
       })
       .catch((error) => {
