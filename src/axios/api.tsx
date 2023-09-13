@@ -59,6 +59,8 @@ interface usersinfo {
   profileImg: string
   follower: number
   following: number
+  currentPoint: number
+  totalPoint: number
 }
 
 interface follow {
@@ -101,7 +103,6 @@ const getPosts = async (): Promise<Post[]> => {
     }
     posts.push(data as Post) // 형 변환을 통해 타입 일치화
   })
-  console.log(posts)
   return posts
 }
 
@@ -627,3 +628,4 @@ export {
   findfollowNumber,
   getSearchedDataTTTT
 }
+export type { usersinfo }
