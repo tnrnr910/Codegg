@@ -203,7 +203,7 @@ function SigninPage() {
       })
       navigate("/")
       setDisable(false)
-      // 뒤로가기 방지 및 alert
+      // 뒤로가기 방지
       history.pushState(null, "", location.href)
       window.addEventListener("popstate", preventGoBack)
       return () => {
@@ -258,6 +258,12 @@ function SigninPage() {
             timer: 1000
           })
           navigate("/")
+          // 뒤로가기 방지
+          history.pushState(null, "", location.href)
+          window.addEventListener("popstate", preventGoBack)
+          return () => {
+            window.removeEventListener("popstate", preventGoBack)
+          }
         } else {
           void Swal.fire({
             position: "center",
@@ -267,6 +273,12 @@ function SigninPage() {
             timer: 1000
           })
           navigate("/")
+          // 뒤로가기 방지
+          history.pushState(null, "", location.href)
+          window.addEventListener("popstate", preventGoBack)
+          return () => {
+            window.removeEventListener("popstate", preventGoBack)
+          }
         }
       })
       .catch((error) => {
