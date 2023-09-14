@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
 import Buttons from "../../Components/Buttons"
-import PointApply from "../../Components/PointApply"
+import Postbody from "../../Components/Postbody"
 
 function QnAPage() {
   const navigate = useNavigate()
@@ -146,10 +146,7 @@ function QnAPage() {
               댓글 수
             </StyledPostTitlePostCommentNum>
           </StyledPostTitleBox>
-          <PointApply
-            categorySelected={categorySelected}
-            postBoard="questions"
-          />
+          <Postbody categorySelected={categorySelected} postBoard="questions" />
           <WriteBtnBox>
             <Buttons
               onClick={() => {

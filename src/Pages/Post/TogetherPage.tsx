@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
 import Buttons from "../../Components/Buttons"
-import PointApply from "../../Components/PointApply"
+import Postbody from "../../Components/Postbody"
 
 function TogetherPage() {
   const navigate = useNavigate()
@@ -146,7 +146,7 @@ function TogetherPage() {
               댓글 수
             </StyledPostTitlePostCommentNum>
           </StyledPostTitleBox>
-          <PointApply categorySelected={categorySelected} postBoard="meetups" />
+          <Postbody categorySelected={categorySelected} postBoard="meetups" />
           <WriteBtnBox>
             <Buttons
               onClick={() => {

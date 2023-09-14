@@ -14,7 +14,7 @@ interface StyledPostTitleProps {
   isBold: boolean
 }
 
-function PointApply({ categorySelected, postBoard }: PointApplyProps) {
+function Postbody({ categorySelected, postBoard }: PointApplyProps) {
   const navigate = useNavigate()
   const { isLoading, data } = useQuery("posts", getPosts)
   const list: any = data
@@ -120,7 +120,7 @@ function PointApply({ categorySelected, postBoard }: PointApplyProps) {
   )
 }
 
-export default PointApply
+export default Postbody
 
 const BodyDiv = styled.div`
   margin-left: 24px;

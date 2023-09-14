@@ -123,6 +123,8 @@ const Write: React.FC = () => {
             postUserEmail: auth.currentUser?.email,
             postDisplayName: auth.currentUser?.displayName,
             postSkin: "",
+            postColor: "",
+            postFontsize: "",
             likes: 0,
             comments: 0
           }

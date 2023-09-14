@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
 import Buttons from "../../Components/Buttons"
-import PointApply from "../../Components/PointApply"
+import Postbody from "../../Components/Postbody"
 
 function TipPage() {
   const navigate = useNavigate()
@@ -146,7 +146,7 @@ function TipPage() {
               댓글 수
             </StyledPostTitlePostCommentNum>
           </StyledPostTitleBox>
-          <PointApply categorySelected={categorySelected} postBoard="tips" />
+          <Postbody categorySelected={categorySelected} postBoard="tips" />
           <WriteBtnBox>
             <Buttons
               onClick={() => {
