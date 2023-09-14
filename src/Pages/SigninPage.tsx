@@ -22,7 +22,7 @@ import {
   setPersistence,
   browserSessionPersistence
 } from "firebase/auth"
-import { addDoc, collection } from "firebase/firestore"
+import { doc, setDoc } from "firebase/firestore"
 import { useQuery } from "react-query"
 
 // 유효성검사 스키마
@@ -153,7 +153,7 @@ function SigninPage() {
         text: "성공적으로 회원가입되었습니다.",
         confirmButtonColor: "#0C356A"
       })
-      await addDoc(collection(db, "usersinfo"), {
+      await setDoc(doc(db, "usersinfo", emailWatch), {
         badgeImg: "",
         displayName: displayNameWatch,
         email: emailWatch,
@@ -225,20 +225,21 @@ function SigninPage() {
     signInWithPopup(auth, provider) // 팝업창 띄워서 로그인
       .then(async (data) => {
         const userdata = data.user
-        console.log({ data })
-        console.log(userdata)
         const usersinfo = usersinfoData.find(function (item: any) {
           return item.email === userdata.email
         })
-        console.log("usersinfodata", data)
-        console.log("usersinfo", usersinfo)
+        console.log({ usersinfo })
         // 회원정보 등록
-        if (auth.currentUser != null && usersinfo === undefined) {
+        if (
+          auth.currentUser != null &&
+          usersinfo === undefined &&
+          userdata.email !== null
+        ) {
           await updateProfile(auth.currentUser, {
             displayName: userdata.displayName,
             photoURL: userdata.photoURL
           })
-          await addDoc(collection(db, "usersinfo"), {
+          await setDoc(doc(db, "usersinfo", userdata.email), {
             badgeImg: "",
             displayName: userdata.displayName,
             email: userdata.email,
@@ -457,6 +458,7 @@ const SigninSignoutBackground = styled.div`
   width: 100%;
   height: 56rem;
   background: url(https://i.postimg.cc/TwNqmVkj/background-signin1.png)
+    // TODO: asset 폴더 안에 이미지 넣기!!!!
     no-repeat center;
   background-size: cover;
   display: flex;
