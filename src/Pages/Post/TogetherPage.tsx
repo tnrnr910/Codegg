@@ -4,8 +4,8 @@ import { useNavigate } from "react-router"
 import styled from "styled-components"
 import { useQuery } from "react-query"
 import { getPosts } from "../../axios/api"
-import { formatDate } from "../../Components/DateChange"
 import Buttons from "../../Components/Buttons"
+import PointApply from "../../Components/PointApply"
 
 function TogetherPage() {
   const navigate = useNavigate()
@@ -146,96 +146,7 @@ function TogetherPage() {
               댓글 수
             </StyledPostTitlePostCommentNum>
           </StyledPostTitleBox>
-          <Body>
-            <BodyDiv>
-              {categorySelected === "카테고리" ? (
-                <>
-                  {list
-                    .filter(
-                      (item: { postBoard: string }) =>
-                        item.postBoard === "meetups"
-                    )
-                    .map(
-                      (info: {
-                        id: string
-                        postTime: number
-                        postTitle: string
-                        postCategory: string
-                        likes: number
-                        comments: number
-                      }) => {
-                        return (
-                          <ListContainer key={info.id}>
-                            <StyledPost
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              <StyledPostCategory>
-                                {info.postCategory}
-                              </StyledPostCategory>
-                              <StyledPostTitle>
-                                {info.postTitle}
-                              </StyledPostTitle>
-                              <TimeAndLikeAndCommentBox>
-                                <p>{formatDate(info.postTime)}</p>
-                                <StyledNumber>{info.likes}</StyledNumber>
-                                <StyledNumber>{info.comments}</StyledNumber>
-                              </TimeAndLikeAndCommentBox>
-                            </StyledPost>
-                          </ListContainer>
-                        )
-                      }
-                    )}
-                </>
-              ) : (
-                <>
-                  {list
-                    .filter(
-                      (item: { postBoard: string }) =>
-                        item.postBoard === "meetups"
-                    )
-                    .filter(
-                      (item: { postCategory: string }) =>
-                        categorySelected !== "카테고리" &&
-                        item.postCategory === categorySelected
-                    )
-                    .map(
-                      (info: {
-                        id: string
-                        postTime: number
-                        postTitle: string
-                        postCategory: string
-                        likes: number
-                        comments: number
-                      }) => {
-                        return (
-                          <ListContainer key={info.id}>
-                            <StyledPost
-                              onClick={() => {
-                                navigate(`/detailPage/${info.id}`)
-                              }}
-                            >
-                              <StyledPostCategory>
-                                {info.postCategory}
-                              </StyledPostCategory>
-                              <StyledPostTitle>
-                                {info.postTitle}
-                              </StyledPostTitle>
-                              <TimeAndLikeAndCommentBox>
-                                <p>{formatDate(info.postTime)}</p>
-                                <StyledNumber>{info.likes}</StyledNumber>
-                                <StyledNumber>{info.comments}</StyledNumber>
-                              </TimeAndLikeAndCommentBox>
-                            </StyledPost>
-                          </ListContainer>
-                        )
-                      }
-                    )}
-                </>
-              )}
-            </BodyDiv>
-          </Body>
+          <PointApply categorySelected={categorySelected} postBoard="meetups" />
           <WriteBtnBox>
             <Buttons
               onClick={() => {
@@ -253,44 +164,6 @@ function TogetherPage() {
 }
 
 export default TogetherPage
-
-const StyledPostTitle = styled.p`
-  width: 500px;
-  justify-content: left;
-  padding-top: 3px;
-`
-
-const StyledNumber = styled.p`
-  margin-right: 20px;
-`
-
-const StyledPost = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border: 0.0625rem solid #ffffff;
-  margin-bottom: 1.25rem;
-  background-color: #ffffff;
-  height: 20px;
-  width: 100%;
-  cursor: pointer;
-`
-
-const StyledPostCategory = styled.td`
-  border: solid #e7e7e7 1px;
-  padding: 3px 3px 3px 3px;
-  color: #9f9f9f;
-  display: flex;
-  width: 45px;
-  justify-content: center;
-`
-
-const TimeAndLikeAndCommentBox = styled.td`
-  display: flex;
-  justify-content: space-between;
-  float: right;
-  width: 255px;
-  margin-right: 24px;
-`
 
 const StyledContainer = styled.div`
   margin-top: 4rem;
@@ -415,14 +288,6 @@ const StyledCategoryButton = styled.button`
   width: auto;
 `
 
-const Body = styled.div`
-  width: 100%;
-`
-
-const BodyDiv = styled.div`
-  margin-left: 24px;
-`
-
 const ListContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -443,5 +308,3 @@ const WriteBtnBox = styled.div`
   justify-content: flex-end;
   margin: 2rem 0 1rem 0;
 `
-
-// const Pagination = styled.div``

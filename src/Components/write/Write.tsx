@@ -122,6 +122,7 @@ const Write: React.FC = () => {
             postTime: new Date().getTime(),
             postUserEmail: auth.currentUser?.email,
             postDisplayName: auth.currentUser?.displayName,
+            postSkin: "",
             likes: 0,
             comments: 0
           }
