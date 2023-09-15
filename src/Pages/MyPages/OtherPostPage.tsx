@@ -422,10 +422,29 @@ const OtherPostPage: React.FC = () => {
   )
 }
 
+const StyledPostTitle = styled.p`
+  width: 500px;
+  justify-content: left;
+  padding-top: 3px;
+`
+
+const StyledNumber = styled.p`
+  margin-right: 20px;
+`
+
+const TimeAndLikeAndCommentBox = styled.td`
+  display: flex;
+  justify-content: space-between;
+  float: right;
+  width: 255px;
+  margin-right: 23px;
+`
+
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 6.875rem;
+  margin-top: 2rem;
   justify-content: center;
+  height: 780px;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
@@ -537,27 +556,39 @@ const StyledButton = styled.button`
 `
 
 const StyledPostContainer = styled.div`
-  border: 0.0625rem solid #ccc;
-  background-color: #f8f8f8;
-  padding: 1.25rem;
+  font-size: 13px;
+  border: 0px solid;
+  background-color: white;
   margin-bottom: 1.25rem;
 `
 
-const StyledPostList = styled.ul`
+const StyledPostList = styled.table`
   list-style: none;
   padding: 0;
+  background-color: white;
+  border-color: white;
+  width: 100%;
 `
 
-const StyledPost = styled.li`
-  border: 0.0625rem solid #ccc;
-  padding: 1.25rem;
+const StyledPost = styled.tr`
+  display: flex;
+  justify-content: space-between;
+  border: 0.0625rem solid #ffffff;
   margin-bottom: 1.25rem;
-  background-color: #f8f8f8;
+  background-color: #ffffff;
+  height: 20px;
+  width: 100%;
+  cursor: pointer;
 `
 
-const StyledPostCategory = styled.p`
-  font-weight: bold;
-  margin-bottom: 0.3125rem;
+const StyledPostCategory = styled.td`
+  border: solid #e7e7e7 1px;
+  padding: 3px 3px 3px 3px;
+  color: #9f9f9f;
+  display: flex;
+  width: 45px;
+  justify-content: center;
+  margin-left: 16px;
 `
 
 const StyledNumberBlue = styled.span`
@@ -613,6 +644,7 @@ const StyledPostTitlePostName = styled.span`
   width: 31.25rem;
   text-align: center;
   font-size: 0.875rem;
+  margin-left: 80px;
 `
 
 const StyledPostTitlePostDay = styled.span`
@@ -648,24 +680,6 @@ const SearchWord = styled.span`
   margin-top: 12px;
   margin-left: 2.8rem;
   font-size: 0.875rem;
-`
-
-const StyledPostTitle = styled.p`
-  width: 500px;
-  justify-content: left;
-  padding-top: 3px;
-`
-
-const StyledNumber = styled.p`
-  margin-right: 20px;
-`
-
-const TimeAndLikeAndCommentBox = styled.td`
-  display: flex;
-  justify-content: space-between;
-  float: right;
-  width: 255px;
-  margin-right: 23px;
 `
 
 export default OtherPostPage

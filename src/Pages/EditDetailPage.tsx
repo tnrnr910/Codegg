@@ -19,6 +19,7 @@ interface Post {
   postTitle: string
   postTime: number
   postUserEmail: string
+  postSkin: string
   likes: number
   comments: number
 }
@@ -36,6 +37,7 @@ function EditDetailPage() {
     postTitle: "",
     postTime: 0,
     postUserEmail: "",
+    postSkin: "",
     likes: 0,
     comments: 0
   })
