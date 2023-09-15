@@ -3,6 +3,7 @@ import { styled } from "styled-components"
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
+import { CurrentUserBadge, CurrentUserLevel } from "../../Components/badge"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
@@ -23,14 +24,14 @@ function MyProfilePage() {
             <ProfileImgs>
               <ProfileImgBox>
                 <ProfileImage
-                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
+                  src={auth.currentUser?.photoURL ?? "img/blank-profile.png"}
                 />
               </ProfileImgBox>
               <ProfileLevelAndNickName>
                 <div>
                   <BadgeWrap>
-                    <BadgeImage src={require("./profile.jpg")} alt="프사" />
-                    <div>입문자</div>
+                    <CurrentUserBadge />
+                    <CurrentUserLevel />
                   </BadgeWrap>
                 </div>
                 <NickName>{auth.currentUser?.displayName}</NickName>
@@ -128,15 +129,13 @@ const ProfileLevelAndNickName = styled.div`
   justify-content: center;
   flex-direction: column;
 `
-const BadgeImage = styled.img`
-  width: 1.375rem;
-  height: 1.375rem;
-  border-radius: 50%;
-  object-fit: cover;
-`
+
 const BadgeWrap = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 0.375rem;
+  gap: 0.3rem;
 `
 const NickName = styled.div`
   font-weight: bold;
