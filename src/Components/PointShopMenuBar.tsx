@@ -32,9 +32,9 @@ function PointShopMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
         타이틀 효과
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === "/MyPurchases"}
+        active={activeMenuItem === "/PoinShopPage"}
         onClick={() => {
-          handleMenuItemClick("/MyPurchases")
+          handleMenuItemClick("/PoinShopPage")
         }}
       >
         내가 구매한 상품
@@ -90,7 +90,6 @@ const MenuItem = styled.div<MenuItemProps>`
 `
 
 const TitleEffect = styled.div`
-  margin-top: 1rem;
   background-color: #007bff;
   color: white;
   padding: 8px;
