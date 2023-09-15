@@ -1,44 +1,49 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { styled } from "styled-components"
-// import { useQuery } from "react-query"
 import { getBoardPosts } from "../axios/api"
 import SideRanking from "../Components/SideRanking"
-import { AiOutlineLike } from "react-icons/ai"
-import { FaRegComment } from "react-icons/fa"
 import BannerCarousel from "../Components/BannerCarousel"
+import MainpageList from "../Components/MainpageList"
+
+interface Post {
+  id: string
+  postCategory: string
+  postTitle: string
+  postContent: string
+  postImgUrl: string
+  postBoard: string
+  postTime: number
+  postUserEmail: string
+  postDisplayName: string
+  postSkin: string
+  postColor: string
+  postFontsize: string
+  likes: number
+  comments: number
+}
 
 function MainPage() {
   const navigate = useNavigate()
-  // const { isLoading, data } = useQuery("posts", getPosts)
-  const [dataQuestions, setDataQuestions] = useState([])
-  const [dataMeetups, setDataMeetups] = useState([])
-  const [dataTips, setDataTips] = useState([])
-  const [dataNotice, setDataNotice] = useState([])
+  const [dataQuestions, setDataQuestions] = useState<Post[]>([])
+  const [dataMeetups, setDataMeetups] = useState<Post[]>([])
+  const [dataTips, setDataTips] = useState<Post[]>([])
+  const [dataNotice, setDataNotice] = useState<Post[]>([])
 
-  // const list: any = data
-  // console.log(list)
-  // if (isLoading) {
-  //   return <div>로딩중입니다..</div>
-  // }
   useEffect(() => {
-    getBoardPosts("questions", 8).then((dummyData: any) => {
-      setDataQuestions(dummyData)
+    getBoardPosts("questions", 8).then((PostsData: Post[]) => {
+      setDataQuestions(PostsData)
     })
-    getBoardPosts("meetups", 8).then((dummyData: any) => {
-      setDataMeetups(dummyData)
+    getBoardPosts("meetups", 8).then((PostsData: Post[]) => {
+      setDataMeetups(PostsData)
     })
-    getBoardPosts("tips", 8).then((dummyData: any) => {
-      setDataTips(dummyData)
+    getBoardPosts("tips", 8).then((PostsData: Post[]) => {
+      setDataTips(PostsData)
     })
-    getBoardPosts("Notice", 8).then((dummyData: any) => {
-      setDataNotice(dummyData)
+    getBoardPosts("Notice", 8).then((PostsData: Post[]) => {
+      setDataNotice(PostsData)
     })
   }, [])
-
-  const ClickLikeBtn: any = (id: string) => {
-    // navigate(`/DetailPage/${id}`)
-  }
 
   return (
     <>
@@ -57,41 +62,7 @@ function MainPage() {
                 더보기 ＞
               </TitleDiv2>
             </Title>
-            <Body>
-              <BodyDiv>
-                {dataQuestions.map(
-                  (info: {
-                    id: string
-                    postTitle: string
-                    postCategory: string
-                    likes: number
-                    comments: number
-                  }) => {
-                    return (
-                      <ListContainer key={info.id}>
-                        <ListDiv
-                          onClick={() => {
-                            navigate(`/detailPage/${info.id}`)
-                          }}
-                        >
-                          <ListCategory>{info.postCategory}</ListCategory>
-                          <div>{info.postTitle}</div>
-                        </ListDiv>
-                        <ListBox>
-                          <LikeDiv>
-                            <AiOutlineLike size="16px" />
-                            {info.likes}
-                          </LikeDiv>
-                          <div>
-                            <FaRegComment size="16px" /> {info.comments}
-                          </div>
-                        </ListBox>
-                      </ListContainer>
-                    )
-                  }
-                )}
-              </BodyDiv>
-            </Body>
+            <MainpageList data={dataQuestions} />
           </PostBox>
           <PostBox>
             <Title>
@@ -104,41 +75,7 @@ function MainPage() {
                 더보기 ＞
               </TitleDiv2>
             </Title>
-            <Body>
-              <BodyDiv>
-                {dataMeetups.map(
-                  (info: {
-                    id: string
-                    postTitle: string
-                    postCategory: string
-                    likes: number
-                    comments: number
-                  }) => {
-                    return (
-                      <ListContainer key={info.id}>
-                        <ListDiv
-                          onClick={() => {
-                            navigate(`/detailPage/${info.id}`)
-                          }}
-                        >
-                          <ListCategory> {info.postCategory}</ListCategory>
-                          {info.postTitle}
-                        </ListDiv>
-                        <ListBox>
-                          <LikeDiv onClick={ClickLikeBtn}>
-                            <AiOutlineLike size="16px" />
-                            {info.likes}
-                          </LikeDiv>
-                          <div>
-                            <FaRegComment size="16px" /> {info.comments}
-                          </div>
-                        </ListBox>
-                      </ListContainer>
-                    )
-                  }
-                )}
-              </BodyDiv>
-            </Body>
+            <MainpageList data={dataMeetups} />
           </PostBox>
           <PostBox>
             <Title>
@@ -151,41 +88,7 @@ function MainPage() {
                 더보기 ＞
               </TitleDiv2>
             </Title>
-            <Body>
-              <BodyDiv>
-                {dataTips.map(
-                  (info: {
-                    id: string
-                    postTitle: string
-                    postCategory: string
-                    likes: number
-                    comments: number
-                  }) => {
-                    return (
-                      <ListContainer key={info.id}>
-                        <ListDiv
-                          onClick={() => {
-                            navigate(`/detailPage/${info.id}`)
-                          }}
-                        >
-                          <ListCategory> {info.postCategory}</ListCategory>
-                          {info.postTitle}
-                        </ListDiv>
-                        <ListBox>
-                          <LikeDiv onClick={ClickLikeBtn}>
-                            <AiOutlineLike size="16px" />
-                            {info.likes}
-                          </LikeDiv>
-                          <div>
-                            <FaRegComment size="16px" /> {info.comments}
-                          </div>
-                        </ListBox>
-                      </ListContainer>
-                    )
-                  }
-                )}
-              </BodyDiv>
-            </Body>
+            <MainpageList data={dataTips} />
           </PostBox>
           <PostBox>
             <Title>
@@ -229,20 +132,6 @@ function MainPage() {
 }
 
 export default MainPage
-
-// const Banner = styled.div`
-//   width: 100%;
-//   height: 25rem;
-//   border: solid #d9d9d9 1px;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-
-//   & > img {
-//     width: 100%;
-//     object-fit: cover;
-//   }
-// `
 
 const Container = styled.div`
   width: 100%;
@@ -296,13 +185,6 @@ const BodyDiv = styled.div`
   height: 330px;
   font-size: 13px;
 `
-const ListDiv = styled.div`
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-`
 const NoticeDiv = styled.div`
   font-size: 13px;
   display: flex;
@@ -311,33 +193,10 @@ const NoticeDiv = styled.div`
   cursor: pointer;
   font-weight: bold;
 `
-const ListCategory = styled.div`
-  width: 40px;
-  text-align: center;
-  border: solid #e7e7e7 1px;
-  padding: 3px;
-  color: #9f9f9f;
-`
 
 const ListContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: 19px;
-`
-
-const ListBox = styled.div`
-  display: flex;
-  color: #9f9f9f;
-
-  & > div {
-    width: 40px;
-    display: flex;
-    align-items: end;
-    gap: 4px;
-  }
-`
-
-const LikeDiv = styled.div`
-  margin-right: 10px;
 `
