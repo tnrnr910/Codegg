@@ -17,9 +17,10 @@ interface ShopItem {
 }
 
 const PointShopPage: React.FC = () => {
-  const [userPoints, setUserPoints] = useState(2000)
+  const [userPoints, setUserPoints] = useState(1000)
   const [selectedItems, setSelectedItems] = useState<ShopItem[]>([])
   const [showDescription, setShowDescription] = useState<boolean>(false)
+  const [selectedItemsList, setSelectedItemsList] = useState<number[]>([])
 
   const items: ShopItem[] = [
     {
@@ -68,11 +69,23 @@ const PointShopPage: React.FC = () => {
 
   const handleItemSelect = (item: ShopItem) => {
     if (userPoints >= item.price) {
-      if (selectedItems.includes(item)) {
-        setSelectedItems(selectedItems.filter((i) => i !== item))
+      let bool = false
+      selectedItems?.map((itemOfItems) => {
+        if (itemOfItems.id === item.id) {
+          bool = true
+        }
+        return bool
+      })
+      if (bool) {
+        setSelectedItemsList(selectedItemsList.filter((i) => i !== item.id))
+        setSelectedItems(selectedItems.filter((i) => i.id !== item.id))
+        console.log(selectedItems)
       } else {
+        setSelectedItemsList([...selectedItemsList, item.id])
         setSelectedItems([...selectedItems, item])
+        console.log(selectedItems)
       }
+      console.log(selectedItems)
     } else {
       alert("포인트가 부족합니다.")
     }
@@ -101,11 +114,17 @@ const PointShopPage: React.FC = () => {
       <PointShopMenuBar activeMenuItem={""} />
       <ShopContainer>
         <StyledTitle>포인트샵</StyledTitle>
-        <p>보유 포인트: {userPoints}</p>
-
+        <p>
+          보유 포인트:{" "}
+          <span style={{ fontWeight: "bold", color: "#0c356a" }}>
+            {userPoints}P
+          </span>
+        </p>
         <ItemList>
           <PointListNameBox>
-            <ListName>효과</ListName> <ListPointName>필요 포인트</ListPointName>
+            <CheckBoxNoneChecked type="checkbox" />
+            <ListName> 효과</ListName>
+            <ListPointName>필요 포인트</ListPointName>
           </PointListNameBox>
 
           {/* 본문 내용 */}
@@ -118,10 +137,10 @@ const PointShopPage: React.FC = () => {
             >
               <CheckBox
                 type="checkbox"
-                checked={selectedItems.includes(item)}
                 onChange={() => {
                   handleItemSelect(item)
                 }}
+                checked={selectedItemsList.includes(item.id)}
               />
               <ItemName>{item.name}</ItemName>
               <ItemPrice>{item.price} 포인트</ItemPrice>
@@ -134,8 +153,9 @@ const PointShopPage: React.FC = () => {
             </Item>
           ))}
         </ItemList>
-
-        <ApplyButton onClick={applySelectedItems}>구매하기</ApplyButton>
+        <BtnBox>
+          <ApplyButton onClick={applySelectedItems}>구매하기</ApplyButton>
+        </BtnBox>
       </ShopContainer>
     </PointShopWrap>
   )
@@ -144,12 +164,12 @@ const PointShopPage: React.FC = () => {
 const PointShopWrap = styled.div`
   display: flex;
   margin-top: 2rem;
-  justify-content: center;
   height: 780px;
 `
 const PointListNameBox = styled.div`
   width: 100%;
   text-align: right;
+  display: flex;
   height: 1.875rem;
   margin-top: 0.625rem;
   margin-bottom: 1.25rem;
@@ -159,23 +179,23 @@ const PointListNameBox = styled.div`
 `
 
 const ListName = styled.div`
-  float: left;
-  width: 5.625rem;
+  flex: 1;
+  float: right;
+  width: 30px;
   text-align: center;
   font-size: 0.875rem;
+  padding-left: 40px;
 `
 
 const ListPointName = styled.div`
   display: inline-block;
-  width: 5.625rem;
+  width: 140px;
   text-align: center;
   font-size: 0.875rem;
 `
 
 const ShopContainer = styled.div`
   margin: 20px auto;
-  max-width: 600px;
-  text-align: center;
   flex-direction: column;
   display: flex;
   padding: 1.25rem;
@@ -183,10 +203,8 @@ const ShopContainer = styled.div`
 `
 
 const ItemList = styled.ul`
-  width: 33rem;
-  text-align: center;
   font-size: 0.875rem;
-  margin-left: 80px;
+  width: 70%;
 `
 
 const Item = styled.li`
@@ -202,19 +220,36 @@ const Item = styled.li`
 `
 
 const ItemName = styled.span`
-  flex: 1;
+  white-space: nowrap; /* 텍스트 줄 바꿈 방지 */
+  overflow: hidden; /* 텍스트 오버플로우 시 숨김 처리 */
+  text-overflow: ellipsis; /* 텍스트가 숨겨질 때 ...로 표시 */
+  width: 500px;
+  text-align: left;
 `
 
 const ItemPrice = styled.span`
-  flex: 1;
+  all: initial;
+  float: inline-end;
+  font-size: 13px;
+  margin-right: 35px;
 `
 
 const CheckBox = styled.input`
-  flex: 0.5;
   height: 20px;
   width: 20px;
 `
 
+const CheckBoxNoneChecked = styled.input`
+  height: 20px;
+  width: 20px;
+  float: left;
+  margin-top: -3px;
+`
+const BtnBox = styled.div`
+  width: 70%;
+  display: flex;
+  justify-content: right;
+`
 const ApplyButton = styled.button`
   background-color: #0c356a;
   color: #fff;
@@ -223,14 +258,15 @@ const ApplyButton = styled.button`
   padding: 8px 8px;
   cursor: pointer;
   margin-top: 20px;
+  margin-right: 20px;
   width: 100px;
-  margin-left: auto;
 `
 
 const StyledTitle = styled.div`
   margin-bottom: 3.125rem;
   font-size: 1.5625rem;
   font-weight: bold;
+  float: left;
 `
 
 const DescriptionContainer = styled.div`
