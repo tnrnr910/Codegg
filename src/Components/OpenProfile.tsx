@@ -11,7 +11,7 @@ import {
   signOut
 } from "firebase/auth"
 import { deleteDoc, doc } from "firebase/firestore"
-import { getusersinfos } from "../axios/api"
+import { getUsersInfos } from "../axios/api"
 import { useQuery } from "react-query"
 
 interface auth {
@@ -21,7 +21,7 @@ interface auth {
 function OpenProfile({ closeModal }: any) {
   const navigate = useNavigate()
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
-  const { data } = useQuery("usersinfo", getusersinfos)
+  const { data } = useQuery("usersinfo", getUsersInfos)
   const usersinfoData: any = data
 
   useEffect(() => {

@@ -370,7 +370,7 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   return searchResults
 }
 
-const getusersinfos: any = async (): Promise<usersinfo[]> => {
+const getUsersInfos = async (): Promise<usersinfo[]> => {
   const docRef = query(collection(db, "usersinfo"))
   const docSnap = await getDocs(docRef)
 
@@ -387,7 +387,7 @@ const getusersinfos: any = async (): Promise<usersinfo[]> => {
   return usersinfo
 }
 
-const getusersinfo = async (email: string): Promise<usersinfo[]> => {
+const getUsersInfo = async (email: string): Promise<usersinfo[]> => {
   const usersinfoQuery = query(
     collection(db, "usersinfo"),
     where("email", "==", email)
@@ -616,8 +616,8 @@ export {
   getUserLikes,
   getMyLikePosts,
   getUserLikesPost,
-  getusersinfo,
-  getusersinfos,
+  getUsersInfo,
+  getUsersInfos,
   formatDate,
   setfollow,
   getfollow,

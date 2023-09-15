@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import { useNavigate, useParams } from "react-router"
 import { BiSearch } from "react-icons/bi"
-import { getusersinfo } from "../../axios/api"
+import { getUsersInfo } from "../../axios/api"
 import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
 import { formatDate } from "../../Components/DateChange"
 
@@ -66,7 +66,7 @@ const OtherPostPage: React.FC = () => {
       }
       getData()
 
-      void getusersinfo(email).then((dummyData: any) => {
+      void getUsersInfo(email).then((dummyData: any) => {
         setuserstInfo(dummyData[0])
       })
     }

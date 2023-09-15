@@ -5,7 +5,7 @@ import {
   getfollowData,
   getfollowerData,
   getfollowerInfo,
-  getusersinfo
+  getUsersInfo
 } from "../../axios/api"
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
@@ -49,7 +49,7 @@ const FollowPage: React.FC = () => {
           const userInfopromises: any[] = []
 
           followuserEmail.forEach((item: string) => {
-            const userInfoPromise = getusersinfo(item)
+            const userInfoPromise = getUsersInfo(item)
             userInfopromises.push(userInfoPromise)
           })
           Promise.all(userInfopromises)

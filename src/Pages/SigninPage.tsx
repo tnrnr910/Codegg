@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc"
 import Swal from "sweetalert2"
 import { SigninSignupBtns } from "../Components/Buttons"
 import { useSelector } from "react-redux"
-import { getusersinfos } from "../axios/api"
+import { getUsersInfos } from "../axios/api"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -59,7 +59,7 @@ function SigninPage() {
     }
   }
 
-  const { data } = useQuery("usersinfo", getusersinfos)
+  const { data } = useQuery("usersinfo", getUsersInfos)
   const usersinfoData: any[] = data as any[]
 
   // 버튼 disable 초기값(중복클릭 방지용)

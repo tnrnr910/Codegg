@@ -5,7 +5,7 @@ import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
 import {
   findfollow,
   findfollowNumber,
-  getusersinfo,
+  getUsersInfo,
   setfollow
 } from "../../axios/api"
 import { auth, db } from "../../axios/firebase"
@@ -35,7 +35,7 @@ function OtherProfilePage() {
   console.log("사용자 이메일", userId)
   useEffect(() => {
     if (email !== undefined) {
-      void getusersinfo(email).then((userinfoData: any) => {
+      void getUsersInfo(email).then((userinfoData: any) => {
         setuserstInfo(userinfoData[0])
         if (userstInfo !== undefined) {
           findfollowNumber(email)

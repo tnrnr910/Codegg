@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import { useNavigate, useParams } from "react-router"
-import { getusersinfo } from "../axios/api"
+import { getUsersInfo } from "../axios/api"
 
 interface MenuItemProps {
   active: boolean
@@ -35,7 +35,7 @@ function OtherPageMenuBar({ activeMenuItem }: OtherPageMenuBarProps) {
 
   useEffect(() => {
     if (userEmail !== undefined) {
-      void getusersinfo(userEmail).then((userinfoData: any) => {
+      void getUsersInfo(userEmail).then((userinfoData: any) => {
         setuserstInfo(userinfoData[0])
       })
     }

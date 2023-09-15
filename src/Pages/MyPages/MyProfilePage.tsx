@@ -3,7 +3,8 @@ import { styled } from "styled-components"
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
-import { CurrentUserBadge, CurrentUserLevel } from "../../Components/badge"
+import CurrentUserLevel from "../../Components/badge/CurrentUserLevel"
+import CurrentUserBadge from "../../Components/badge/CuurentUserBadge"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
