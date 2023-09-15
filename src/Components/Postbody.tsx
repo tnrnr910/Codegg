@@ -11,7 +11,9 @@ interface PointApplyProps {
 }
 
 interface StyledPostTitleProps {
-  isBold: boolean
+  Bold: string
+  color: string
+  fontsize: string
 }
 
 function Postbody({ categorySelected, postBoard }: PointApplyProps) {
@@ -39,9 +41,11 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                     postTime: number
                     postTitle: string
                     postCategory: string
-                    postSkin: string
                     likes: number
                     comments: number
+                    postSkin: string
+                    postColor: string
+                    postFontsize: string
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -53,7 +57,11 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                           <StyledPostCategory>
                             {info.postCategory}
                           </StyledPostCategory>
-                          <StyledPostTitle isBold={info.postSkin === "bold"}>
+                          <StyledPostTitle
+                            Bold={info.postSkin}
+                            color={info.postColor}
+                            fontsize={info.postFontsize}
+                          >
                             {info.postTitle}
                           </StyledPostTitle>
                           <TimeAndLikeAndCommentBox>
@@ -85,9 +93,11 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                     postTime: number
                     postTitle: string
                     postCategory: string
-                    postSkin: string
                     likes: number
                     comments: number
+                    postSkin: string
+                    postColor: string
+                    postFontsize: string
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -99,7 +109,11 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                           <StyledPostCategory>
                             {info.postCategory}
                           </StyledPostCategory>
-                          <StyledPostTitle isBold={info.postSkin === "bold"}>
+                          <StyledPostTitle
+                            Bold={info.postSkin}
+                            color={info.postColor}
+                            fontsize={info.postFontsize}
+                          >
                             {info.postTitle}
                           </StyledPostTitle>
                           <TimeAndLikeAndCommentBox>
@@ -140,7 +154,9 @@ const Body = styled.div`
 const StyledPostTitle = styled.p<StyledPostTitleProps>`
   width: 500px;
   justify-content: left;
-  font-weight: ${(props) => (props.isBold ? "bold" : "normal")};
+  color: ${(props) => props.color ?? "black"};
+  font-size: ${(props) => props.fontsize ?? ""};
+  font-weight: ${(props) => props.Bold ?? "initial"};
   padding-top: 3px;
 `
 

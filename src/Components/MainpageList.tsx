@@ -5,7 +5,9 @@ import { FaRegComment } from "react-icons/fa"
 import { useNavigate } from "react-router"
 
 interface StyledPostTitleProps {
-  isBold: boolean
+  Bold: string
+  color: string
+  fontsize: string
 }
 
 function MainpageList({ data }: any) {
@@ -22,6 +24,8 @@ function MainpageList({ data }: any) {
             likes: number
             comments: number
             postSkin: string
+            postColor: string
+            postFontsize: string
           }) => {
             return (
               <ListContainer key={item.id}>
@@ -31,7 +35,11 @@ function MainpageList({ data }: any) {
                   }}
                 >
                   <ListCategory>{item.postCategory}</ListCategory>
-                  <StyledPostTitle isBold={item.postSkin === "bold"}>
+                  <StyledPostTitle
+                    Bold={item.postSkin}
+                    color={item.postColor}
+                    fontsize={item.postFontsize}
+                  >
                     {item.postTitle}
                   </StyledPostTitle>
                 </ListDiv>
@@ -105,5 +113,7 @@ const ListCategory = styled.div`
 `
 
 const StyledPostTitle = styled.p<StyledPostTitleProps>`
-  font-weight: ${(props) => (props.isBold ? "bold" : "normal")};
+  color: ${(props) => props.color ?? "black"};
+  font-size: ${(props) => props.fontsize ?? "13px"};
+  font-weight: ${(props) => props.Bold ?? "initial"};
 `
