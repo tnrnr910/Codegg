@@ -70,10 +70,8 @@ function EditMyProfilePage() {
     if (file != null) {
       try {
         const storageRefPath = ref(storage as any, "user_photos/" + file.name)
-        console.log(storageRefPath)
         await uploadBytes(storageRefPath, file)
         const downloadURL = await getDownloadURL(storageRefPath)
-        console.log(downloadURL)
         setUserPhoto(downloadURL)
       } catch (error) {
         console.error("프로필 사진 변경 오류:", error)
@@ -99,8 +97,6 @@ function EditMyProfilePage() {
       alert("프로필 변경 중 오류가 발생했습니다.")
     }
   }
-
-  console.log(auth.currentUser)
 
   // 로그인 유지(로컬, 세션스토리지 등) / 비밀번호 틀려도 로그인 됨
 

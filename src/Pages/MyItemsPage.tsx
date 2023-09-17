@@ -117,22 +117,18 @@ const PointShopPage: React.FC = () => {
           setUserPoints(dummyData)
         })
         void getUserItems(user?.email).then((dummyData: myItemList) => {
-          console.log(dummyData)
           const TempItemList: ShopItem[] = []
           if (dummyData !== undefined) {
             if (dummyData.postTitleBold !== "") {
-              console.log(dummyData.postTitleBold)
               const tempItemBold: ShopItem | undefined = items.find(
                 (item) => item.value === dummyData.postTitleBold
               )
-              console.log(tempItemBold)
 
               if (tempItemBold !== undefined) {
                 TempItemList.push(tempItemBold)
               }
             }
             if (dummyData.postTitleSize !== "") {
-              console.log(dummyData.postTitleSize)
               const tempItemSize: ShopItem | undefined = items.find(
                 (item) => item.value === dummyData.postTitleSize
               )
@@ -142,18 +138,15 @@ const PointShopPage: React.FC = () => {
               }
             }
             if (dummyData.postTitleColor !== "") {
-              console.log(dummyData.postTitleColor)
               const tempItemColor: ShopItem | undefined = items.find(
                 (item) => item.value === dummyData.postTitleColor
               )
-              console.log(tempItemColor)
 
               if (tempItemColor !== undefined) {
                 TempItemList.push(tempItemColor)
               }
             }
             if (dummyData.postTitleFont !== "") {
-              console.log(dummyData.postTitleFont)
               const tempItemFont: ShopItem | undefined = items.find(
                 (item) => item.value === dummyData.postTitleFont
               )
@@ -165,7 +158,6 @@ const PointShopPage: React.FC = () => {
           }
           setMyItemList(TempItemList)
         })
-        console.log(myItemList)
       }
     })
   }, [])
@@ -182,13 +174,10 @@ const PointShopPage: React.FC = () => {
       if (bool) {
         setSelectedItemsList(selectedItemsList.filter((i) => i !== item.id))
         setSelectedItems(selectedItems.filter((i) => i.id !== item.id))
-        console.log(selectedItems)
       } else {
         setSelectedItemsList([...selectedItemsList, item.id])
         setSelectedItems([...selectedItems, item])
-        console.log(selectedItems)
       }
-      console.log(selectedItems)
     } else {
       alert("포인트가 부족합니다.")
     }

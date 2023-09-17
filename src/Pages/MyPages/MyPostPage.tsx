@@ -110,7 +110,6 @@ const MyPostPage: React.FC = () => {
           id: postSnap.id,
           ...postSnap.data()
         }
-        console.log(data)
         return data as Post
       })
     )
@@ -167,7 +166,6 @@ const MyPostPage: React.FC = () => {
         }
       }
     })
-    console.log(postsTemp)
     if (postCategory !== "카테고리") {
       postsTemp.filter((post) => post.postCategory === postCategory)
     }

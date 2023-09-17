@@ -41,8 +41,6 @@ function OtherPageMenuBar({ activeMenuItem }: OtherPageMenuBarProps) {
     }
   }, [])
 
-  console.log("유저정보", userstInfo)
-
   return (
     <MenuBarWrap>
       <MyPageHead>{userstInfo?.displayName}님 페이지</MyPageHead>
