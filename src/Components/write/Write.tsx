@@ -96,7 +96,7 @@ const Write: React.FC = () => {
               void updatePoints(userEmail, currentPoint, totalPoint + 10)
             })
           } else {
-            console.log("일치하는 문서를 찾을 수 없습니다.")
+            console.error("일치하는 문서를 찾을 수 없습니다.")
           }
         } catch (error) {
           console.error("Firestore 쿼리 오류:", error)
@@ -132,8 +132,6 @@ const Write: React.FC = () => {
           try {
             addDoc(collection(db, "posts"), postData)
               .then(() => {
-                // 글 작성 성공 시의 코드
-                console.log("글 작성 성공")
                 navigate(-1)
               })
               .catch((e) => {
@@ -204,8 +202,6 @@ const Write: React.FC = () => {
         <UploadIcon>
           <Dropzone
             onDrop={(acceptedFiles) => {
-              // 파일이 드롭존에 드롭되면 이벤트 핸들러 실행
-              console.log(acceptedFiles)
               if (acceptedFiles.length > 0) {
                 // 파일이 선택된 경우
                 setImageFile(acceptedFiles[0]) // 첫 번째 파일을 상태에 저장

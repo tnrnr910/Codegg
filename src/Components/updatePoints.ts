@@ -29,6 +29,6 @@ export async function updatePoints(
       console.error("포인트 업데이트 실패:", error)
     }
   } else {
-    console.log("사용자를 찾을 수 없습니다.")
+    console.error("사용자를 찾을 수 없습니다.")
   }
 }

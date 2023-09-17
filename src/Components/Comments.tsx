@@ -112,7 +112,6 @@ function Comments() {
     if (name === "inputText") {
       setInputText(value)
     }
-    console.log(inputText)
   }
 
   // 댓글 수정 인풋값을 inputEditText로 샛함

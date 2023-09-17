@@ -119,13 +119,10 @@ const PointShopPage: React.FC = () => {
       if (bool) {
         setSelectedItemsList(selectedItemsList.filter((i) => i !== item.id))
         setSelectedItems(selectedItems.filter((i) => i.id !== item.id))
-        console.log(selectedItems)
       } else {
         setSelectedItemsList([...selectedItemsList, item.id])
         setSelectedItems([...selectedItems, item])
-        console.log(selectedItems)
       }
-      console.log(selectedItems)
     } else {
       alert("포인트가 부족합니다.")
     }
