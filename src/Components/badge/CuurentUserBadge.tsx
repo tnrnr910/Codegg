@@ -17,26 +17,27 @@ function CuurentUserBadge() {
     return <div>Error loading data</div>
   }
 
-  const currentUserInfoData = usersinfosData.find((data: any) => {
+  const currentUserInfoData = usersinfosData?.find((data: any) => {
     return data.id === auth.currentUser?.email
   })
 
-  const totalPoint = currentUserInfoData.totalPoint
-  if (totalPoint > 0 && totalPoint < 100) {
+  const userTotalPoint = currentUserInfoData?.userTotalPoint
+  if (userTotalPoint >= 0 && userTotalPoint <= 99) {
     badgeImgUrl = "/img/lv1.png"
-  } else if (totalPoint > 99 && totalPoint < 199) {
+  } else if (userTotalPoint >= 100 && userTotalPoint <= 199) {
     badgeImgUrl = "/img/lv2.png"
-  } else if (totalPoint > 199 && totalPoint < 299) {
+  } else if (userTotalPoint >= 200 && userTotalPoint <= 299) {
     badgeImgUrl = "/img/lv3.png"
-  } else if (totalPoint > 299 && totalPoint < 399) {
+  } else if (userTotalPoint >= 300 && userTotalPoint <= 399) {
     badgeImgUrl = "/img/lv4.png"
-  } else if (totalPoint > 299 && totalPoint < 399) {
+  } else if (userTotalPoint >= 400) {
+    badgeImgUrl = "/img/lv5.png"
+  } else if (userTotalPoint <= 0) {
     badgeImgUrl = "/img/lv5.png"
   }
 
   return (
     <>
-      {/* <div>{auth.currentUser?.displayName}</div> */}
       <BadgeImage src={badgeImgUrl} alt="badgeImage" />
     </>
   )

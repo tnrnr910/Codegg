@@ -154,7 +154,7 @@ function SigninPage() {
         confirmButtonColor: "#0C356A"
       })
       await setDoc(doc(db, "usersinfo", emailWatch), {
-        badgeImg: "",
+        badgeImg: "/img/lv1.png",
         displayName: displayNameWatch,
         email: emailWatch,
         isAdmin: false,

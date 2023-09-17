@@ -10,8 +10,8 @@ async function updateUserBadge(userEmail: string) {
     return data.id === userEmail
   })
 
-  // async function userBadge(userinfoData: any) {
   const userTotalPoint = userinfoData?.totalPoint
+
   if (userTotalPoint >= 0 && userTotalPoint <= 99) {
     try {
       await updateDoc(doc(db, "usersinfo", userinfoData.id), {
@@ -44,7 +44,7 @@ async function updateUserBadge(userEmail: string) {
     } catch (error) {
       console.error("뱃지 업데이트 실패:", error)
     }
-  } else if (userTotalPoint >= 400 && userTotalPoint <= 1000) {
+  } else if (userTotalPoint >= 400) {
     try {
       await updateDoc(doc(db, "usersinfo", userinfoData.id), {
         badgeImg: "/img/lv5.png"
@@ -64,8 +64,5 @@ async function updateUserBadge(userEmail: string) {
     console.log("사용자를 찾을 수 없습니다.")
   }
 }
-
-// void userBadge(userinfoData)
-// }
 
 export default updateUserBadge

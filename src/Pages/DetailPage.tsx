@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 // import { getAuth } from "firebase/auth"
 import { useParams, useNavigate } from "react-router-dom"
-import { findLikes, getPost, setLikes } from "../axios/api"
+import { findLikes, getPost, getUsersInfos, setLikes } from "../axios/api"
 import Comments from "../Components/Comments"
 import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
@@ -42,6 +42,14 @@ function DetailPage() {
   const [commentsCount, setCommentsCount] = useState(0)
   const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
   const [LikeBtnOne, setLikeBtnOne] = useState<boolean>(false)
+  // const usersInfosData: any = getUsersInfos()
+  // const userinfoData = usersInfosData
+  const [usersInfosData, setUsersInfosData] = useState<any>(null)
+  const [userInfoData, setUserInfoData] = useState<any>(null)
+  // const usersInfoData = usersInfosData.find((data: { id: string }) => {
+  //   return data.id === postInfo?.postUserEmail
+  // })
+  console.log({ usersInfosData })
 
   // post 정보를 하나만 가져오기
   useEffect(() => {
@@ -53,6 +61,17 @@ function DetailPage() {
           setLikesCount(postInfo.likes)
           setCommentsCount(postInfo.comments)
         }
+
+        // getUsersInfos 함수를 이용하여 사용자 정보를 가져와 설정
+        void getUsersInfos().then((data: any) => {
+          setUsersInfosData(data)
+          // postUserEmail과 일치하는 사용자 정보 찾기
+          const userInfo = data.find(
+            (userInfo: any) => userInfo.id === dummyData.postUserEmail
+          )
+          // userInfo를 이용하여 필요한 정보 표시
+          setUserInfoData(userInfo)
+        })
       })
 
       // 실시간 좋아요 숫자 업데이트
@@ -186,6 +205,7 @@ function DetailPage() {
                 navigate(`/OtherProfilePage/${postInfo?.postUserEmail}`)
               }}
             >
+              <PostUserBadge src={userInfoData?.badgeImg} alt="badgeImage" />
               {postInfo?.postDisplayName}
             </DetailUserName>
             <DetailUserInfo>
@@ -300,6 +320,16 @@ const DetailUserName = styled.div`
   color: #b5b5b5;
   padding-left: 16px;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+`
+
+const PostUserBadge = styled.img`
+  width: 1rem;
+  height: 1.3rem;
+  object-fit: contain;
 `
 
 const DetailUserInfo = styled.div`

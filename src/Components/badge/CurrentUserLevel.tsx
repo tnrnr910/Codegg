@@ -16,26 +16,27 @@ function CurrentUserLevel() {
     return <div>Error loading data</div>
   }
 
-  const currentUserInfoData = usersinfosData.find((data: any) => {
+  const currentUserInfoData = usersinfosData?.find((data: any) => {
     return data.id === auth.currentUser?.email
   })
 
-  const totalPoint = currentUserInfoData.totalPoint
-  if (totalPoint > 0 && totalPoint < 100) {
+  const userTotalPoint = currentUserInfoData.userTotalPoint
+  if (userTotalPoint >= 0 && userTotalPoint <= 99) {
     level = "입문자"
-  } else if (totalPoint > 99 && totalPoint < 199) {
+  } else if (userTotalPoint >= 100 && userTotalPoint <= 199) {
     level = "주니어"
-  } else if (totalPoint > 199 && totalPoint < 299) {
+  } else if (userTotalPoint >= 200 && userTotalPoint <= 299) {
     level = "시니어"
-  } else if (totalPoint > 299 && totalPoint < 399) {
+  } else if (userTotalPoint >= 300 && userTotalPoint <= 399) {
     level = "프로"
-  } else if (totalPoint > 299 && totalPoint < 399) {
+  } else if (userTotalPoint >= 400) {
     level = "마스터"
-  } else level = "관리자"
+  } else if (userTotalPoint <= 0) {
+    level = "관리자"
+  }
 
   return (
     <>
-      {/* <div>{auth.currentUser?.displayName}</div> */}
       <div>{level}</div>
     </>
   )
