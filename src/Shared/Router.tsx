@@ -22,6 +22,10 @@ import EditMyProfilePage from "../Pages/MyPages/EditMyProfilePage"
 import EditDetailPage from "../Pages/EditDetailPage"
 import OtherProfilePage from "../Pages/MyPages/OtherProfilePage"
 import OtherPostPage from "../Pages/MyPages/OtherPostPage"
+import AdminPage from "../Pages/MyPages/AdminPage"
+import AdminPostPage from "../Pages/MyPages/AdminPostPage"
+import AdminReportpostPage from "../Pages/MyPages/AdminReportpostPage"
+import AdminLetterPage from "../Pages/MyPages/AdminLetterPage"
 
 function Router(): any {
   return (
@@ -53,6 +57,13 @@ function Router(): any {
           <Route path="/OtherPostPage/:email" element={<OtherPostPage />} />
           <Route path="/EditMyProfilePage" element={<EditMyProfilePage />} />
           <Route path="/EditDetailPage/:id" element={<EditDetailPage />} />
+          <Route path="/AdminPage" element={<AdminPage />} />
+          <Route path="/AdminPostPage" element={<AdminPostPage />} />
+          <Route
+            path="/AdminReportpostPage"
+            element={<AdminReportpostPage />}
+          />
+          <Route path="/AdminLetterPage" element={<AdminLetterPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
