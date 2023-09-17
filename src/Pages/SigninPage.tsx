@@ -22,7 +22,7 @@ import {
   setPersistence,
   browserSessionPersistence
 } from "firebase/auth"
-import { addDoc, collection } from "firebase/firestore"
+import { addDoc, collection, doc, setDoc } from "firebase/firestore"
 import { useQuery } from "react-query"
 
 // 유효성검사 스키마
@@ -163,6 +163,13 @@ function SigninPage() {
         Following: 0,
         totalPoint: 0,
         currentPoint: 0
+      })
+
+      await setDoc(doc(db, "useritems", emailWatch), {
+        postTitleBold: "",
+        postTitleColor: "",
+        postTitleFont: "",
+        postTitleSize: ""
       })
       // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)

@@ -4,6 +4,7 @@ import MainPage from "../Pages/MainPage"
 import DetailPage from "../Pages/DetailPage"
 import ErrorPage from "../Pages/ErrorPage"
 import PointShopPage from "../Pages/PointShopPage"
+import MyItemsPage from "../Pages/MyItemsPage"
 import SigninPage from "../Pages/SigninPage"
 import NoticePage from "../Pages/Post/NoticePage"
 import QnAPage from "../Pages/Post/QnAPage"
@@ -32,6 +33,7 @@ function Router(): any {
           <Route path="/DetailPage/:id" element={<DetailPage />} />
           <Route path="/*" element={<ErrorPage />} />
           <Route path="/PointShopPage" element={<PointShopPage />} />
+          <Route path="/MyItemsPage" element={<MyItemsPage />} />
           <Route path="/SigninPage" element={<SigninPage />} />
           <Route path="/NoticePage" element={<NoticePage />} />
           <Route path="/QnAPage" element={<QnAPage />} />
