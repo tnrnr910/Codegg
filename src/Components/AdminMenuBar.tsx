@@ -1,75 +1,75 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { styled } from "styled-components"
-import { useNavigate, useParams } from "react-router"
-import { getusersinfo } from "../axios/api"
+import { useNavigate } from "react-router"
 
 interface MenuItemProps {
   active: boolean
   onClick: () => void
   children: React.ReactNode
 }
-interface OtherPageMenuBarProps {
+interface MyPageMenuBarProps {
   activeMenuItem: string
 }
 
-interface UserData {
-  id: string
-  badgeImg: string
-  displayName: string
-  email: string
-  isAdmin: string
-  profileImg: string
-  follower: number
-  following: number
-}
-
-function OtherPageMenuBar({ activeMenuItem }: OtherPageMenuBarProps) {
-  const { email } = useParams()
+function AdminMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
   const navigate = useNavigate()
-  const [userstInfo, setuserstInfo] = useState<UserData>()
-  const userEmail = email
-
   const handleMenuItemClick = (path: string) => {
     navigate(path)
   }
 
-  useEffect(() => {
-    if (userEmail !== undefined) {
-      void getusersinfo(userEmail).then((userinfoData: any) => {
-        setuserstInfo(userinfoData[0])
-      })
-    }
-  }, [])
-
   return (
     <MenuBarWrap>
-      <MyPageHead>{userstInfo?.displayName}님 페이지</MyPageHead>
+      <MyPageHead>마이페이지</MyPageHead>
       <MenuItem
-        active={activeMenuItem === `/OtherProfilePage/${userEmail}`}
+        active={activeMenuItem === "/MyProfilePage"}
         onClick={() => {
-          handleMenuItemClick(`/OtherProfilePage/${userEmail}`)
+          handleMenuItemClick("/MyProfilePage")
         }}
       >
-        {userstInfo?.displayName}님 프로필
+        프로필 관리
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === `/OtherPostPage/${userEmail}`}
+        active={activeMenuItem === "/MyPostPage"}
         onClick={() => {
-          handleMenuItemClick(`/OtherPostPage/${userEmail}`)
+          handleMenuItemClick("/MyPostPage")
         }}
       >
-        {userstInfo?.displayName}님이 쓴 글
+        내가 쓴 글
+      </MenuItem>
+      <MenuItem
+        active={activeMenuItem === "/MyLikePage"}
+        onClick={() => {
+          handleMenuItemClick("/MyLikePage")
+        }}
+      >
+        좋아요 한 게시물
+      </MenuItem>
+      <MenuItem
+        active={activeMenuItem === "/FollowPage"}
+        onClick={() => {
+          handleMenuItemClick("/FollowPage")
+        }}
+      >
+        팔로우/팔로워
+      </MenuItem>
+      <MenuItem
+        active={activeMenuItem === "/MyLetterPage"}
+        onClick={() => {
+          handleMenuItemClick("/MyLetterPage")
+        }}
+      >
+        쪽지함
       </MenuItem>
     </MenuBarWrap>
   )
 }
 
-export default OtherPageMenuBar
+export default AdminMenuBar
 
 const MenuBarWrap = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 18.625rem;
+  margin-left: 16rem;
   margin-right: 0.4rem;
   margin-top: 1.875rem;
   width: 9.8125rem;

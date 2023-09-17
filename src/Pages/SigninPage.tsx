@@ -22,7 +22,7 @@ import {
   setPersistence,
   browserSessionPersistence
 } from "firebase/auth"
-import { addDoc, collection } from "firebase/firestore"
+import { addDoc, collection, doc, setDoc } from "firebase/firestore"
 import { useQuery } from "react-query"
 
 // 유효성검사 스키마
@@ -106,9 +106,7 @@ function SigninPage() {
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
     setPersistence(auth, browserSessionPersistence) // 유저정보를 로컬스토리지에 넣는걸 도와줌
-      .then(() => {
-        console.log("Session persistence successfully set!")
-      })
+      .then(() => {})
       .catch((error) => {
         console.error("Error setting session persistence:", error)
       })
@@ -163,6 +161,13 @@ function SigninPage() {
         Following: 0,
         totalPoint: 0,
         currentPoint: 0
+      })
+
+      await setDoc(doc(db, "useritems", emailWatch), {
+        postTitleBold: "",
+        postTitleColor: "",
+        postTitleFont: "",
+        postTitleSize: ""
       })
       // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)

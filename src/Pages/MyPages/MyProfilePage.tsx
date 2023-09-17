@@ -1,8 +1,12 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
-import { auth } from "../../axios/firebase"
+import { auth, db } from "../../axios/firebase"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
+import { onAuthStateChanged, type User } from "firebase/auth"
+import { useQuery } from "react-query"
+import { getusersinfos } from "../../axios/api"
+import { collection, getDocs, query, where } from "firebase/firestore"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
@@ -12,6 +16,70 @@ interface auth {
 function MyProfilePage() {
   const navigate = useNavigate()
   const activeMenuItem = "/MyProfilePage"
+  const [userCurrentPoint, setUserCurrentPoint] = useState<number | null>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null) // User 타입 사용
+  const { data } = useQuery("usersinfo", getusersinfos)
+  const usersinfoData: any = data
+  const [myPostCount, setMyPostCount] = useState<number>(0)
+  const [followingCount, setFollowingCount] = useState<number>(0)
+  const [followerCount, setFollowerCount] = useState<number>(0)
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (currentUser != null && Boolean(usersinfoData)) {
+      const currentUserInfo = usersinfoData.find(
+        (user: any) => user.email === currentUser?.email
+      )
+      if (currentUserInfo != null) {
+        setUserCurrentPoint(currentUserInfo.currentPoint)
+      }
+    }
+  }, [currentUser, usersinfoData])
+
+  useEffect(() => {
+    const fetchUserPostCount = async () => {
+      if (currentUser?.email != null) {
+        const q = query(
+          collection(db, "posts"),
+          where("postUserEmail", "==", currentUser.email)
+        )
+        const querySnapshot = await getDocs(q)
+        const postCount = querySnapshot.size
+        setMyPostCount(postCount)
+      }
+    }
+
+    void fetchUserPostCount()
+  }, [currentUser])
+
+  useEffect(() => {
+    const fetchFollowingAndFollowersCount = async () => {
+      if (currentUser?.email != null) {
+        const followingQuery = query(
+          collection(db, "follow"),
+          where("userEmail", "==", currentUser.email)
+        )
+        const followingSnapshot = await getDocs(followingQuery)
+        const followingCount = followingSnapshot.size
+        const followerQuery = query(
+          collection(db, "follow"),
+          where("followUserEmail", "==", currentUser.email)
+        )
+        const followerSnapshot = await getDocs(followerQuery)
+        const followerCount = followerSnapshot.size
+
+        setFollowingCount(followingCount)
+        setFollowerCount(followerCount)
+      }
+    }
+
+    void fetchFollowingAndFollowersCount()
+  }, [currentUser])
 
   return (
     <ProfileWrap>
@@ -23,7 +91,7 @@ function MyProfilePage() {
             <ProfileImgs>
               <ProfileImgBox>
                 <ProfileImage
-                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
+                  src={currentUser?.photoURL ?? require("./profile.jpg")}
                 />
               </ProfileImgBox>
               <ProfileLevelAndNickName>
@@ -33,19 +101,21 @@ function MyProfilePage() {
                     <div>입문자</div>
                   </BadgeWrap>
                 </div>
-                <NickName>{auth.currentUser?.displayName}</NickName>
+                <NickName>{currentUser?.displayName}</NickName>
               </ProfileLevelAndNickName>
             </ProfileImgs>
             <MyDataWrap>
               <MyData>
-                <Follower>팔로워 8</Follower>
-                <Following>팔로잉 15</Following>
-                <MyPost>작성글 32</MyPost>
+                <Follower>팔로워 {followerCount}</Follower>
+                <Following>팔로잉 {followingCount}</Following>
+                <MyPost>
+                  {myPostCount !== 0 ? `작성글 ${myPostCount}` : "작성글 0"}
+                </MyPost>
               </MyData>
               <MyPoint>보유 포인트</MyPoint>
-              <PointScore>10,000p</PointScore>
+              <PointScore>{userCurrentPoint?.toLocaleString()}P</PointScore>
               <MyEmail>이메일</MyEmail>
-              <EmailAd>{auth.currentUser?.email}</EmailAd>
+              <EmailAd>{currentUser?.email}</EmailAd>
               <MyStackAndPW>
                 <StackNotice>관심 있는 기술 태그</StackNotice>
                 <Stacks>React / Node / Spring</Stacks>
