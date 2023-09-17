@@ -23,6 +23,7 @@ function OpenProfile({ closeModal }: any) {
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
   const { data } = useQuery("usersinfo", getusersinfos)
   const usersinfoData: any = data
+  const [userCurrentPoint, setUserCurrentPoint] = useState<number | null>(null)
 
   useEffect(() => {
     // 사용자 인증 정보 확인하기
@@ -31,6 +32,17 @@ function OpenProfile({ closeModal }: any) {
       console.log("onAuthStateChanged user", user) // 사용자 인증 정보가 변경될 때마다 해당 이벤트를 받아 처리
     })
   }, [])
+
+  useEffect(() => {
+    if (currentUser != null && Boolean(usersinfoData)) {
+      const currentUserInfo = usersinfoData.find(
+        (user: any) => user.email === currentUser.email
+      )
+      if (currentUserInfo != null) {
+        setUserCurrentPoint(currentUserInfo.currentPoint)
+      }
+    }
+  }, [currentUser, usersinfoData])
 
   // 로그아웃 함수
   const logOut = (event: any) => {
@@ -115,7 +127,9 @@ function OpenProfile({ closeModal }: any) {
             }
           />
           <ProfileName>{auth.currentUser?.displayName}</ProfileName>
-          <ProfilePoint>보유 포인트 : 0P</ProfilePoint>
+          <ProfilePoint>
+            보유 포인트 : {userCurrentPoint?.toLocaleString()}P
+          </ProfilePoint>
           <ProfileEdit
             onClick={() => {
               navigate("/MyProfilePage")
