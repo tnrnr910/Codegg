@@ -24,17 +24,17 @@ function PointShopMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
     <MenuBarWrap>
       <MyPageHead>포인트샵</MyPageHead> {/* 페이지 타이틀 변경 */}
       <MenuItem
-        active={activeMenuItem === "/PointShopHome"}
+        active={activeMenuItem === "/PointShopPage"}
         onClick={() => {
-          handleMenuItemClick("/PointShopHome")
+          handleMenuItemClick("/PointShopPage")
         }}
       >
         타이틀 효과
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === "/PoinShopPage"}
+        active={activeMenuItem === "/MyItemsPage"}
         onClick={() => {
-          handleMenuItemClick("/PoinShopPage")
+          handleMenuItemClick("/MyItemsPage")
         }}
       >
         내가 구매한 상품
@@ -59,7 +59,7 @@ function PointShopMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
 const MenuBarWrap = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 10rem;
+  margin-left: 16.25rem;
   margin-right: 0.4rem;
   margin-top: 1.875rem;
   width: 9.8125rem;
