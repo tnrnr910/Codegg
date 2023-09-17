@@ -143,7 +143,7 @@ function MyLetterPage() {
     void fetchMessages()
 
     if (recipient.length > 0) {
-      getUsersInfos().then((users: any[]) => {
+      void getUsersInfos().then((users: any[]) => {
         const recipientUser = users.find(
           (user) => user.displayName === recipient
         )

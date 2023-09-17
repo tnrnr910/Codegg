@@ -35,8 +35,8 @@ function OtherPageMenuBar({ activeMenuItem }: OtherPageMenuBarProps) {
 
   useEffect(() => {
     if (userEmail !== undefined) {
-      void getUsersInfo(userEmail).then((userinfoData: any) => {
-        setuserstInfo(userinfoData[0])
+      void getUsersInfo(userEmail).then((userInfoData: any) => {
+        setuserstInfo(userInfoData[0])
       })
     }
   }, [])

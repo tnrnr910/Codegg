@@ -6,15 +6,15 @@ import { doc, updateDoc } from "firebase/firestore"
 async function updateBadgeLevel(userEmail: string) {
   const usersInfosData: any = await getUsersInfos()
 
-  const userinfoData = usersInfosData.find((data: { id: string }) => {
+  const userInfoData = usersInfosData.find((data: { id: string }) => {
     return data.id === userEmail
   })
 
-  const userTotalPoint = userinfoData?.totalPoint
+  const userTotalPoint = userInfoData?.totalPoint
 
   if (userTotalPoint >= 0 && userTotalPoint <= 99) {
     try {
-      await updateDoc(doc(db, "userLevelAndBadge", userinfoData.id), {
+      await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv1.png",
         userLevel: "입문자"
       })
@@ -23,7 +23,7 @@ async function updateBadgeLevel(userEmail: string) {
     }
   } else if (userTotalPoint >= 100 && userTotalPoint <= 199) {
     try {
-      await updateDoc(doc(db, "userLevelAndBadge", userinfoData.id), {
+      await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv2.png",
         userLevel: "주니어"
       })
@@ -32,7 +32,7 @@ async function updateBadgeLevel(userEmail: string) {
     }
   } else if (userTotalPoint >= 200 && userTotalPoint <= 299) {
     try {
-      await updateDoc(doc(db, "userLevelAndBadge", userinfoData.id), {
+      await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv3.png",
         userLevel: "시니어"
       })
@@ -41,7 +41,7 @@ async function updateBadgeLevel(userEmail: string) {
     }
   } else if (userTotalPoint >= 300 && userTotalPoint <= 399) {
     try {
-      await updateDoc(doc(db, "userLevelAndBadge", userinfoData.id), {
+      await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv4.png",
         userLevel: "프로"
       })
@@ -50,7 +50,7 @@ async function updateBadgeLevel(userEmail: string) {
     }
   } else if (userTotalPoint >= 400) {
     try {
-      await updateDoc(doc(db, "userLevelAndBadge", userinfoData.id), {
+      await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv5.png",
         userLevel: "마스터"
       })
@@ -59,7 +59,7 @@ async function updateBadgeLevel(userEmail: string) {
     }
   } else if (userTotalPoint <= 0) {
     try {
-      await updateDoc(doc(db, "userLevelAndBadge", userinfoData.id), {
+      await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv5.png",
         userLevel: "마스터"
       })

@@ -407,16 +407,16 @@ const getUsersInfo = async (email: string): Promise<usersInfo[]> => {
     where("email", "==", email)
   )
   const usersInfoQuerySnapshot = await getDocs(usersInfoQuery)
-  const usersInfoes: usersInfo[] = []
+  const usersInfos: usersInfo[] = []
 
   usersInfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
       ...doc.data()
     }
-    usersInfoes.push(data as usersInfo)
+    usersInfos.push(data as usersInfo)
   })
-  return usersInfoes
+  return usersInfos
 }
 
 // formatDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
@@ -528,7 +528,7 @@ const getfollowData: any = async (userEmail: string) => {
 }
 
 const getfollowerInfo = async (email: string): Promise<usersInfo[]> => {
-  const usersInfoes: usersInfo[] = []
+  const usersInfos: usersInfo[] = []
   const usersInfoQuery = query(
     collection(db, "usersInfo"),
     where("email", "==", email)
@@ -541,10 +541,10 @@ const getfollowerInfo = async (email: string): Promise<usersInfo[]> => {
         id: doc.id,
         ...doc.data()
       }
-      usersInfoes.push(data as usersInfo)
+      usersInfos.push(data as usersInfo)
     }
   })
-  return usersInfoes
+  return usersInfos
 }
 
 const getfollowerData: any = async (followuserEmail: string) => {
@@ -576,7 +576,7 @@ const getfollowerData: any = async (followuserEmail: string) => {
 }
 
 const findfollowNumber: any = async (userEmail: string) => {
-  const userinfo = query(
+  const userInfo = query(
     collection(db, "usersInfo"),
     where("email", "==", userEmail)
   )
@@ -592,12 +592,12 @@ const findfollowNumber: any = async (userEmail: string) => {
 
   const querySnapshotfollower = await getDocs(follower)
   const querySnapshotfollowing = await getDocs(following)
-  const querySnapshotuserinfo = await getDocs(userinfo)
+  const querySnapshotuserInfo = await getDocs(userInfo)
 
   const follwerNum = querySnapshotfollower.size
   const followingNum = querySnapshotfollowing.size
 
-  const firstDocument = querySnapshotuserinfo.docs[0]
+  const firstDocument = querySnapshotuserInfo.docs[0]
 
   await updateDoc(doc(collection(db, "usersInfo"), firstDocument.id), {
     follower: follwerNum
