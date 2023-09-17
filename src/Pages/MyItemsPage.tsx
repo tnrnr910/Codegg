@@ -2,7 +2,12 @@
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import PointShopMenuBar from "../Components/PointShopMenuBar"
-import { getPoint, updatePoint, updateUserItems } from "../axios/api"
+import {
+  getPoint,
+  getUserItems,
+  updatePoint,
+  updateUserItems
+} from "../axios/api"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 interface ShopItem {
@@ -26,26 +31,22 @@ interface item {
   value: string
 }
 
+interface myItemList {
+  postTitleBold: string
+  postTitleColor: string
+  postTitleFont: string
+  postTitleSize: string
+}
+
 const PointShopPage: React.FC = () => {
   const auth = getAuth()
   const [userId, setUserId] = useState<string | null>("")
   const [userPoints, setUserPoints] = useState(0)
   const [selectedItems, setSelectedItems] = useState<ShopItem[]>([])
+  const [myItemList, setMyItemList] = useState<ShopItem[]>([])
   const [showDescription, setShowDescription] = useState<boolean>(false)
   const [selectedItemsList, setSelectedItemsList] = useState<number[]>([])
-  const activeMenuItem = "/PointShopPage"
-
-  // 맨처음 페이지 렌더링시 작동하는 useEffect
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user !== null) {
-        setUserId(user?.email)
-        void getPoint(user?.email).then((dummyData: number) => {
-          setUserPoints(dummyData)
-        })
-      }
-    })
-  }, [userPoints])
+  const activeMenuItem = "/MyItemsPage"
 
   const items: ShopItem[] = [
     {
@@ -107,6 +108,68 @@ const PointShopPage: React.FC = () => {
     }
   ]
 
+  // 맨처음 페이지 렌더링시 작동하는 useEffect
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user !== null) {
+        setUserId(user?.email)
+        void getPoint(user?.email).then((dummyData: number) => {
+          setUserPoints(dummyData)
+        })
+        void getUserItems(user?.email).then((dummyData: myItemList) => {
+          console.log(dummyData)
+          const TempItemList: ShopItem[] = []
+          if (dummyData !== undefined) {
+            if (dummyData.postTitleBold !== "") {
+              console.log(dummyData.postTitleBold)
+              const tempItemBold: ShopItem | undefined = items.find(
+                (item) => item.value === dummyData.postTitleBold
+              )
+              console.log(tempItemBold)
+
+              if (tempItemBold !== undefined) {
+                TempItemList.push(tempItemBold)
+              }
+            }
+            if (dummyData.postTitleSize !== "") {
+              console.log(dummyData.postTitleSize)
+              const tempItemSize: ShopItem | undefined = items.find(
+                (item) => item.value === dummyData.postTitleSize
+              )
+
+              if (tempItemSize !== undefined) {
+                TempItemList.push(tempItemSize)
+              }
+            }
+            if (dummyData.postTitleColor !== "") {
+              console.log(dummyData.postTitleColor)
+              const tempItemColor: ShopItem | undefined = items.find(
+                (item) => item.value === dummyData.postTitleColor
+              )
+              console.log(tempItemColor)
+
+              if (tempItemColor !== undefined) {
+                TempItemList.push(tempItemColor)
+              }
+            }
+            if (dummyData.postTitleFont !== "") {
+              console.log(dummyData.postTitleFont)
+              const tempItemFont: ShopItem | undefined = items.find(
+                (item) => item.value === dummyData.postTitleFont
+              )
+
+              if (tempItemFont !== undefined) {
+                TempItemList.push(tempItemFont)
+              }
+            }
+          }
+          setMyItemList(TempItemList)
+        })
+        console.log(myItemList)
+      }
+    })
+  }, [])
+
   const handleItemSelect = (item: ShopItem) => {
     if (userPoints >= item.price) {
       let bool = false
@@ -135,7 +198,7 @@ const PointShopPage: React.FC = () => {
     setShowDescription(!showDescription)
   }
 
-  const applySelectedItems = async () => {
+  const deleteSelectedItems = async () => {
     const totalPrice = selectedItems.reduce(
       (total, item) => total + item.price,
       0
@@ -143,7 +206,7 @@ const PointShopPage: React.FC = () => {
     const items: item[] = selectedItems.map((item) => {
       const tempItem = {
         type: item.type,
-        value: item.value
+        value: ""
       }
       return tempItem
     })
@@ -163,7 +226,7 @@ const PointShopPage: React.FC = () => {
     <PointShopWrap>
       <PointShopMenuBar activeMenuItem={activeMenuItem} />
       <ShopContainer>
-        <StyledTitle>포인트샵</StyledTitle>
+        <StyledTitle>내가 구매한 상품</StyledTitle>
         <p>
           보유 포인트:{" "}
           <span style={{ fontWeight: "bold", color: "#0c356a" }}>
@@ -173,11 +236,11 @@ const PointShopPage: React.FC = () => {
         <ItemList>
           <PointListNameBox>
             <ListName> 효과</ListName>
-            <ListPointName>필요 포인트</ListPointName>
+            <ListPointName>사용 포인트</ListPointName>
           </PointListNameBox>
 
           {/* 본문 내용 */}
-          {items.map((item) => (
+          {myItemList.map((item) => (
             <Item
               key={item.id}
               onMouseEnter={toggleDescription}
@@ -210,7 +273,7 @@ const PointShopPage: React.FC = () => {
           >
             선택 취소
           </CancelButton>
-          <ApplyButton onClick={applySelectedItems}>구매하기</ApplyButton>
+          <ApplyButton onClick={deleteSelectedItems}>삭제하기</ApplyButton>
         </BtnBox>
       </ShopContainer>
     </PointShopWrap>
