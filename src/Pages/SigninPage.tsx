@@ -106,9 +106,7 @@ function SigninPage() {
   // 세션 지속성 설정 :현재의 세션이나 탭에서만 상태가 유지되며 사용자가 인증된 탭이나 창이 닫히면 삭제됨을 나타냅니다
   useEffect(() => {
     setPersistence(auth, browserSessionPersistence) // 유저정보를 로컬스토리지에 넣는걸 도와줌
-      .then(() => {
-        console.log("Session persistence successfully set!")
-      })
+      .then(() => {})
       .catch((error) => {
         console.error("Error setting session persistence:", error)
       })
@@ -159,10 +157,18 @@ function SigninPage() {
         email: emailWatch,
         isAdmin: false,
         profileImg: "https://i.ibb.co/K5B1hKZ/blank-profile.png",
-        Follower: 0,
-        Following: 0,
+        follower: 0,
+        following: 0,
         totalPoint: 0,
-        currentPoint: 0
+        currentPoint: 0,
+        userLevel: "입문자"
+      })
+
+      await setDoc(doc(db, "useritems", emailWatch), {
+        postTitleBold: "",
+        postTitleColor: "",
+        postTitleFont: "",
+        postTitleSize: ""
       })
       // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)
@@ -245,10 +251,11 @@ function SigninPage() {
             email: userdata.email,
             isAdmin: false,
             profileImg: userdata.photoURL,
-            Follower: 0,
-            Following: 0,
+            follower: 0,
+            following: 0,
             totalPoint: 0,
-            currentPoint: 0
+            currentPoint: 0,
+            userLevel: "입문자"
           })
           // }
           void Swal.fire({

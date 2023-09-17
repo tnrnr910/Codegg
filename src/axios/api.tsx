@@ -69,6 +69,18 @@ interface follow {
   userEmail: string
 }
 
+interface item {
+  type: string
+  value: string
+}
+
+interface myItemList {
+  postTitleBold: string
+  postTitleColor: string
+  postTitleFont: string
+  postTitleSize: string
+}
+
 const getPost = async (postId: string): Promise<Post> => {
   let data = {}
   const postRef = doc(db, "posts", postId)
@@ -88,7 +100,6 @@ const getPost = async (postId: string): Promise<Post> => {
       // likes: 0
     }
   }
-  console.log(data)
   return data as Post
 }
 
@@ -193,7 +204,6 @@ const addLike = async (userId: string, postId: string) => {
 }
 // 좋아요 setting 함수
 const setLikes: any = async (set: boolean, userId: string, postId: string) => {
-  console.log(set)
   if (!set) {
     await addLike(userId, postId)
   } else {
@@ -213,14 +223,12 @@ const setLikes: any = async (set: boolean, userId: string, postId: string) => {
   }
 }
 const findLikes: any = async (userId: string, postId: string) => {
-  console.log(userId, postId)
   const q = query(
     collection(db, "likes"),
     where("userId", "==", userId),
     where("postId", "==", postId)
   )
   const querySnapshot = await getDocs(q)
-  console.log(querySnapshot.size)
   if (querySnapshot.size === 0) {
     return false
   } else {
@@ -423,7 +431,6 @@ const addfollow = async (followuserEmail: string, userEmail: string) => {
       followuserEmail,
       userEmail
     })
-    console.log("팔로우 등록 성공")
   } catch (error) {
     console.error("팔로우 등록 실패:", error)
     // 적절한 오류 처리 추가
@@ -481,8 +488,6 @@ const findfollow: any = async (followuserEmail: string, userEmail: string) => {
 
   const querySnapshot = await getDocs(q)
 
-  console.log(querySnapshot.size)
-
   if (querySnapshot.size === 0) {
     return false
   } else {
@@ -509,10 +514,9 @@ const getfollowData: any = async (userEmail: string) => {
       followData.push(data)
     })
 
-    console.log(followData)
     return followData
   } else {
-    console.log("사용자를 찾을 수 없습니다.")
+    console.error("사용자를 찾을 수 없습니다.")
     return []
   }
 }
@@ -534,7 +538,6 @@ const getfollowerInfo = async (email: string): Promise<usersinfo[]> => {
       usersinfoes.push(data as usersinfo)
     }
   })
-  console.log(usersinfoes)
   return usersinfoes
 }
 
@@ -559,10 +562,9 @@ const getfollowerData: any = async (followuserEmail: string) => {
       followData.push(data)
     })
 
-    console.log(followData)
     return followData
   } else {
-    console.log("사용자를 찾을 수 없습니다.")
+    console.error("사용자를 찾을 수 없습니다.")
     return []
   }
 }
@@ -591,9 +593,6 @@ const findfollowNumber: any = async (userEmail: string) => {
 
   const firstDocument = querySnapshotuserinfo.docs[0]
 
-  console.log(follwerNum)
-  console.log(followingNum)
-
   await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
     follower: follwerNum
   })
@@ -601,6 +600,100 @@ const findfollowNumber: any = async (userEmail: string) => {
   await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
     following: followingNum
   })
+}
+
+const getPoint = async (userEmail: string | null) => {
+  if (userEmail == null) {
+    return 0
+  }
+  const q = query(collection(db, "usersinfo"), where("email", "==", userEmail))
+
+  const querySnapshot = await getDocs(q)
+
+  let data = 0
+  if (!querySnapshot.empty) {
+    querySnapshot.forEach((doc) => {
+      data = doc.data().currentPoint
+    })
+    return data
+  } else {
+    return 0
+  }
+}
+
+const updatePoint = async (userEmail: string | null, currentPoint: number) => {
+  if (userEmail == null) {
+    return 0
+  }
+  const q = query(collection(db, "usersinfo"), where("email", "==", userEmail))
+
+  const querySnapshot = await getDocs(q)
+
+  let docId = ""
+  if (!querySnapshot.empty) {
+    querySnapshot.forEach((doc) => {
+      docId = doc.id
+    })
+    await updateDoc(doc(collection(db, "usersinfo"), docId), {
+      currentPoint
+    })
+  } else {
+    return 0
+  }
+}
+
+const updateUserItems = async (userEmail: string | null, items: item[]) => {
+  if (userEmail == null) {
+    return 0
+  }
+  const userItemsRef = doc(db, "useritems", userEmail)
+  const userItemsSnap = await getDoc(userItemsRef)
+
+  if (userItemsSnap.exists()) {
+    return await Promise.all(
+      items.map(async (item: item) => {
+        if (item.type === "postTitleBold") {
+          await updateDoc(userItemsRef, {
+            postTitleBold: item.value
+          })
+        } else if (item.type === "postTitleColor") {
+          await updateDoc(userItemsRef, {
+            postTitleColor: item.value
+          })
+        } else if (item.type === "postTitleFont") {
+          await updateDoc(userItemsRef, {
+            postTitleFont: item.value
+          })
+        } else if (item.type === "postTitleSize") {
+          await updateDoc(userItemsRef, {
+            postTitleSize: item.value
+          })
+        }
+      })
+    )
+  } else {
+    return 0
+  }
+}
+
+const getUserItems = async (userEmail: string | null) => {
+  const myItem: myItemList = {
+    postTitleBold: "",
+    postTitleColor: "",
+    postTitleFont: "",
+    postTitleSize: ""
+  }
+  if (userEmail == null) {
+    return myItem
+  }
+  const userItemsRef = doc(db, "useritems", userEmail)
+  const userItemsSnap = await getDoc(userItemsRef)
+
+  if (userItemsSnap.exists()) {
+    return userItemsSnap.data() as myItemList
+  }
+
+  return myItem
 }
 
 export {
@@ -626,6 +719,10 @@ export {
   getfollowerInfo,
   getfollowerData,
   findfollowNumber,
+  getPoint,
+  updatePoint,
+  updateUserItems,
+  getUserItems,
   getSearchedDataTTTT
 }
 export type { usersinfo }

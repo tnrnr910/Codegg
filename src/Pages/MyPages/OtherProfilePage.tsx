@@ -31,8 +31,6 @@ function OtherProfilePage() {
   const [isfollow, setIsfollow] = useState<boolean>(false)
   const userId = auth.currentUser?.email
 
-  console.log("유저 이메일", email)
-  console.log("사용자 이메일", userId)
   useEffect(() => {
     if (email !== undefined) {
       void getUsersInfo(email).then((userinfoData: any) => {
@@ -60,10 +58,6 @@ function OtherProfilePage() {
       }
     }
   }, [])
-
-  console.log("상세페이지유저정보", userstInfo)
-  console.log(isfollow)
-  console.log(auth.currentUser?.email)
 
   const FollowHandler = () => {
     if (auth.currentUser != null && userId !== email) {

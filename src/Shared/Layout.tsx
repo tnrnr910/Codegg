@@ -32,8 +32,6 @@ function Header() {
     useSelector((state: RootState) => state.search)
   )
   useEffect(() => {
-    console.log(auth.currentUser)
-    // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
     })

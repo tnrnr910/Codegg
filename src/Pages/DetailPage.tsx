@@ -78,7 +78,6 @@ function DetailPage() {
       onSnapshot(doc(db, "posts", id), (doc) => {
         setLikesCount(doc?.data()?.likes)
         setCommentsCount(doc?.data()?.comments)
-        console.log(doc.data())
       })
 
       // TODO: userId는 로그인 했을 때만 존재하는 값!

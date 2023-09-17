@@ -1,10 +1,12 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
 import { useNavigate } from "react-router"
-import { auth } from "../../axios/firebase"
+import { auth, db } from "../../axios/firebase"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
-import CurrentUserLevel from "../../Components/badge/CurrentUserLevel"
-import CurrentUserBadge from "../../Components/badge/CuurentUserBadge"
+import { onAuthStateChanged, type User } from "firebase/auth"
+import { useQuery } from "react-query"
+import { getUsersInfos } from "../../axios/api"
+import { collection, getDocs, query, where } from "firebase/firestore"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 interface auth {
@@ -14,6 +16,74 @@ interface auth {
 function MyProfilePage() {
   const navigate = useNavigate()
   const activeMenuItem = "/MyProfilePage"
+  const [userCurrentPoint, setUserCurrentPoint] = useState<number | null>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null) // User 타입 사용
+  const { data } = useQuery("usersinfo", getUsersInfos)
+  const usersinfoData: any = data
+  const [myPostCount, setMyPostCount] = useState<number>(0)
+  const [followingCount, setFollowingCount] = useState<number>(0)
+  const [followerCount, setFollowerCount] = useState<number>(0)
+  const [badgeImgUrl, setBadgeImgUrl] = useState<string | undefined>(undefined)
+  const [userLevel, setUserLevel] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (currentUser != null && Boolean(usersinfoData)) {
+      const currentUserInfo = usersinfoData.find(
+        (user: any) => user.email === currentUser?.email
+      )
+      if (currentUserInfo != null) {
+        setUserCurrentPoint(currentUserInfo.currentPoint)
+        setBadgeImgUrl(currentUserInfo.badgeImg)
+        setUserLevel(currentUserInfo.userLevel)
+      }
+    }
+  }, [currentUser, usersinfoData])
+
+  useEffect(() => {
+    const fetchUserPostCount = async () => {
+      if (currentUser?.email != null) {
+        const q = query(
+          collection(db, "posts"),
+          where("postUserEmail", "==", currentUser.email)
+        )
+        const querySnapshot = await getDocs(q)
+        const postCount = querySnapshot.size
+        setMyPostCount(postCount)
+      }
+    }
+
+    void fetchUserPostCount()
+  }, [currentUser])
+
+  useEffect(() => {
+    const fetchFollowingAndFollowersCount = async () => {
+      if (currentUser?.email != null) {
+        const followingQuery = query(
+          collection(db, "follow"),
+          where("userEmail", "==", currentUser.email)
+        )
+        const followingSnapshot = await getDocs(followingQuery)
+        const followingCount = followingSnapshot.size
+        const followerQuery = query(
+          collection(db, "follow"),
+          where("followUserEmail", "==", currentUser.email)
+        )
+        const followerSnapshot = await getDocs(followerQuery)
+        const followerCount = followerSnapshot.size
+
+        setFollowingCount(followingCount)
+        setFollowerCount(followerCount)
+      }
+    }
+
+    void fetchFollowingAndFollowersCount()
+  }, [currentUser])
 
   return (
     <ProfileWrap>
@@ -31,23 +101,25 @@ function MyProfilePage() {
               <ProfileLevelAndNickName>
                 <div>
                   <BadgeWrap>
-                    <CurrentUserBadge />
-                    <CurrentUserLevel />
+                    <BadgeImage src={badgeImgUrl} alt="badgeImage" />
+                    <div>{userLevel}</div>
                   </BadgeWrap>
                 </div>
-                <NickName>{auth.currentUser?.displayName}</NickName>
+                <NickName>{currentUser?.displayName}</NickName>
               </ProfileLevelAndNickName>
             </ProfileImgs>
             <MyDataWrap>
               <MyData>
-                <Follower>팔로워 8</Follower>
-                <Following>팔로잉 15</Following>
-                <MyPost>작성글 32</MyPost>
+                <Follower>팔로워 {followerCount}</Follower>
+                <Following>팔로잉 {followingCount}</Following>
+                <MyPost>
+                  {myPostCount !== 0 ? `작성글 ${myPostCount}` : "작성글 0"}
+                </MyPost>
               </MyData>
               <MyPoint>보유 포인트</MyPoint>
-              <PointScore>10,000p</PointScore>
+              <PointScore>{userCurrentPoint?.toLocaleString()}P</PointScore>
               <MyEmail>이메일</MyEmail>
-              <EmailAd>{auth.currentUser?.email}</EmailAd>
+              <EmailAd>{currentUser?.email}</EmailAd>
               <MyStackAndPW>
                 <StackNotice>관심 있는 기술 태그</StackNotice>
                 <Stacks>React / Node / Spring</Stacks>
@@ -138,6 +210,12 @@ const BadgeWrap = styled.div`
   margin-bottom: 0.375rem;
   gap: 0.3rem;
 `
+const BadgeImage = styled.img`
+  width: 1rem;
+  height: 1.3rem;
+  object-fit: contain;
+`
+
 const NickName = styled.div`
   font-weight: bold;
 `

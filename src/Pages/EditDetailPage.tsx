@@ -59,7 +59,6 @@ function EditDetailPage() {
       onSnapshot(doc(db, "posts", id), (doc) => {
         setLikesCount(doc?.data()?.likes)
         setCommentsCount(doc?.data()?.comments)
-        console.log(doc.data())
       })
     }
   }, [])

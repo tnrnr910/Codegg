@@ -68,9 +68,7 @@ const MyLikePage: React.FC = () => {
     getPosts: Post[]
   ) => {
     const postsTemp: Post[] = []
-    console.log(getPosts)
     getPosts?.map((post) => {
-      console.log(post)
       if (post.postContent.includes(keyword)) {
         const newPost: Post = {
           id: post.id,
@@ -97,7 +95,6 @@ const MyLikePage: React.FC = () => {
         postsTemp.push(newPost)
       }
     })
-    console.log(postsTemp)
     if (postCategory !== "카테고리") {
       postsTemp.filter((post) => post.postCategory === postCategory)
     }

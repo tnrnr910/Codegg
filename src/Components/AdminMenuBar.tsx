@@ -69,7 +69,7 @@ export default AdminMenuBar
 const MenuBarWrap = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 10rem;
+  margin-left: 16rem;
   margin-right: 0.4rem;
   margin-top: 1.875rem;
   width: 9.8125rem;

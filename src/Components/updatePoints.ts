@@ -1,7 +1,7 @@
 import { getUsersInfos, type usersinfo } from "../axios/api"
 import { doc, updateDoc } from "firebase/firestore"
 import { db } from "../axios/firebase"
-import updateUserBadge from "./badge/updateUserBadge"
+import updateBadgeLevel from "./updateBadgeLevel"
 
 export async function updatePoints(
   userEmail: string,
@@ -26,11 +26,11 @@ export async function updatePoints(
         currentPoint: updatedCurrentPoint,
         totalPoint: updatedTotalPoint
       })
-      await updateUserBadge(userEmail)
+      await updateBadgeLevel(userEmail)
     } catch (error) {
       console.error("포인트 업데이트 실패:", error)
     }
   } else {
-    console.log("사용자를 찾을 수 없습니다.")
+    console.error("사용자를 찾을 수 없습니다.")
   }
 }
