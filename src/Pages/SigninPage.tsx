@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc"
 import Swal from "sweetalert2"
 import { SigninSignupBtns } from "../Components/Buttons"
 import { useSelector } from "react-redux"
-import { getusersinfos } from "../axios/api"
+import { getUsersInfos } from "../axios/api"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -22,7 +22,7 @@ import {
   setPersistence,
   browserSessionPersistence
 } from "firebase/auth"
-import { addDoc, collection, doc, setDoc } from "firebase/firestore"
+import { doc, setDoc } from "firebase/firestore"
 import { useQuery } from "react-query"
 
 // 유효성검사 스키마
@@ -59,8 +59,8 @@ function SigninPage() {
     }
   }
 
-  const { data } = useQuery("usersinfo", getusersinfos)
-  const usersinfoData: any[] = data as any[]
+  const { data } = useQuery("usersInfo", getUsersInfos)
+  const usersInfoData: any[] = data as any[]
 
   // 버튼 disable 초기값(중복클릭 방지용)
   const [disable, setDisable] = useState(false)
@@ -151,23 +151,27 @@ function SigninPage() {
         text: "성공적으로 회원가입되었습니다.",
         confirmButtonColor: "#0C356A"
       })
-      await addDoc(collection(db, "usersinfo"), {
-        badgeImg: "",
+      await setDoc(doc(db, "usersInfo", emailWatch), {
+        badgeImg: "/img/lv1.png",
         displayName: displayNameWatch,
         email: emailWatch,
         isAdmin: false,
         profileImg: "https://i.ibb.co/K5B1hKZ/blank-profile.png",
-        Follower: 0,
-        Following: 0,
+        follower: 0,
+        following: 0,
         totalPoint: 0,
-        currentPoint: 0
+        currentPoint: 0,
+        userLevel: "입문자"
       })
-
       await setDoc(doc(db, "useritems", emailWatch), {
         postTitleBold: "",
         postTitleColor: "",
         postTitleFont: "",
         postTitleSize: ""
+      })
+      await setDoc(doc(db, "userLevelAndBadge", emailWatch), {
+        badgeImg: "/img/lv1.png",
+        userLevel: "입문자"
       })
       // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)
@@ -230,29 +234,37 @@ function SigninPage() {
     signInWithPopup(auth, provider) // 팝업창 띄워서 로그인
       .then(async (data) => {
         const userdata = data.user
-        console.log({ data })
-        console.log(userdata)
-        const usersinfo = usersinfoData.find(function (item: any) {
+        const usersInfo = usersInfoData.find(function (item: any) {
           return item.email === userdata.email
         })
-        console.log("usersinfodata", data)
-        console.log("usersinfo", usersinfo)
+        console.log({ usersInfo })
         // 회원정보 등록
-        if (auth.currentUser != null && usersinfo === undefined) {
+        if (
+          auth.currentUser != null &&
+          usersInfo === undefined &&
+          userdata.email !== null
+        ) {
           await updateProfile(auth.currentUser, {
             displayName: userdata.displayName,
             photoURL: userdata.photoURL
           })
-          await addDoc(collection(db, "usersinfo"), {
+          await setDoc(doc(db, "usersInfo", userdata.email), {
             badgeImg: "",
             displayName: userdata.displayName,
             email: userdata.email,
             isAdmin: false,
             profileImg: userdata.photoURL,
-            Follower: 0,
-            Following: 0,
+            follower: 0,
+            following: 0,
             totalPoint: 0,
-            currentPoint: 0
+            currentPoint: 0,
+            userLevel: "입문자"
+          })
+          await setDoc(doc(db, "useritems", emailWatch), {
+            postTitleBold: "",
+            postTitleColor: "",
+            postTitleFont: "",
+            postTitleSize: ""
           })
           // }
           void Swal.fire({
@@ -462,6 +474,7 @@ const SigninSignoutBackground = styled.div`
   width: 100%;
   height: 56rem;
   background: url(https://i.postimg.cc/TwNqmVkj/background-signin1.png)
+    // TODO: asset 폴더 안에 이미지 넣기!!!!
     no-repeat center;
   background-size: cover;
   display: flex;

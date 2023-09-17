@@ -12,7 +12,7 @@ import {
   doc
 } from "firebase/firestore"
 import { formatDate } from "../../Components/DateChange"
-import { getusersinfos } from "../../axios/api"
+import { getUsersInfos } from "../../axios/api"
 
 interface Message {
   id: string
@@ -143,7 +143,7 @@ function MyLetterPage() {
     void fetchMessages()
 
     if (recipient.length > 0) {
-      getusersinfos().then((users: any[]) => {
+      void getUsersInfos().then((users: any[]) => {
         const recipientUser = users.find(
           (user) => user.displayName === recipient
         )

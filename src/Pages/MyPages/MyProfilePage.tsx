@@ -5,7 +5,7 @@ import { auth, db } from "../../axios/firebase"
 import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { onAuthStateChanged, type User } from "firebase/auth"
 import { useQuery } from "react-query"
-import { getusersinfos } from "../../axios/api"
+import { getUsersInfos, getUserLevelAndBadge } from "../../axios/api"
 import { collection, getDocs, query, where } from "firebase/firestore"
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -18,11 +18,12 @@ function MyProfilePage() {
   const activeMenuItem = "/MyProfilePage"
   const [userCurrentPoint, setUserCurrentPoint] = useState<number | null>(null)
   const [currentUser, setCurrentUser] = useState<User | null>(null) // User 타입 사용
-  const { data } = useQuery("usersinfo", getusersinfos)
-  const usersinfoData: any = data
+  const { data } = useQuery("usersInfo", getUsersInfos)
+  const usersInfoData: any = data
   const [myPostCount, setMyPostCount] = useState<number>(0)
   const [followingCount, setFollowingCount] = useState<number>(0)
   const [followerCount, setFollowerCount] = useState<number>(0)
+  const [userLevelAndBadge, setUserLevelAndBadge] = useState<any>(null)
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -31,15 +32,22 @@ function MyProfilePage() {
   }, [])
 
   useEffect(() => {
-    if (currentUser != null && Boolean(usersinfoData)) {
-      const currentUserInfo = usersinfoData.find(
+    if (currentUser != null && Boolean(usersInfoData)) {
+      const currentUserInfo = usersInfoData.find(
         (user: any) => user.email === currentUser?.email
       )
+      void getUserLevelAndBadge().then((data: any) => {
+        const userLevelAndBadge = data.find(
+          (userLevelAndBadge: any) =>
+            userLevelAndBadge.id === auth.currentUser?.email
+        )
+        setUserLevelAndBadge(userLevelAndBadge)
+      })
       if (currentUserInfo != null) {
         setUserCurrentPoint(currentUserInfo.currentPoint)
       }
     }
-  }, [currentUser, usersinfoData])
+  }, [currentUser, usersInfoData])
 
   useEffect(() => {
     const fetchUserPostCount = async () => {
@@ -91,14 +99,17 @@ function MyProfilePage() {
             <ProfileImgs>
               <ProfileImgBox>
                 <ProfileImage
-                  src={currentUser?.photoURL ?? require("./profile.jpg")}
+                  src={auth.currentUser?.photoURL ?? "img/blank-profile.png"}
                 />
               </ProfileImgBox>
               <ProfileLevelAndNickName>
                 <div>
                   <BadgeWrap>
-                    <BadgeImage src={require("./profile.jpg")} alt="프사" />
-                    <div>입문자</div>
+                    <BadgeImage
+                      src={userLevelAndBadge?.badgeImg}
+                      alt="badgeImage"
+                    />
+                    <div>{userLevelAndBadge?.userLevel}</div>
                   </BadgeWrap>
                 </div>
                 <NickName>{currentUser?.displayName}</NickName>
@@ -198,16 +209,20 @@ const ProfileLevelAndNickName = styled.div`
   justify-content: center;
   flex-direction: column;
 `
-const BadgeImage = styled.img`
-  width: 1.375rem;
-  height: 1.375rem;
-  border-radius: 50%;
-  object-fit: cover;
-`
+
 const BadgeWrap = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 0.375rem;
+  gap: 0.3rem;
 `
+const BadgeImage = styled.img`
+  width: 1rem;
+  height: 1.3rem;
+  object-fit: contain;
+`
+
 const NickName = styled.div`
   font-weight: bold;
 `
