@@ -2,12 +2,7 @@
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import PointShopMenuBar from "../Components/PointShopMenuBar"
-import {
-  getPoint,
-  getUserItems,
-  updatePoint,
-  updateUserItems
-} from "../axios/api"
+import { getPoint, getUserItems, updateUserItems } from "../axios/api"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 interface ShopItem {
@@ -188,10 +183,6 @@ const PointShopPage: React.FC = () => {
   }
 
   const deleteSelectedItems = async () => {
-    const totalPrice = selectedItems.reduce(
-      (total, item) => total + item.price,
-      0
-    )
     const items: item[] = selectedItems.map((item) => {
       const tempItem = {
         type: item.type,
@@ -199,13 +190,15 @@ const PointShopPage: React.FC = () => {
       }
       return tempItem
     })
-    if (userPoints >= totalPrice) {
-      await updatePoint(userId, userPoints - totalPrice)
-      setUserPoints(userPoints - totalPrice)
+    if (items.length !== 0) {
       await updateUserItems(userId, items)
+      // eslint-disable-next-line array-callback-return
+      items.map((item) => {
+        setMyItemList(myItemList.filter((myItem) => myItem.type !== item.type))
+      })
       setSelectedItems([])
       setSelectedItemsList([]) // 선택 취소 버튼 클릭 시 모든 항목 선택 해제
-      alert("선택한 아이템이 적용되었습니다.")
+      alert("구매한 아이템이 삭제되었습니다.")
     } else {
       alert("포인트가 부족합니다.")
     }
@@ -216,12 +209,7 @@ const PointShopPage: React.FC = () => {
       <PointShopMenuBar activeMenuItem={activeMenuItem} />
       <ShopContainer>
         <StyledTitle>내가 구매한 상품</StyledTitle>
-        <p>
-          보유 포인트:{" "}
-          <span style={{ fontWeight: "bold", color: "#0c356a" }}>
-            {userPoints}P
-          </span>
-        </p>
+
         <ItemList>
           <PointListNameBox>
             <ListName> 효과</ListName>

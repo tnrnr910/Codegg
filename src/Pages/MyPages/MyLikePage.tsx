@@ -350,9 +350,9 @@ const TimeAndLikeAndCommentBox = styled.td`
 
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 3rem;
+  margin-top: 2rem;
   justify-content: center;
-  height: 1000px;
+  height: 780px;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;

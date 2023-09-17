@@ -149,7 +149,7 @@ const ProfileWrap = styled.div`
 const ProfileTap = styled.div`
   display: flex;
   width: 66rem;
-  margin-left: 2.5rem;
+  padding: 1.25rem;
   flex-direction: column;
 `
 const ProfileHead = styled.div`

@@ -678,6 +678,9 @@ const SearchWord = styled.span`
   margin-top: 12px;
   margin-left: 2.8rem;
   font-size: 0.875rem;
+  @media screen and (max-width: 760px) {
+    background: red;
+  }
 `
 
 export default MyPostPage
