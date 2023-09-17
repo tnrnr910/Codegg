@@ -82,7 +82,7 @@ const Write: React.FC = () => {
 
       if (auth.currentUser) {
         const userQuery = query(
-          collection(db, "usersinfo"),
+          collection(db, "usersInfo"),
           where("email", "==", auth.currentUser.email)
         )
 

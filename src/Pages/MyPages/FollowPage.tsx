@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
 
-interface usersinfo {
+interface usersInfo {
   id: string
   badgeImg: string
   displayName: string
@@ -35,8 +35,8 @@ interface TabOption {
 const FollowPage: React.FC = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("Follow")
-  const [followuserinfo, setfollowUserinfo] = useState<usersinfo[]>([])
-  const [followerinfo, setfollowerInfo] = useState<usersinfo[]>([])
+  const [followuserinfo, setfollowUserinfo] = useState<usersInfo[]>([])
+  const [followerinfo, setfollowerInfo] = useState<usersInfo[]>([])
   const activeMenuItem = "/FollowPage"
 
   useEffect(() => {

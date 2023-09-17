@@ -33,7 +33,7 @@ interface Post {
   likes: number
   comments: number
 }
-interface Comment {
+interface comment {
   id: string
   commentContent: string
   commentTime: string
@@ -50,7 +50,7 @@ interface like {
   userId: string
 }
 
-interface usersinfo {
+interface usersInfo {
   id: string
   badgeImg: string
   displayName: string
@@ -79,6 +79,12 @@ interface myItemList {
   postTitleColor: string
   postTitleFont: string
   postTitleSize: string
+}
+
+interface levelAndBadge {
+  id: string
+  badgeImg: string
+  userLevel: string
 }
 
 const getPost = async (postId: string): Promise<Post> => {
@@ -131,16 +137,16 @@ const getMyLikePosts = async (postIds: string[]): Promise<Post[]> => {
   )
 }
 
-const getComments = async (): Promise<Comment[]> => {
+const getComments = async (): Promise<comment[]> => {
   const q = query(collection(db, "comments"))
   const querySnapshot = await getDocs(q)
-  const comments: Comment[] = []
+  const comments: comment[] = []
   querySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
       ...doc.data()
     }
-    comments.push(data as Comment) // 형 변환을 통해 타입 일치화
+    comments.push(data as comment) // 형 변환을 통해 타입 일치화
   })
   return comments
 }
@@ -378,39 +384,39 @@ const getSearchedData = async (searchKeyword: string): Promise<Post[]> => {
   return searchResults
 }
 
-const getUsersInfos = async (): Promise<usersinfo[]> => {
-  const docRef = query(collection(db, "usersinfo"))
+const getUsersInfos = async (): Promise<usersInfo[]> => {
+  const docRef = query(collection(db, "usersInfo"))
   const docSnap = await getDocs(docRef)
 
-  const usersinfo: usersinfo[] = []
+  const usersInfo: usersInfo[] = []
 
   docSnap.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
       ...doc.data()
     }
-    usersinfo.push(data as usersinfo) // 형 변환을 통해 타입 일치화
+    usersInfo.push(data as usersInfo) // 형 변환을 통해 타입 일치화
   })
 
-  return usersinfo
+  return usersInfo
 }
 
-const getUsersInfo = async (email: string): Promise<usersinfo[]> => {
-  const usersinfoQuery = query(
-    collection(db, "usersinfo"),
+const getUsersInfo = async (email: string): Promise<usersInfo[]> => {
+  const usersInfoQuery = query(
+    collection(db, "usersInfo"),
     where("email", "==", email)
   )
-  const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
-  const usersinfoes: usersinfo[] = []
+  const usersInfoQuerySnapshot = await getDocs(usersInfoQuery)
+  const usersInfoes: usersInfo[] = []
 
-  usersinfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
+  usersInfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
     const data = {
       id: doc.id,
       ...doc.data()
     }
-    usersinfoes.push(data as usersinfo)
+    usersInfoes.push(data as usersInfo)
   })
-  return usersinfoes
+  return usersInfoes
 }
 
 // formatDate 함수는 Date 객체를 받아서 "YYYY.MM.DD" 형식의 문자열로 변환됨
@@ -521,24 +527,24 @@ const getfollowData: any = async (userEmail: string) => {
   }
 }
 
-const getfollowerInfo = async (email: string): Promise<usersinfo[]> => {
-  const usersinfoes: usersinfo[] = []
-  const usersinfoQuery = query(
-    collection(db, "usersinfo"),
+const getfollowerInfo = async (email: string): Promise<usersInfo[]> => {
+  const usersInfoes: usersInfo[] = []
+  const usersInfoQuery = query(
+    collection(db, "usersInfo"),
     where("email", "==", email)
   )
-  const usersinfoQuerySnapshot = await getDocs(usersinfoQuery)
+  const usersInfoQuerySnapshot = await getDocs(usersInfoQuery)
 
-  usersinfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
+  usersInfoQuerySnapshot.forEach((doc: DocumentSnapshot) => {
     if (doc != null) {
       const data = {
         id: doc.id,
         ...doc.data()
       }
-      usersinfoes.push(data as usersinfo)
+      usersInfoes.push(data as usersInfo)
     }
   })
-  return usersinfoes
+  return usersInfoes
 }
 
 const getfollowerData: any = async (followuserEmail: string) => {
@@ -571,7 +577,7 @@ const getfollowerData: any = async (followuserEmail: string) => {
 
 const findfollowNumber: any = async (userEmail: string) => {
   const userinfo = query(
-    collection(db, "usersinfo"),
+    collection(db, "usersInfo"),
     where("email", "==", userEmail)
   )
   const follower = query(
@@ -593,11 +599,11 @@ const findfollowNumber: any = async (userEmail: string) => {
 
   const firstDocument = querySnapshotuserinfo.docs[0]
 
-  await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
+  await updateDoc(doc(collection(db, "usersInfo"), firstDocument.id), {
     follower: follwerNum
   })
 
-  await updateDoc(doc(collection(db, "usersinfo"), firstDocument.id), {
+  await updateDoc(doc(collection(db, "usersInfo"), firstDocument.id), {
     following: followingNum
   })
 }
@@ -606,7 +612,7 @@ const getPoint = async (userEmail: string | null) => {
   if (userEmail == null) {
     return 0
   }
-  const q = query(collection(db, "usersinfo"), where("email", "==", userEmail))
+  const q = query(collection(db, "usersInfo"), where("email", "==", userEmail))
 
   const querySnapshot = await getDocs(q)
 
@@ -625,7 +631,7 @@ const updatePoint = async (userEmail: string | null, currentPoint: number) => {
   if (userEmail == null) {
     return 0
   }
-  const q = query(collection(db, "usersinfo"), where("email", "==", userEmail))
+  const q = query(collection(db, "usersInfo"), where("email", "==", userEmail))
 
   const querySnapshot = await getDocs(q)
 
@@ -634,7 +640,7 @@ const updatePoint = async (userEmail: string | null, currentPoint: number) => {
     querySnapshot.forEach((doc) => {
       docId = doc.id
     })
-    await updateDoc(doc(collection(db, "usersinfo"), docId), {
+    await updateDoc(doc(collection(db, "usersInfo"), docId), {
       currentPoint
     })
   } else {
@@ -696,6 +702,23 @@ const getUserItems = async (userEmail: string | null) => {
   return myItem
 }
 
+const getUserLevelAndBadge = async (): Promise<levelAndBadge[]> => {
+  const docRef = query(collection(db, "userLevelAndBadge"))
+  const docSnap = await getDocs(docRef)
+
+  const userLevelAndBadge: levelAndBadge[] = []
+
+  docSnap.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    userLevelAndBadge.push(data as levelAndBadge) // 형 변환을 통해 타입 일치화
+  })
+
+  return userLevelAndBadge
+}
+
 export {
   getPost,
   getPosts,
@@ -723,6 +746,7 @@ export {
   updatePoint,
   updateUserItems,
   getUserItems,
-  getSearchedDataTTTT
+  getSearchedDataTTTT,
+  getUserLevelAndBadge
 }
-export type { usersinfo }
+export type { usersInfo }

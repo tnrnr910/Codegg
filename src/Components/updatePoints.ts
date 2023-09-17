@@ -1,4 +1,4 @@
-import { getUsersInfos, type usersinfo } from "../axios/api"
+import { getUsersInfos, type usersInfo } from "../axios/api"
 import { doc, updateDoc } from "firebase/firestore"
 import { db } from "../axios/firebase"
 import updateBadgeLevel from "./updateBadgeLevel"
@@ -11,15 +11,15 @@ export async function updatePoints(
   const updatedCurrentPoint = currentPoint + 10
   const updatedTotalPoint = totalPoint + 0
 
-  const usersinfoList = await getUsersInfos()
+  const usersInfoList = await getUsersInfos()
 
-  const targetUser: usersinfo | undefined = usersinfoList.find(
-    (user: usersinfo) => user.email === userEmail
+  const targetUser: usersInfo | undefined = usersInfoList.find(
+    (user: usersInfo) => user.email === userEmail
   )
 
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (targetUser) {
-    const userDocRef = doc(db, "usersinfo", targetUser.id)
+    const userDocRef = doc(db, "usersInfo", targetUser.id)
 
     try {
       await updateDoc(userDocRef, {

@@ -31,7 +31,7 @@ interface TabOption {
   label: string
 }
 
-interface usersinfo {
+interface usersInfo {
   id: string
   badgeImg: string
   displayName: string
@@ -49,7 +49,7 @@ const OtherPostPage: React.FC = () => {
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
   const [userId, setUserId] = useState<string | null>("")
-  const [userstInfo, setuserstInfo] = useState<usersinfo>()
+  const [userstInfo, setuserstInfo] = useState<usersInfo>()
   const [posts, setPosts] = useState<Post[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = `/OtherPostPage/${email}`

@@ -42,7 +42,7 @@ function OtherProfilePage() {
         }
       })
 
-      onSnapshot(doc(db, "usersinfo", email), (doc) => {
+      onSnapshot(doc(db, "usersInfo", email), (doc) => {
         setFollower(doc?.data()?.follower)
         setFollowing(doc?.data()?.following)
       })

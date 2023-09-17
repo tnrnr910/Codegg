@@ -59,8 +59,8 @@ function SigninPage() {
     }
   }
 
-  const { data } = useQuery("usersinfo", getUsersInfos)
-  const usersinfoData: any[] = data as any[]
+  const { data } = useQuery("usersInfo", getUsersInfos)
+  const usersInfoData: any[] = data as any[]
 
   // 버튼 disable 초기값(중복클릭 방지용)
   const [disable, setDisable] = useState(false)
@@ -151,7 +151,7 @@ function SigninPage() {
         text: "성공적으로 회원가입되었습니다.",
         confirmButtonColor: "#0C356A"
       })
-      await setDoc(doc(db, "usersinfo", emailWatch), {
+      await setDoc(doc(db, "usersInfo", emailWatch), {
         badgeImg: "/img/lv1.png",
         displayName: displayNameWatch,
         email: emailWatch,
@@ -163,12 +163,15 @@ function SigninPage() {
         currentPoint: 0,
         userLevel: "입문자"
       })
-
       await setDoc(doc(db, "useritems", emailWatch), {
         postTitleBold: "",
         postTitleColor: "",
         postTitleFont: "",
         postTitleSize: ""
+      })
+      await setDoc(doc(db, "userLevelAndBadge", emailWatch), {
+        badgeImg: "/img/lv1.png",
+        userLevel: "입문자"
       })
       // 로그아웃 후 로그인 탭으로 이동
       await signOut(auth)
@@ -231,21 +234,21 @@ function SigninPage() {
     signInWithPopup(auth, provider) // 팝업창 띄워서 로그인
       .then(async (data) => {
         const userdata = data.user
-        const usersinfo = usersinfoData.find(function (item: any) {
+        const usersInfo = usersInfoData.find(function (item: any) {
           return item.email === userdata.email
         })
-        console.log({ usersinfo })
+        console.log({ usersInfo })
         // 회원정보 등록
         if (
           auth.currentUser != null &&
-          usersinfo === undefined &&
+          usersInfo === undefined &&
           userdata.email !== null
         ) {
           await updateProfile(auth.currentUser, {
             displayName: userdata.displayName,
             photoURL: userdata.photoURL
           })
-          await setDoc(doc(db, "usersinfo", userdata.email), {
+          await setDoc(doc(db, "usersInfo", userdata.email), {
             badgeImg: "",
             displayName: userdata.displayName,
             email: userdata.email,
@@ -256,6 +259,12 @@ function SigninPage() {
             totalPoint: 0,
             currentPoint: 0,
             userLevel: "입문자"
+          })
+          await setDoc(doc(db, "useritems", emailWatch), {
+            postTitleBold: "",
+            postTitleColor: "",
+            postTitleFont: "",
+            postTitleSize: ""
           })
           // }
           void Swal.fire({

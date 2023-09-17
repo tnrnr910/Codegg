@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
-// import { getAuth } from "firebase/auth"
 import { useParams, useNavigate } from "react-router-dom"
-import { findLikes, getPost, getUsersInfos, setLikes } from "../axios/api"
+import {
+  findLikes,
+  getPost,
+  setLikes,
+  getUserLevelAndBadge
+} from "../axios/api"
 import Comments from "../Components/Comments"
 import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
@@ -34,6 +38,12 @@ interface Post {
   comments: number
 }
 
+interface LevelAndBadge {
+  id: string
+  badgeImg: string
+  userLevel: string
+}
+
 function DetailPage() {
   const { id } = useParams<string>()
   const navigate = useNavigate()
@@ -42,14 +52,7 @@ function DetailPage() {
   const [commentsCount, setCommentsCount] = useState(0)
   const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
   const [LikeBtnOne, setLikeBtnOne] = useState<boolean>(false)
-  // const usersInfosData: any = getUsersInfos()
-  // const userinfoData = usersInfosData
-  const [usersInfosData, setUsersInfosData] = useState<any>(null)
-  const [userInfoData, setUserInfoData] = useState<any>(null)
-  // const usersInfoData = usersInfosData.find((data: { id: string }) => {
-  //   return data.id === postInfo?.postUserEmail
-  // })
-  console.log({ usersInfosData })
+  const [userLevelAndBadge, setUserLevelAndBadge] = useState<LevelAndBadge>()
 
   // post 정보를 하나만 가져오기
   useEffect(() => {
@@ -62,15 +65,14 @@ function DetailPage() {
           setCommentsCount(postInfo.comments)
         }
 
-        // getUsersInfos 함수를 이용하여 사용자 정보를 가져와 설정
-        void getUsersInfos().then((data: any) => {
-          setUsersInfosData(data)
+        // 유저레벨과 뱃지 가져오기
+        void getUserLevelAndBadge().then((data: any) => {
           // postUserEmail과 일치하는 사용자 정보 찾기
-          const userInfo = data.find(
-            (userInfo: any) => userInfo.id === dummyData.postUserEmail
+          const userLevelAndBadge = data.find(
+            (userLevelAndBadge: any) =>
+              userLevelAndBadge.id === dummyData.postUserEmail
           )
-          // userInfo를 이용하여 필요한 정보 표시
-          setUserInfoData(userInfo)
+          setUserLevelAndBadge(userLevelAndBadge)
         })
       })
 
@@ -204,7 +206,10 @@ function DetailPage() {
                 navigate(`/OtherProfilePage/${postInfo?.postUserEmail}`)
               }}
             >
-              <PostUserBadge src={userInfoData?.badgeImg} alt="badgeImage" />
+              <PostUserBadge
+                src={userLevelAndBadge?.badgeImg}
+                alt="badgeImage"
+              />
               {postInfo?.postDisplayName}
             </DetailUserName>
             <DetailUserInfo>
