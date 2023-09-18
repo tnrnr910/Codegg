@@ -9,6 +9,8 @@ import { useNavigate } from "react-router"
 import { getUserLikesPost } from "../../axios/api"
 
 import { formatDate } from "../../Components/DateChange"
+import Pagination from "react-js-pagination"
+import "../../Components/pagination.css"
 
 interface TabOption {
   value: string
@@ -48,6 +50,25 @@ const MyLikePage: React.FC = () => {
       }
     })
   }, [])
+
+  const [currentPost, setCurrentPost] = useState(posts) // 게시판 목록에 보여줄 게시글
+  const [page, setPage] = useState<number>(1) // 현재 페이지 번호
+
+  const postPerPage = 10 // 페이지 당 게시글 개수
+  const indexOfLastPost = page * postPerPage
+  const indexOfFirstPost = indexOfLastPost - postPerPage
+
+  const postLength = posts?.length
+
+  const handlePageChange = (page: number) => {
+    setPage(page)
+  }
+
+  useEffect(() => {
+    if (posts !== undefined) {
+      setCurrentPost(posts.slice(indexOfFirstPost, indexOfLastPost))
+    }
+  }, [posts, page, indexOfFirstPost, indexOfLastPost])
 
   // let { isLoading, data } = useQuery(
   //   ["likes", userId],
@@ -271,12 +292,12 @@ const MyLikePage: React.FC = () => {
           </StyledPostTitlePostCommentNum>
         </StyledPostTitleBox>
         <StyledPostContainer>
-          {posts === undefined ? (
+          {currentPost === undefined ? (
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
               {categorySelected === "카테고리"
-                ? posts
+                ? currentPost
                     ?.filter((post) => post.postBoard === activeTab)
                     .map((post) => (
                       <StyledPost
@@ -296,7 +317,7 @@ const MyLikePage: React.FC = () => {
                         </TimeAndLikeAndCommentBox>
                       </StyledPost>
                     ))
-                : posts
+                : currentPost
                     ?.filter((post) => post.postBoard === activeTab)
                     ?.filter(
                       (post) =>
@@ -325,6 +346,15 @@ const MyLikePage: React.FC = () => {
             </StyledPostList>
           )}
         </StyledPostContainer>
+        <Pagination
+          activePage={page}
+          itemsCountPerPage={postPerPage}
+          totalItemsCount={postLength}
+          pageRangeDisplayed={10}
+          prevPageText={"‹"}
+          nextPageText={"›"}
+          onChange={handlePageChange}
+        />
       </StyledContainer>
     </MyPostWrap>
   )
@@ -352,11 +382,11 @@ const MyPostWrap = styled.div`
   display: flex;
   margin-top: 2rem;
   justify-content: center;
-  height: 780px;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
+  height: 780px;
 `
 
 const StyledTitle = styled.div`

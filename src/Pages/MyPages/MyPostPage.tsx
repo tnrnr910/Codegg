@@ -14,6 +14,8 @@ import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import { useNavigate } from "react-router"
 import { BiSearch } from "react-icons/bi"
 import { formatDate } from "../../Components/DateChange"
+import Pagination from "react-js-pagination"
+import "../../Components/pagination.css"
 
 interface Post {
   id: string
@@ -58,6 +60,25 @@ const MyPostPage: React.FC = () => {
       }
     })
   }, [userId])
+
+  const [currentPost, setCurrentPost] = useState(posts) // 게시판 목록에 보여줄 게시글
+  const [page, setPage] = useState<number>(1) // 현재 페이지 번호
+
+  const postPerPage = 10 // 페이지 당 게시글 개수
+  const indexOfLastPost = page * postPerPage
+  const indexOfFirstPost = indexOfLastPost - postPerPage
+
+  const postLength = posts?.length
+
+  const handlePageChange = (page: number) => {
+    setPage(page)
+  }
+
+  useEffect(() => {
+    if (posts !== undefined) {
+      setCurrentPost(posts.slice(indexOfFirstPost, indexOfLastPost))
+    }
+  }, [posts, page, indexOfFirstPost, indexOfLastPost])
 
   // 파이어베이스에서 내가 쓴 게시글을 가지고 오는 함수
   const GetPostData: any = async (postBoard: string) => {
@@ -360,12 +381,12 @@ const MyPostPage: React.FC = () => {
           </StyledPostTitlePostCommentNum>
         </StyledPostTitleBox>
         <StyledPostContainer>
-          {posts.length === 0 ? (
+          {currentPost.length === 0 ? (
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
               {categorySelected === "카테고리"
-                ? posts.map((post) => (
+                ? currentPost?.map((post) => (
                     <StyledPost
                       key={post.id}
                       onClick={() => {
@@ -383,8 +404,8 @@ const MyPostPage: React.FC = () => {
                       </TimeAndLikeAndCommentBox>
                     </StyledPost>
                   ))
-                : posts
-                    .filter(
+                : currentPost
+                    ?.filter(
                       (post) =>
                         categorySelected !== "카테고리" &&
                         post.postCategory === categorySelected
@@ -415,6 +436,15 @@ const MyPostPage: React.FC = () => {
             </StyledPostList>
           )}
         </StyledPostContainer>
+        <Pagination
+          activePage={page}
+          itemsCountPerPage={postPerPage}
+          totalItemsCount={postLength}
+          pageRangeDisplayed={10}
+          prevPageText={"‹"}
+          nextPageText={"›"}
+          onChange={handlePageChange}
+        />
       </StyledContainer>
     </MyPostWrap>
   )
@@ -442,11 +472,11 @@ const MyPostWrap = styled.div`
   display: flex;
   margin-top: 2rem;
   justify-content: center;
-  height: 780px;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
+  height: 780px;
 `
 
 const StyledTitle = styled.div`

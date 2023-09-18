@@ -162,6 +162,7 @@ const ProfileTap = styled.div`
   width: 66rem;
   padding: 1.25rem;
   flex-direction: column;
+  height: 780px;
 `
 const ProfileHead = styled.div`
   font-size: 1.5625rem;
