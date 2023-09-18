@@ -152,7 +152,6 @@ function SigninPage() {
         confirmButtonColor: "#0C356A"
       })
       await setDoc(doc(db, "usersInfo", emailWatch), {
-        badgeImg: "/img/lv1.png",
         displayName: displayNameWatch,
         email: emailWatch,
         isAdmin: false,
@@ -160,8 +159,7 @@ function SigninPage() {
         follower: 0,
         following: 0,
         totalPoint: 0,
-        currentPoint: 0,
-        userLevel: "입문자"
+        currentPoint: 0
       })
       await setDoc(doc(db, "useritems", emailWatch), {
         postTitleBold: "",
@@ -240,7 +238,7 @@ function SigninPage() {
         console.log({ usersInfo })
         // 회원정보 등록
         if (
-          auth.currentUser != null &&
+          auth.currentUser !== null &&
           usersInfo === undefined &&
           userdata.email !== null
         ) {
@@ -249,7 +247,6 @@ function SigninPage() {
             photoURL: userdata.photoURL
           })
           await setDoc(doc(db, "usersInfo", userdata.email), {
-            badgeImg: "",
             displayName: userdata.displayName,
             email: userdata.email,
             isAdmin: false,
@@ -257,16 +254,18 @@ function SigninPage() {
             follower: 0,
             following: 0,
             totalPoint: 0,
-            currentPoint: 0,
-            userLevel: "입문자"
+            currentPoint: 0
           })
-          await setDoc(doc(db, "useritems", emailWatch), {
+          await setDoc(doc(db, "useritems", userdata.email), {
             postTitleBold: "",
             postTitleColor: "",
             postTitleFont: "",
             postTitleSize: ""
           })
-          // }
+          await setDoc(doc(db, "userLevelAndBadge", userdata.email), {
+            badgeImg: "/img/lv1.png",
+            userLevel: "입문자"
+          })
           void Swal.fire({
             position: "center",
             title: "정상적으로 로그인 되었습니다.",
