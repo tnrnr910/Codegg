@@ -260,12 +260,13 @@ export default MyLetterPage
 
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 6.875rem;
+  margin-top: 2rem;
   justify-content: center;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
+  height: 780px;
 `
 const StyledTitle = styled.div`
   margin-bottom: 3.125rem;

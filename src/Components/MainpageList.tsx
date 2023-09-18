@@ -66,12 +66,20 @@ export default MainpageList
 const Body = styled.div`
   width: 35rem;
   border-top: solid #dadada 1px;
+
+  @media (max-width: 768px) {
+    width: 100%; /* 화면 폭이 768px 이하일 때 전체 너비로 변경 */
+  }
 `
 
 const BodyDiv = styled.div`
   margin: 0 24px;
   height: 330px;
   font-size: 13px;
+
+  @media (max-width: 768px) {
+    height: auto; /* 화면 폭이 768px 이하일 때 높이를 자동으로 조절 */
+  }
 `
 const ListDiv = styled.div`
   font-size: 13px;
@@ -116,4 +124,8 @@ const StyledPostTitle = styled.p<StyledPostTitleProps>`
   color: ${(props) => props.color ?? "black"};
   font-size: ${(props) => props.fontsize ?? "13px"};
   font-weight: ${(props) => props.Bold ?? "initial"};
+
+  @media (max-width: 768px) {
+    font-size: 16px; /* 화면 폭이 768px 이하일 때 폰트 크기를 조절 */
+  }
 `

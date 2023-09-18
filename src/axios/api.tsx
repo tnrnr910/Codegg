@@ -123,6 +123,24 @@ const getPosts = async (): Promise<Post[]> => {
   return posts
 }
 
+const getPostsOfBoard = async (board: string): Promise<Post[]> => {
+  const q = query(
+    collection(db, "posts"),
+    where("postBoard", "==", board),
+    orderBy("postTime", "desc")
+  )
+  const querySnapshot = await getDocs(q)
+  const posts: Post[] = []
+  querySnapshot.forEach((doc: DocumentSnapshot) => {
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    }
+    posts.push(data as Post) // 형 변환을 통해 타입 일치화
+  })
+  return posts
+}
+
 const getMyLikePosts = async (postIds: string[]): Promise<Post[]> => {
   return await Promise.all(
     postIds.map(async (postId: string) => {
@@ -722,6 +740,7 @@ const getUserLevelAndBadge = async (): Promise<levelAndBadge[]> => {
 export {
   getPost,
   getPosts,
+  getPostsOfBoard,
   getComments,
   getBoardPosts,
   getPostData,

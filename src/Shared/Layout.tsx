@@ -309,6 +309,7 @@ const SearchInput = styled.div`
   -webkit-border-radius: 0.3125rem;
   -moz-border-radius: 0.3125rem;
   border-radius: 0.3125rem;
+  margin-left: 30px;
 `
 
 const InputField = styled.input`
