@@ -564,6 +564,7 @@ const getfollowerInfo = async (email: string): Promise<usersInfo[]> => {
       }
       usersInfos.push(data as usersInfo)
     }
+    console.log(usersInfos)
   })
   return usersInfos
 }
@@ -752,39 +753,43 @@ const applyPostItems = async (userEmail: string | null, items: item[]) => {
 
   let docId = ""
 
-  void Promise.all(
-    items.map(async (item: item) => {
-      if (item.type === "postTitleBold") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postSkin: item.value
-        })
-      } else if (item.type === "postTitleColor") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postColor: item.value
-        })
-      } else if (item.type === "postTitleFont") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postColor: item.value
-        })
-      } else if (item.type === "postTitleSize") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postFontsize: item.value
-        })
-      }
-    })
-  )
+  if (!userPostsSnap.empty) {
+    void Promise.all(
+      items.map(async (item: item) => {
+        if (item.type === "postTitleBold") {
+          userPostsSnap.forEach(async (post) => {
+            docId = post.id
+            await updateDoc(doc(collection(db, "posts"), docId), {
+              postSkin: item.value
+            })
+          })
+        } else if (item.type === "postTitleColor") {
+          userPostsSnap.forEach(async (post) => {
+            docId = post.id
+            await updateDoc(doc(collection(db, "posts"), docId), {
+              postColor: item.value
+            })
+          })
+        } else if (item.type === "postTitleFont") {
+          userPostsSnap.forEach(async (post) => {
+            docId = post.id
+            await updateDoc(doc(collection(db, "posts"), docId), {
+              postFont: item.value
+            })
+          })
+        } else if (item.type === "postTitleSize") {
+          userPostsSnap.forEach(async (post) => {
+            docId = post.id
+            await updateDoc(doc(collection(db, "posts"), docId), {
+              postFontSize: item.value
+            })
+          })
+        }
+      })
+    )
+  } else {
+    return 0
+  }
 }
 
 export {

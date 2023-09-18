@@ -2,12 +2,7 @@
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import PointShopMenuBar from "../Components/PointShopMenuBar"
-import {
-  applyPostItems,
-  getPoint,
-  getUserItems,
-  updateUserItems
-} from "../axios/api"
+import { applyPostItems, getUserItems, updateUserItems } from "../axios/api"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 interface ShopItem {
@@ -41,7 +36,6 @@ interface myItemList {
 const PointShopPage: React.FC = () => {
   const auth = getAuth()
   const [userId, setUserId] = useState<string | null>("")
-  const [userPoints, setUserPoints] = useState(0)
   const [selectedItems, setSelectedItems] = useState<ShopItem[]>([])
   const [myItemList, setMyItemList] = useState<ShopItem[]>([])
   const [showDescription, setShowDescription] = useState<boolean>(false)
@@ -113,9 +107,6 @@ const PointShopPage: React.FC = () => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         setUserId(user?.email)
-        void getPoint(user?.email).then((dummyData: number) => {
-          setUserPoints(dummyData)
-        })
         void getUserItems(user?.email).then((dummyData: myItemList) => {
           const TempItemList: ShopItem[] = []
           if (dummyData !== undefined) {
@@ -163,23 +154,19 @@ const PointShopPage: React.FC = () => {
   }, [])
 
   const handleItemSelect = (item: ShopItem) => {
-    if (userPoints >= item.price) {
-      let bool = false
-      selectedItems?.map((itemOfItems) => {
-        if (itemOfItems.id === item.id) {
-          bool = true
-        }
-        return bool
-      })
-      if (bool) {
-        setSelectedItemsList(selectedItemsList.filter((i) => i !== item.id))
-        setSelectedItems(selectedItems.filter((i) => i.id !== item.id))
-      } else {
-        setSelectedItemsList([...selectedItemsList, item.id])
-        setSelectedItems([...selectedItems, item])
+    let bool = false
+    selectedItems?.map((itemOfItems) => {
+      if (itemOfItems.id === item.id) {
+        bool = true
       }
+      return bool
+    })
+    if (bool) {
+      setSelectedItemsList(selectedItemsList.filter((i) => i !== item.id))
+      setSelectedItems(selectedItems.filter((i) => i.id !== item.id))
     } else {
-      alert("포인트가 부족합니다.")
+      setSelectedItemsList([...selectedItemsList, item.id])
+      setSelectedItems([...selectedItems, item])
     }
   }
 

@@ -124,7 +124,8 @@ const Write: React.FC = () => {
             postDisplayName: auth.currentUser?.displayName,
             postSkin: "",
             postColor: "",
-            postFontsize: "",
+            postFontSize: "",
+            postFont: "",
             likes: 0,
             comments: 0
           }
