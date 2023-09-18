@@ -22,6 +22,7 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
   const navigate = useNavigate()
   const { isLoading, data } = useQuery(
     ["posts", postBoard],
+    // eslint-disable-next-line @typescript-eslint/return-await
     async () => await getPostsOfBoard(postBoard)
   )
   const list: any = data

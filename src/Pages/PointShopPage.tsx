@@ -144,6 +144,7 @@ const PointShopPage: React.FC = () => {
       }
       return tempItem
     })
+
     if (userPoints >= totalPrice) {
       await updatePoint(userId, userPoints - totalPrice)
       setUserPoints(userPoints - totalPrice)
