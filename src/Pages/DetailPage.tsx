@@ -236,10 +236,12 @@ function DetailPage() {
               <br />
             </DetailContentBody>
           </DetailContent>
-          <EditBox>
-            <EditBtn onClick={editBtn}>수정</EditBtn>
-            <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
-          </EditBox>
+          {auth.currentUser?.email === postInfo?.postUserEmail ? (
+            <EditBox>
+              <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
+              <EditBtn onClick={editBtn}>수정</EditBtn>
+            </EditBox>
+          ) : null}
         </DetailContainer>
         <Comments />
         <ButtonBox>
@@ -403,10 +405,6 @@ const TopBtn = styled.div`
   cursor: pointer;
 `
 
-const EditBtn = styled.button`
-  cursor: pointer;
-`
-
 const EditBox = styled.div`
   width: 52rem;
   display: flex;
@@ -414,6 +412,24 @@ const EditBox = styled.div`
   gap: 8px;
 `
 
+const EditBtn = styled.button`
+  color: white;
+  background: #0c356a;
+  border: 1px solid #dadada;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
+  cursor: pointer;
+`
+
 const DeleteBtn = styled.button`
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #dadada;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
   cursor: pointer;
 `

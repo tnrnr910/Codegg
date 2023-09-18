@@ -16,7 +16,7 @@ const StyledForm = styled.form`
   align-items: center;
   box-sizing: border-box;
   min-height: 740px;
-  width: 926px; // 주어진 너비를 적용
+  width: 920px; // 주어진 너비를 적용
   // height: 683px; // 주어진 높이를 적용
   /* height: 1200px;
   
@@ -26,7 +26,8 @@ const StyledForm = styled.form`
   background-color: #f4f4f4;
   border: 1px solid #dadada;
   border-radius: 16px;
-  margin-bottom: 40px;
+  padding-bottom: 30px;
+  margin-bottom: 20px;
 `
 
 const StyledLabel = styled.label`
@@ -41,7 +42,7 @@ const StyledInput = styled.input`
 
   box-sizing: border-box;
 
-  width: 834px;
+  width: 830px;
   height: 50px;
 
   background-color: #ffffff;
@@ -53,7 +54,7 @@ const StyledSelect = styled.select`
   margin-top: 54px;
   margin-bottom: 20px;
   padding: 5px;
-  width: 834px;
+  width: 830px;
   height: 50px;
 
   background: #ffffff;
@@ -61,7 +62,7 @@ const StyledSelect = styled.select`
   border-radius: 7px;
 `
 const StyledSimpleMDE = styled.textarea`
-  width: 834px;
+  width: 830px;
   height: 298px;
   resize: none;
 
@@ -85,7 +86,7 @@ const StyledInputFile = styled.input`
 `
 
 const UploadIcon = styled.label`
-  width: 834px;
+  width: 830px;
   height: 250px;
   background: #ffffff url("/WritePictureIcon.png") no-repeat center;
   border: 1px solid #dadada;
@@ -94,31 +95,34 @@ const UploadIcon = styled.label`
   margin-bottom: 20px;
 `
 
+const Buttons = styled.div`
+  width: 830px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 10px;
+`
+
 const CancelButton = styled(StyledButton)`
   color: #000000;
-  border: none;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  width: 197px;
-  height: 46px;
-  float: right;
   background: #ffffff;
   border: 1px solid #dadada;
   border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
+  cursor: pointer;
 `
 
 const SubmitButton = styled(StyledButton)`
   color: white;
-  border: none;
-  cursor: pointer;
-  width: 197px;
-  height: 46px;
   background: #0c356a;
   border: 1px solid #dadada;
   border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
+  cursor: pointer;
 `
 
 const StyledFileLabel = styled.label`
@@ -152,5 +156,6 @@ export {
   StyledFileLabel,
   FileBtnImg,
   StyledDropzone,
-  DropzoneP
+  DropzoneP,
+  Buttons
 }

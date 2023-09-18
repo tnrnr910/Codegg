@@ -15,6 +15,7 @@ import {
   StyledSimpleMDE,
   UploadIcon,
   StyledInputFile,
+  Buttons,
   CancelButton,
   SubmitButton,
   StyledFileLabel,
@@ -24,7 +25,7 @@ import {
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useNavigate, useParams } from "react-router"
 import Dropzone from "react-dropzone"
-import { updatePoints } from "../updatePoints"
+import { updatePoints } from "../../utils/updatePoints"
 
 const Write: React.FC = () => {
   const { board } = useParams()
@@ -227,13 +228,12 @@ const Write: React.FC = () => {
             )}
           </Dropzone>
         </UploadIcon>
-
-        <div>
+        <Buttons>
           <CancelButton type="button" onClick={cancelBtn}>
-            Cancel
+            취소하기
           </CancelButton>
-          <SubmitButton type="submit">Submit</SubmitButton>
-        </div>
+          <SubmitButton type="submit">작성하기</SubmitButton>
+        </Buttons>
       </StyledForm>
     </>
   )

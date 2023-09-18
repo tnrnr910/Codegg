@@ -53,7 +53,7 @@ function EditMyProfilePage() {
   }
 
   const [userPhoto, setUserPhoto] = useState<string | null>(
-    auth.currentUser?.displayName ?? null
+    auth.currentUser?.photoURL ?? null
   )
 
   const fileRef = useRef<HTMLInputElement | null>(null)
@@ -73,6 +73,17 @@ function EditMyProfilePage() {
         await uploadBytes(storageRefPath, file)
         const downloadURL = await getDownloadURL(storageRefPath)
         setUserPhoto(downloadURL)
+
+        // 프로필 이미지 프리뷰 업데이트
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const img = document.getElementById("profile-preview")
+          if (img != null && e.target != null) {
+            // null 체크 추가
+            img.setAttribute("src", e.target.result as string)
+          }
+        }
+        reader.readAsDataURL(file)
       } catch (error) {
         console.error("프로필 사진 변경 오류:", error)
         alert("프로필 사진 변경 중 오류가 발생했습니다.")
@@ -89,6 +100,7 @@ function EditMyProfilePage() {
           photoURL: userPhoto
         })
         alert("프로필 정보가 변경되었습니다.")
+        console.log(userPhoto)
       } else {
         alert("사용자가 로그인하지 않았거나 닉네임이 비어있습니다.")
       }
@@ -97,8 +109,6 @@ function EditMyProfilePage() {
       alert("프로필 변경 중 오류가 발생했습니다.")
     }
   }
-
-  // 로그인 유지(로컬, 세션스토리지 등) / 비밀번호 틀려도 로그인 됨
 
   return (
     <ProfileWrap>
@@ -109,10 +119,14 @@ function EditMyProfilePage() {
           <ProfileDetail>
             <ProfileImgs>
               <ProfileImgBox>
-                <ProfileImage
-                  src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
-                  alt="프사"
-                />
+                {userPhoto != null ? (
+                  <ImgPreview id="profile-preview" src={userPhoto} alt="프사" />
+                ) : (
+                  <ProfileImage
+                    src={auth.currentUser?.photoURL ?? require("./profile.jpg")}
+                    alt="프사"
+                  />
+                )}
                 <ProfileImageChange
                   src={require("./ProfileChange.png")}
                   alt="변경"
@@ -140,7 +154,7 @@ function EditMyProfilePage() {
                       ? auth.currentUser?.displayName
                       : ""
                   }
-                  value={nickName ?? ""} // null인 경우에 대비하여 널 병합 연산자 사용
+                  value={nickName ?? ""}
                   onChange={handleNickNameChange}
                 />
               </NickNameWrap>
@@ -237,6 +251,13 @@ const ProfileImage = styled.img`
   object-fit: cover;
   src: ${auth.currentUser?.photoURL};
 `
+const ImgPreview = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+`
+
 const ProfileImageChange = styled.img`
   position: absolute;
   bottom: 0;
