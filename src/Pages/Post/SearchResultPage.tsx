@@ -2,6 +2,7 @@ import React from "react"
 import { styled } from "styled-components"
 import { useSelector } from "react-redux"
 import { formatDate } from "../../Components/DateChange"
+import { useNavigate } from "react-router"
 
 interface RootState {
   search: {
@@ -10,6 +11,7 @@ interface RootState {
 }
 
 function SearchResultPage() {
+  const navigate = useNavigate()
   const searchResults = useSelector(
     (state: RootState) => state.search.searchResults
   )
@@ -26,7 +28,13 @@ function SearchResultPage() {
             }
             건)
           </div>{" "}
-          <div>더보기</div>
+          <div
+            onClick={() => {
+              navigate("/QnAPage")
+            }}
+          >
+            더보기
+          </div>
         </HeadWrap>
         <div>
           {searchResults
@@ -34,15 +42,19 @@ function SearchResultPage() {
             .map((result, index) => (
               <div key={index}>
                 <ResultWrap>
-                  <LeftContainer>
+                  <LeftContainer
+                    onClick={() => {
+                      navigate(`/detailPage/${result.id}`)
+                    }}
+                  >
                     <CategoryTitle>{result.postCategory}</CategoryTitle>
                     <PostTitle>{result.postTitle}</PostTitle>
                   </LeftContainer>
                   <RightContainer>
                     <NickName>{result.postDisplayName}</NickName>
-                    <div>{formatDate(result.postTime)}</div>
-                    <Likes>좋아요 수</Likes>
-                    <div>댓글 수</div>
+                    <Time>{formatDate(result.postTime)}</Time>
+                    <Likes>{result.likes}</Likes>
+                    <Comments>{result.comments}</Comments>
                   </RightContainer>
                 </ResultWrap>
               </div>
@@ -60,7 +72,13 @@ function SearchResultPage() {
             }
             건)
           </div>{" "}
-          <div>더보기</div>
+          <div
+            onClick={() => {
+              navigate("/TipPage")
+            }}
+          >
+            더보기
+          </div>
         </HeadWrap>
         <div>
           {searchResults
@@ -75,8 +93,8 @@ function SearchResultPage() {
                   <RightContainer>
                     <NickName>{result.postDisplayName}</NickName>
                     <div>{formatDate(result.postTime)}</div>
-                    <Likes>좋아요 수</Likes>
-                    <div>댓글 수</div>
+                    <Likes>{result.likes}</Likes>
+                    <Comments>{result.comments}</Comments>
                   </RightContainer>
                 </ResultWrap>
               </div>
@@ -94,7 +112,13 @@ function SearchResultPage() {
             }
             건)
           </div>{" "}
-          <div>더보기</div>
+          <div
+            onClick={() => {
+              navigate("/TogetherPage")
+            }}
+          >
+            더보기
+          </div>
         </HeadWrap>
         <div>
           {searchResults
@@ -109,8 +133,8 @@ function SearchResultPage() {
                   <RightContainer>
                     <NickName>{result.postDisplayName}</NickName>
                     <div>{formatDate(result.postTime)}</div>
-                    <Likes>좋아요 수</Likes>
-                    <div>댓글 수</div>
+                    <Likes>{result.likes}</Likes>
+                    <Comments>{result.comments}</Comments>
                   </RightContainer>
                 </ResultWrap>
               </div>
@@ -156,6 +180,9 @@ const HeadWrap = styled.div`
   div:nth-child(2) {
     color: #3e3d42;
   }
+  div:last-child {
+    cursor: pointer;
+  }
 `
 const ResultWrap = styled.div`
   display: flex;
@@ -166,30 +193,48 @@ const ResultWrap = styled.div`
 `
 
 const LeftContainer = styled.div`
-  flex: 1;
+  flex: 2;
   display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
 `
 
 const RightContainer = styled.div`
   flex: 1;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
 `
-const Likes = styled.div`
-  margin-left: 0.3125rem;
-  margin-right: 0.3125rem;
-`
+
 const CategoryTitle = styled.div`
   font-weight: bold;
   color: #9f9f9f;
-  border: 1px solid #ccc;
+  border: 1px solid #e7e7e7;
+  padding: 3px;
+  width: 45px;
+  display: flex;
+  justify-content: center;
 `
 
 const PostTitle = styled.div`
-  margin-left: 5px;
+  width: 420px;
+  justify-content: left;
+  color: #333333;
 `
 const NickName = styled.div`
-  margin-right: 5px;
+  flex: 2;
+`
+
+const Time = styled.div`
+  flex: 2;
+`
+
+const Likes = styled.div`
+  flex: 1;
+`
+
+const Comments = styled.div`
+  flex: 1;
 `

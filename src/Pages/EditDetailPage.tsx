@@ -145,9 +145,6 @@ function EditDetailPage() {
             />
           </DetailContent>
           <EditBox>
-            <EditBtn onClick={handleEdit} id={postInfo?.id}>
-              저장
-            </EditBtn>
             <DeleteBtn
               onClick={() => {
                 navigate(-1)
@@ -155,6 +152,9 @@ function EditDetailPage() {
             >
               취소
             </DeleteBtn>
+            <EditBtn onClick={handleEdit} id={postInfo?.id}>
+              저장
+            </EditBtn>
           </EditBox>
         </DetailContainer>
         <Comments />
@@ -252,15 +252,24 @@ const DetailContent = styled.div`
   border: solid #dadada 1px;
   border-radius: 7px;
   background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 const InputDetailContent = styled.input`
+  width: 100%;
+  height: 100%;
   font-size: 14px;
-  margin: 17px 0px 0px 17px;
+  border-radius: 7px;
+  vertical-align: top;
+  padding: 0 10px;
+  border: none;
 `
 
 const DetailtitleBox = styled.div`
   display: flex;
   align-items: center;
+  width: 80%;
   gap: 8px;
 `
 const DetailCategory = styled.div`
@@ -272,8 +281,13 @@ const DetailCategory = styled.div`
 
 const InputDetailTitle = styled.input`
   font-size: 19px;
+  width: 80%;
+  height: 48px;
   font-weight: Bold;
   color: #333333;
+  border: none;
+  border-radius: 4px;
+  padding: 0 10px;
 `
 
 const ButtonBox = styled.div`
@@ -303,10 +317,6 @@ const TopBtn = styled.div`
   cursor: pointer;
 `
 
-const EditBtn = styled.button`
-  cursor: pointer;
-`
-
 const EditBox = styled.div`
   width: 52rem;
   display: flex;
@@ -314,6 +324,24 @@ const EditBox = styled.div`
   gap: 8px;
 `
 
+const EditBtn = styled.button`
+  color: white;
+  background: #0c356a;
+  border: 1px solid #dadada;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
+  cursor: pointer;
+`
+
 const DeleteBtn = styled.button`
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #dadada;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
   cursor: pointer;
 `
