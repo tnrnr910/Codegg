@@ -64,7 +64,7 @@ function NoticePage() {
               </>
             </BodyDiv>
           </Body>
-          <WriteBtnBox>
+{/*           <WriteBtnBox>
             <button
               onClick={() => {
                 navigate("/WritePage/Notice")
@@ -72,7 +72,7 @@ function NoticePage() {
             >
               글쓰기
             </button>
-          </WriteBtnBox>
+          </WriteBtnBox> */}
           {/* <Pagination>페이지네이션</Pagination> */}
         </StyledBox>
       </StyledContainer>
@@ -176,10 +176,10 @@ const ListCategory = styled.div`
   padding: 3px 3px 3px 3px;
   color: #9f9f9f;
 `
-const WriteBtnBox = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin: 2rem 0 1rem 0;
-`
+// const WriteBtnBox = styled.div`
+//   display: flex;
+//   justify-content: flex-end;
+//   margin: 2rem 0 1rem 0;
+// `
 
 // const Pagination = styled.div``
