@@ -452,10 +452,10 @@ function formatDate(date: {
   return `${year}.${month}.${day}`
 }
 
-const addfollow = async (followuserEmail: string, userEmail: string) => {
+const addfollow = async (followUserEmail: string, userEmail: string) => {
   try {
     await addDoc(collection(db, "follow"), {
-      followuserEmail,
+      followUserEmail,
       userEmail
     })
   } catch (error) {
@@ -568,10 +568,10 @@ const getfollowerInfo = async (email: string): Promise<usersInfo[]> => {
   return usersInfos
 }
 
-const getfollowerData: any = async (followuserEmail: string) => {
+const getfollowerData: any = async (followUserEmail: string) => {
   const q = query(
     collection(db, "follow"),
-    where("followuserEmail", "==", followuserEmail)
+    where("followUserEmail", "==", followUserEmail)
   )
   const querySnapshot = await getDocs(q)
 
