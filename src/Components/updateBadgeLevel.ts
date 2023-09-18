@@ -21,7 +21,7 @@ async function updateBadgeLevel(userEmail: string) {
     } catch (error) {
       console.error("뱃지/레벨 업데이트 실패:", error)
     }
-  } else if (userTotalPoint >= 100 && userTotalPoint <= 199) {
+  } else if (userTotalPoint >= 100 && userTotalPoint <= 799) {
     try {
       await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv2.png",
@@ -30,7 +30,7 @@ async function updateBadgeLevel(userEmail: string) {
     } catch (error) {
       console.error("뱃지/레벨 업데이트 실패:", error)
     }
-  } else if (userTotalPoint >= 200 && userTotalPoint <= 299) {
+  } else if (userTotalPoint >= 800 && userTotalPoint <= 1999) {
     try {
       await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv3.png",
@@ -39,7 +39,7 @@ async function updateBadgeLevel(userEmail: string) {
     } catch (error) {
       console.error("뱃지/레벨 업데이트 실패:", error)
     }
-  } else if (userTotalPoint >= 300 && userTotalPoint <= 399) {
+  } else if (userTotalPoint >= 2000 && userTotalPoint <= 4999) {
     try {
       await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv4.png",
@@ -48,7 +48,7 @@ async function updateBadgeLevel(userEmail: string) {
     } catch (error) {
       console.error("뱃지/레벨 업데이트 실패:", error)
     }
-  } else if (userTotalPoint >= 400) {
+  } else if (userTotalPoint >= 5000) {
     try {
       await updateDoc(doc(db, "userLevelAndBadge", userInfoData.id), {
         badgeImg: "/img/lv5.png",
