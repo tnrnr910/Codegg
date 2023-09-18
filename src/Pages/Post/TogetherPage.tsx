@@ -140,6 +140,7 @@ function TogetherPage() {
               </SelectPages>
             </StyledPostTitleCategory>
             <StyledPostTitlePostName>글제목</StyledPostTitlePostName>
+            <StyledPostTitleDisplayName>작성자</StyledPostTitleDisplayName>
             <StyledPostTitlePostDay>작성일자 </StyledPostTitlePostDay>
             <StyledPostTitlePostLikes>좋아요 수 </StyledPostTitlePostLikes>
             <StyledPostTitlePostCommentNum>
@@ -201,36 +202,42 @@ const StyledPostTitleBox = styled.div`
 `
 const StyledPostTitleCategory = styled.span`
   float: left;
-  width: 5.625rem;
+  width: 6rem;
   text-align: center;
   font-size: 0.875rem;
 `
 
 const StyledPostTitlePostName = styled.span`
   float: left;
-  width: 31.25rem;
+  width: 22rem;
   text-align: center;
   font-size: 0.875rem;
-  margin-left: 38px;
+`
+
+const StyledPostTitleDisplayName = styled.span`
+  display: inline-block;
+  width: 12rem;
+  text-align: center;
+  font-size: 0.875rem;
 `
 
 const StyledPostTitlePostDay = styled.span`
   display: inline-block;
-  width: 6.875rem;
+  width: 5rem;
   text-align: center;
   font-size: 0.875rem;
 `
 
 const StyledPostTitlePostLikes = styled.span`
   display: inline-block;
-  width: 6.25rem;
+  width: 4rem;
   text-align: center;
   font-size: 0.875rem;
 `
 
 const StyledPostTitlePostCommentNum = styled.span`
   display: inline-block;
-  width: 5.625rem;
+  width: 5rem;
   text-align: center;
   font-size: 0.875rem;
 `

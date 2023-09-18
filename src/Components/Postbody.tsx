@@ -65,6 +65,7 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                   postSkin: string
                   postColor: string
                   postFontsize: string
+                  postDisplayName: string
                 }) => {
                   return (
                     <ListContainer key={info.id}>
@@ -83,6 +84,9 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                         >
                           {info.postTitle}
                         </StyledPostTitle>
+                        <StyledPostDisplayName>
+                          {info.postDisplayName}
+                        </StyledPostDisplayName>
                         <TimeAndLikeAndCommentBox>
                           <p>{formatDate(info.postTime)}</p>
                           <StyledNumber>{info.likes}</StyledNumber>
@@ -113,6 +117,7 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                     postSkin: string
                     postColor: string
                     postFontsize: string
+                    postDisplayName: string
                   }) => {
                     return (
                       <ListContainer key={info.id}>
@@ -131,6 +136,9 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
                           >
                             {info.postTitle}
                           </StyledPostTitle>
+                          <StyledPostDisplayName>
+                            {info.postDisplayName}
+                          </StyledPostDisplayName>
                           <TimeAndLikeAndCommentBox>
                             <p>{formatDate(info.postTime)}</p>
                             <StyledNumber>{info.likes}</StyledNumber>
@@ -162,14 +170,15 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
 export default Postbody
 
 const BodyDiv = styled.div`
-  margin-left: 24px;
+  margin: 0 20px;
 `
 
 const ListContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  height: 25px;
+  /* justify-content: space-between; */
   align-items: center;
+  height: 25px;
+  padding: 0.6rem 0;
 `
 
 const Body = styled.div`
@@ -177,19 +186,21 @@ const Body = styled.div`
 `
 
 const StyledPostTitle = styled.p<StyledPostTitleProps>`
-  width: 500px;
+  width: 420px;
   justify-content: left;
   color: ${(props) => props.color ?? "black"};
   font-size: ${(props) => props.fontsize ?? ""};
   font-weight: ${(props) => props.Bold ?? "initial"};
   padding-top: 3px;
 `
+const StyledPostDisplayName = styled.div`
+  width: 150px;
+`
 
 const StyledPost = styled.div`
   display: flex;
   justify-content: space-between;
   border: 0.0625rem solid #ffffff;
-  margin-bottom: 1.25rem;
   background-color: #ffffff;
   height: 20px;
   width: 100%;
@@ -205,12 +216,11 @@ const StyledPostCategory = styled.td`
   justify-content: center;
 `
 
-const TimeAndLikeAndCommentBox = styled.td`
+const TimeAndLikeAndCommentBox = styled.div`
   display: flex;
   justify-content: space-between;
   float: right;
-  width: 255px;
-  margin-right: 24px;
+  width: 200px;
 `
 
 const StyledNumber = styled.p`
