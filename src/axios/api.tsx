@@ -452,10 +452,10 @@ function formatDate(date: {
   return `${year}.${month}.${day}`
 }
 
-const addfollow = async (followuserEmail: string, userEmail: string) => {
+const addfollow = async (followUserEmail: string, userEmail: string) => {
   try {
     await addDoc(collection(db, "follow"), {
-      followuserEmail,
+      followUserEmail,
       userEmail
     })
   } catch (error) {
@@ -564,14 +564,15 @@ const getfollowerInfo = async (email: string): Promise<usersInfo[]> => {
       }
       usersInfos.push(data as usersInfo)
     }
+    console.log(usersInfos)
   })
   return usersInfos
 }
 
-const getfollowerData: any = async (followuserEmail: string) => {
+const getfollowerData: any = async (followUserEmail: string) => {
   const q = query(
     collection(db, "follow"),
-    where("followuserEmail", "==", followuserEmail)
+    where("followUserEmail", "==", followUserEmail)
   )
   const querySnapshot = await getDocs(q)
 
@@ -752,39 +753,43 @@ const applyPostItems = async (userEmail: string | null, items: item[]) => {
 
   let docId = ""
 
-  void Promise.all(
-    items.map(async (item: item) => {
-      if (item.type === "postTitleBold") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postSkin: item.value
-        })
-      } else if (item.type === "postTitleColor") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postColor: item.value
-        })
-      } else if (item.type === "postTitleFont") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postColor: item.value
-        })
-      } else if (item.type === "postTitleSize") {
-        userPostsSnap.forEach((doc) => {
-          docId = doc.id
-        })
-        await updateDoc(doc(collection(db, "posts"), docId), {
-          postFontsize: item.value
-        })
-      }
-    })
-  )
+  if (!userPostsSnap.empty) {
+    void Promise.all(
+      items.map(async (item: item) => {
+        if (item.type === "postTitleBold") {
+          userPostsSnap.forEach((doc) => {
+            docId = doc.id
+          })
+          await updateDoc(doc(collection(db, "posts"), docId), {
+            postSkin: item.value
+          })
+        } else if (item.type === "postTitleColor") {
+          userPostsSnap.forEach((doc) => {
+            docId = doc.id
+          })
+          await updateDoc(doc(collection(db, "posts"), docId), {
+            postColor: item.value
+          })
+        } else if (item.type === "postTitleFont") {
+          userPostsSnap.forEach((doc) => {
+            docId = doc.id
+          })
+          await updateDoc(doc(collection(db, "posts"), docId), {
+            postColor: item.value
+          })
+        } else if (item.type === "postTitleSize") {
+          userPostsSnap.forEach((doc) => {
+            docId = doc.id
+          })
+          await updateDoc(doc(collection(db, "posts"), docId), {
+            postFontsize: item.value
+          })
+        }
+      })
+    )
+  } else {
+    return 0
+  }
 }
 
 export {
