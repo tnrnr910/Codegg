@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import { useNavigate, useParams } from "react-router"
 import { BiSearch } from "react-icons/bi"
-import { getusersinfo } from "../../axios/api"
+import { getUsersInfo } from "../../axios/api"
 import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
 import { formatDate } from "../../Components/DateChange"
 
@@ -31,7 +31,7 @@ interface TabOption {
   label: string
 }
 
-interface usersinfo {
+interface usersInfo {
   id: string
   badgeImg: string
   displayName: string
@@ -49,7 +49,7 @@ const OtherPostPage: React.FC = () => {
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
   const [userId, setUserId] = useState<string | null>("")
-  const [userstInfo, setuserstInfo] = useState<usersinfo>()
+  const [userstInfo, setuserstInfo] = useState<usersInfo>()
   const [posts, setPosts] = useState<Post[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = `/OtherPostPage/${email}`
@@ -66,7 +66,7 @@ const OtherPostPage: React.FC = () => {
       }
       getData()
 
-      void getusersinfo(email).then((dummyData: any) => {
+      void getUsersInfo(email).then((dummyData: any) => {
         setuserstInfo(dummyData[0])
       })
     }

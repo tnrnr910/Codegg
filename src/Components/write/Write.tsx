@@ -82,7 +82,7 @@ const Write: React.FC = () => {
 
       if (auth.currentUser) {
         const userQuery = query(
-          collection(db, "usersinfo"),
+          collection(db, "usersInfo"),
           where("email", "==", auth.currentUser.email)
         )
 
@@ -92,7 +92,6 @@ const Write: React.FC = () => {
             querySnapshot.forEach((doc) => {
               const userInfo = doc.data()
               const { currentPoint, totalPoint } = userInfo
-
               void updatePoints(userEmail, currentPoint, totalPoint + 10)
             })
           } else {

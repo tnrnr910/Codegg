@@ -5,7 +5,7 @@ import OtherPageMenuBar from "../../Components/OtherPageMenuBar"
 import {
   findfollow,
   findfollowNumber,
-  getusersinfo,
+  getUsersInfo,
   setfollow
 } from "../../axios/api"
 import { auth, db } from "../../axios/firebase"
@@ -25,24 +25,24 @@ interface userInfo {
 function OtherProfilePage() {
   const { email } = useParams()
   const activeMenuItem = `/OtherProfilePage/${email}`
-  const [userstInfo, setuserstInfo] = useState<userInfo>()
+  const [usersInfo, setUsersInfo] = useState<userInfo>()
   const [follower, setFollower] = useState<number>()
   const [following, setFollowing] = useState<number>()
-  const [isfollow, setIsfollow] = useState<boolean>(false)
+  const [isFollow, setIsFollow] = useState<boolean>(false)
   const userId = auth.currentUser?.email
 
   useEffect(() => {
     if (email !== undefined) {
-      void getusersinfo(email).then((userinfoData: any) => {
-        setuserstInfo(userinfoData[0])
-        if (userstInfo !== undefined) {
+      void getUsersInfo(email).then((userInfoData: any) => {
+        setUsersInfo(userInfoData[0])
+        if (usersInfo !== undefined) {
           findfollowNumber(email)
-          setFollower(userstInfo.follower)
-          setFollowing(userstInfo.following)
+          setFollower(usersInfo.follower)
+          setFollowing(usersInfo.following)
         }
       })
 
-      onSnapshot(doc(db, "usersinfo", email), (doc) => {
+      onSnapshot(doc(db, "usersInfo", email), (doc) => {
         setFollower(doc?.data()?.follower)
         setFollowing(doc?.data()?.following)
       })
@@ -50,9 +50,9 @@ function OtherProfilePage() {
       if (auth.currentUser != null) {
         findfollow(email, userId).then((bool: boolean) => {
           if (bool) {
-            setIsfollow(true)
+            setIsFollow(true)
           } else {
-            setIsfollow(false)
+            setIsFollow(false)
           }
         })
       }
@@ -64,10 +64,10 @@ function OtherProfilePage() {
       findfollow(email, userId).then((bool: boolean) => {
         if (!bool) {
           setfollow(false, email, userId)
-          setIsfollow(true)
+          setIsFollow(true)
         } else {
           setfollow(true, email, userId)
-          setIsfollow(false)
+          setIsFollow(false)
         }
       })
     }
@@ -78,24 +78,24 @@ function OtherProfilePage() {
       <OtherPageMenuBar activeMenuItem={activeMenuItem} />
       <ProfileTap>
         <ProfileRightSide>
-          <ProfileHead>{userstInfo?.displayName}님 프로필</ProfileHead>
+          <ProfileHead>{usersInfo?.displayName}님 프로필</ProfileHead>
           <ProfileDetail>
             <ProfileImgs>
               <ProfileImgBox>
                 <ProfileImage
-                  src={userstInfo?.profileImg ?? require("./profile.jpg")}
+                  src={usersInfo?.profileImg ?? require("./profile.jpg")}
                 />
               </ProfileImgBox>
               <ProfileLevelAndNickName>
                 <div>
                   <BadgeWrap>
                     <BadgeImage
-                      src={userstInfo?.badgeImg ?? require("./profile.jpg")}
+                      src={usersInfo?.badgeImg ?? require("./profile.jpg")}
                     />
                     <div>입문자</div>
                   </BadgeWrap>
                 </div>
-                <NickName>{userstInfo?.displayName}</NickName>
+                <NickName>{usersInfo?.displayName}</NickName>
               </ProfileLevelAndNickName>
             </ProfileImgs>
             <MyDataWrap>
@@ -105,7 +105,7 @@ function OtherProfilePage() {
                 <MyPost>작성글 32</MyPost>
               </MyData>
               <FollowBtn onClick={FollowHandler}>
-                {isfollow ? <div>팔로우 취소</div> : <div>+팔로우 하기</div>}
+                {isFollow ? <div>팔로우 취소</div> : <div>+팔로우 하기</div>}
               </FollowBtn>
               <MyStackAndPW>
                 <StackNotice>관심 있는 기술 태그</StackNotice>
