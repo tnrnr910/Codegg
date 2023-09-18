@@ -19,43 +19,35 @@ function AdminMenuBar({ activeMenuItem }: MyPageMenuBarProps) {
 
   return (
     <MenuBarWrap>
-      <MyPageHead>마이페이지</MyPageHead>
+      <MyPageHead>관리자페이지</MyPageHead>
       <MenuItem
-        active={activeMenuItem === "/MyProfilePage"}
+        active={activeMenuItem === "/AdminPage"}
         onClick={() => {
-          handleMenuItemClick("/MyProfilePage")
+          handleMenuItemClick("/AdminPage")
         }}
       >
         프로필 관리
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === "/MyPostPage"}
+        active={activeMenuItem === "/AdminPostPage"}
         onClick={() => {
-          handleMenuItemClick("/MyPostPage")
+          handleMenuItemClick("/AdminPostPage")
         }}
       >
         내가 쓴 글
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === "/MyLikePage"}
+        active={activeMenuItem === "/AdminReportpostPage"}
         onClick={() => {
-          handleMenuItemClick("/MyLikePage")
+          handleMenuItemClick("/AdminReportpostPage")
         }}
       >
-        좋아요 한 게시물
+        신고 받은 게시물
       </MenuItem>
       <MenuItem
-        active={activeMenuItem === "/FollowPage"}
+        active={activeMenuItem === "/AdminLetterPage"}
         onClick={() => {
-          handleMenuItemClick("/FollowPage")
-        }}
-      >
-        팔로우/팔로워
-      </MenuItem>
-      <MenuItem
-        active={activeMenuItem === "/MyLetterPage"}
-        onClick={() => {
-          handleMenuItemClick("/MyLetterPage")
+          handleMenuItemClick("/AdminLetterPage")
         }}
       >
         쪽지함

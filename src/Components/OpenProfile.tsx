@@ -24,6 +24,7 @@ function OpenProfile({ closeModal }: any) {
   const { data } = useQuery("usersInfo", getUsersInfos)
   const usersInfoData: any = data
   const [userCurrentPoint, setUserCurrentPoint] = useState<number | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     // 사용자 인증 정보 확인하기
@@ -39,6 +40,11 @@ function OpenProfile({ closeModal }: any) {
       )
       if (currentUserInfo != null) {
         setUserCurrentPoint(currentUserInfo.currentPoint)
+      }
+      if (auth.currentUser?.email === "codegg@gmail.com") {
+        setIsAdmin(true)
+      } else {
+        setIsAdmin(false)
       }
     }
   }, [currentUser, usersInfoData])
@@ -102,10 +108,6 @@ function OpenProfile({ closeModal }: any) {
     }
   }
 
-  // const deleteUsersInfo = async (event: any) => {
-  //   await deleteDoc(doc(db, "usersInfo", "3vkcOPh9Mn5YBADbU3sg"))
-  // }
-
   return (
     <ModalBox
       onClick={(event) => {
@@ -139,14 +141,25 @@ function OpenProfile({ closeModal }: any) {
           </ProfileEdit>
         </ModalBody>
         <Box>
-          <div
-            onClick={() => {
-              navigate("/MyProfilePage")
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            마이페이지
-          </div>
+          {isAdmin ? (
+            <div
+              onClick={() => {
+                navigate("/AdminPage")
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              관리자페이지
+            </div>
+          ) : (
+            <div
+              onClick={() => {
+                navigate("/MyProfilePage")
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              마이페이지
+            </div>
+          )}
           <div
             onClick={() => {
               navigate("/MyLetterPage")
