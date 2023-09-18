@@ -11,7 +11,7 @@ import {
   signOut
 } from "firebase/auth"
 import { deleteDoc, doc } from "firebase/firestore"
-import { getusersinfos } from "../axios/api"
+import { getUsersInfos } from "../axios/api"
 import { useQuery } from "react-query"
 
 interface auth {
@@ -21,9 +21,10 @@ interface auth {
 function OpenProfile({ closeModal }: any) {
   const navigate = useNavigate()
   const [currentUser, setCurrentUser] = useState(auth.currentUser)
-  const { data } = useQuery("usersinfo", getusersinfos)
-  const usersinfoData: any = data
+  const { data } = useQuery("usersInfo", getUsersInfos)
+  const usersInfoData: any = data
   const [userCurrentPoint, setUserCurrentPoint] = useState<number | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     // 사용자 인증 정보 확인하기
@@ -33,15 +34,20 @@ function OpenProfile({ closeModal }: any) {
   }, [])
 
   useEffect(() => {
-    if (currentUser != null && Boolean(usersinfoData)) {
-      const currentUserInfo = usersinfoData.find(
+    if (currentUser != null && Boolean(usersInfoData)) {
+      const currentUserInfo = usersInfoData.find(
         (user: any) => user.email === currentUser.email
       )
       if (currentUserInfo != null) {
         setUserCurrentPoint(currentUserInfo.currentPoint)
       }
+      if (auth.currentUser?.email === "codegg@gmail.com") {
+        setIsAdmin(true)
+      } else {
+        setIsAdmin(false)
+      }
     }
-  }, [currentUser, usersinfoData])
+  }, [currentUser, usersInfoData])
 
   // 로그아웃 함수
   const logOut = (event: any) => {
@@ -74,7 +80,7 @@ function OpenProfile({ closeModal }: any) {
         if (result.isConfirmed) {
           // 현재 로그인한 사용자 문서를 삭제
           if (currentUser.email != null) {
-            const currentUserInfoData = usersinfoData.find((data: any) => {
+            const currentUserInfoData = usersInfoData.find((data: any) => {
               return data.email === currentUser.email
             })
             void currentUser
@@ -83,7 +89,7 @@ function OpenProfile({ closeModal }: any) {
                 return GoogleAuthProvider.credential(idToken)
               })
               .then(async () => {
-                await deleteDoc(doc(db, "usersinfo", currentUserInfoData?.id))
+                await deleteDoc(doc(db, "usersInfo", currentUserInfoData?.id))
                 // 현재 로그인한 사용자를 Authentication에서 삭제
                 await deleteUser(currentUser)
                 // 알림창 띄우고 홈페이지로 이동
@@ -101,10 +107,6 @@ function OpenProfile({ closeModal }: any) {
       })
     }
   }
-
-  // const deleteUsersInfo = async (event: any) => {
-  //   await deleteDoc(doc(db, "usersinfo", "3vkcOPh9Mn5YBADbU3sg"))
-  // }
 
   return (
     <ModalBox
@@ -139,14 +141,25 @@ function OpenProfile({ closeModal }: any) {
           </ProfileEdit>
         </ModalBody>
         <Box>
-          <div
-            onClick={() => {
-              navigate("/MyProfilePage")
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            마이페이지
-          </div>
+          {isAdmin ? (
+            <div
+              onClick={() => {
+                navigate("/AdminPage")
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              관리자페이지
+            </div>
+          ) : (
+            <div
+              onClick={() => {
+                navigate("/MyProfilePage")
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              마이페이지
+            </div>
+          )}
           <div
             onClick={() => {
               navigate("/MyLetterPage")

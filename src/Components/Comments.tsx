@@ -9,7 +9,7 @@ import { AiOutlineLike } from "react-icons/ai"
 import { FaRegComment } from "react-icons/fa"
 import { useNavigate, useParams } from "react-router-dom"
 
-import { getPost } from "../axios/api"
+import { getPost, getUserLevelAndBadge } from "../axios/api"
 import {
   addDoc,
   collection,
@@ -52,17 +52,33 @@ interface Post {
   comments: number
 }
 
+interface LevelAndBadge {
+  id: string
+  badgeImg: string
+  userLevel: string
+}
+
 function Comments() {
   const navigate = useNavigate()
   const { id } = useParams()
   const [postData, setPostData] = useState<Post>()
   const [activeAddBtn, setActiveAddBtn] = useState<boolean>(false)
+  const [userLevelAndBadge, setUserLevelAndBadge] = useState<LevelAndBadge>()
 
   // 댓글 조회
   useEffect(() => {
     if (id !== undefined) {
       void getPost(id).then((dummyData: any) => {
         setPostData(dummyData)
+        // 유저레벨과 뱃지 가져오기
+        void getUserLevelAndBadge().then((data: any) => {
+          // 작성자와 일치하는 사용자 정보 찾기
+          const userLevelAndBadge = data.find(
+            (userLevelAndBadge: any) =>
+              userLevelAndBadge.id === dummyData.postUserEmail
+          )
+          setUserLevelAndBadge(userLevelAndBadge)
+        })
       })
     } else {
       navigate(-1)
@@ -222,6 +238,10 @@ function Comments() {
                     <CommentContents>
                       <div>
                         <CommentWriter>
+                          <PostUserBadge
+                            src={userLevelAndBadge?.badgeImg}
+                            alt="badgeImage"
+                          />
                           {commentItem.commentUserDisplayName}
                         </CommentWriter>
                         <CommentTime>{commentItem.commentTime}</CommentTime>
@@ -447,7 +467,18 @@ const CommentContents = styled.div`
   }
 `
 
-const CommentWriter = styled.div``
+const CommentWriter = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+`
+
+const PostUserBadge = styled.img`
+  width: 1rem;
+  height: 1.3rem;
+  object-fit: contain;
+`
 
 const CommentTime = styled.div`
   color: #787878;

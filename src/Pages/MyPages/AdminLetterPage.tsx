@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import MyPageMenuBar from "../../Components/MyPageMenuBar"
 import styled from "styled-components"
 import { db, auth } from "../../axios/firebase"
 import {
@@ -13,6 +12,7 @@ import {
 } from "firebase/firestore"
 import { formatDate } from "../../Components/DateChange"
 import { getUsersInfos } from "../../axios/api"
+import AdminMenuBar from "../../Components/AdminMenuBar"
 
 interface Message {
   id: string
@@ -25,8 +25,8 @@ interface Message {
   read: boolean
 }
 
-function MyLetterPage() {
-  const activeMenuItem = "/MyLetterPage"
+function AdminLetterPage() {
+  const activeMenuItem = "/AdminLetterPage"
   const user = auth.currentUser
   const displayName = user?.displayName
 
@@ -159,7 +159,7 @@ function MyLetterPage() {
 
   return (
     <MyPostWrap>
-      <MyPageMenuBar activeMenuItem={activeMenuItem} />
+      <AdminMenuBar activeMenuItem={activeMenuItem} />
       <StyledContainer>
         <StyledTitle>쪽지함</StyledTitle>
         <StyledTabButtons>
@@ -256,17 +256,16 @@ function MyLetterPage() {
   )
 }
 
-export default MyLetterPage
+export default AdminLetterPage
 
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 2rem;
+  margin-top: 6.875rem;
   justify-content: center;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
-  height: 780px;
 `
 const StyledTitle = styled.div`
   margin-bottom: 3.125rem;

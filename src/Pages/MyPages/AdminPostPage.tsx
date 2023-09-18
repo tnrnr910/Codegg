@@ -1,21 +1,19 @@
-/* eslint-disable array-callback-return */
+import {
+  query,
+  collection,
+  where,
+  getDocs,
+  doc,
+  getDoc
+} from "firebase/firestore"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { db } from "../../axios/firebase"
 import React, { useEffect, useState } from "react"
-// import { useQuery } from "react-query"
 import styled from "styled-components"
-import MyPageMenuBar from "../../Components/MyPageMenuBar"
-import { BiSearch } from "react-icons/bi"
 import { useNavigate } from "react-router"
-import { getUserLikesPost } from "../../axios/api"
-
+import { BiSearch } from "react-icons/bi"
 import { formatDate } from "../../Components/DateChange"
-import Pagination from "react-js-pagination"
-import "../../Components/pagination.css"
-
-interface TabOption {
-  value: string
-  label: string
-}
+import AdminMenuBar from "../../Components/AdminMenuBar"
 
 interface Post {
   id: string
@@ -28,92 +26,136 @@ interface Post {
   comments: number
 }
 
-const MyLikePage: React.FC = () => {
+interface TabOption {
+  value: string
+  label: string
+}
+
+const AdminPostPage: React.FC = () => {
   const auth = getAuth()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("questions")
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [categorySelected, setCategorySelected] = useState("카테고리")
-  const [searchTerm, setSearchTerm] = useState("")
+  const [userId, setUserId] = useState<string | null>("")
   const [posts, setPosts] = useState<Post[]>([])
-  const [userId, setUserId] = useState<string | null>(null)
-  const activeMenuItem = "/MyLikePage"
+  const [searchTerm, setSearchTerm] = useState("")
+  const activeMenuItem = "/AdminPostPage"
 
-  // 맨처음 페이지 렌더링시 작동하는 useEffect
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
         setUserId(user.email)
-        void getUserLikesPost(user.email).then((dummyData: any) => {
-          setPosts(dummyData)
-        })
+        setCategorySelected("카테고리")
+        const list = GetPostData(activeTab)
+        const getData = () => {
+          list.then((dummyData: any) => {
+            setPosts(dummyData)
+          })
+        }
+        getData()
       }
     })
-  }, [])
+  }, [userId])
 
-  const [currentPost, setCurrentPost] = useState(posts) // 게시판 목록에 보여줄 게시글
-  const [page, setPage] = useState<number>(1) // 현재 페이지 번호
+  const GetPostData: any = async (postBoard: string) => {
+    const postsTemp: Post[] = []
+    const dbPosts = query(
+      collection(db, "posts"),
+      where("postUserEmail", "==", userId),
+      where("postBoard", "==", postBoard)
+    )
+    const userSnapshot = await getDocs(dbPosts)
+    userSnapshot.forEach((doc: any) => {
+      if (doc != null) {
+        const newPost: Post = {
+          id: doc.id,
+          postCategory: doc.data().postCategory,
+          postTitle: doc.data().postTitle,
+          postTime: doc.data().postTime,
+          postContent: doc.data().postContent,
+          postBoard: doc.data().postBoard,
+          likes: doc.data().likes,
+          comments: doc.data().comments
+        }
 
-  const postPerPage = 10 // 페이지 당 게시글 개수
-  const indexOfLastPost = page * postPerPage
-  const indexOfFirstPost = indexOfLastPost - postPerPage
-
-  const postLength = posts?.length
-
-  const handlePageChange = (page: number) => {
-    setPage(page)
+        postsTemp.push(newPost)
+      }
+    })
+    return postsTemp
   }
 
-  useEffect(() => {
-    if (posts !== undefined) {
-      setCurrentPost(posts.slice(indexOfFirstPost, indexOfLastPost))
-    }
-  }, [posts, page, indexOfFirstPost, indexOfLastPost])
+  const GetCommentData: any = async (userId: string) => {
+    const postIds: string[] = []
+    const dbComments = query(
+      collection(db, "comments"),
+      where("commentUserEmail", "==", userId)
+    )
+    const userSnapshotComments = await getDocs(dbComments)
+    userSnapshotComments.forEach((doc: any) => {
+      if (doc != null) {
+        postIds.push(doc.data().postId)
+      }
+    })
 
-  // let { isLoading, data } = useQuery(
-  //   ["likes", userId],
-  //   async () => await getUserLikesPost(userId),
-  //   { enabled: userId !== null } // 값이 있으면 true
-  // )
+    return await Promise.all(
+      postIds.map(async (postId: string) => {
+        const postRef = doc(db, "posts", postId)
+        const postSnap = await getDoc(postRef)
+        const data = {
+          id: postSnap.id,
+          ...postSnap.data()
+        }
+        return data as Post
+      })
+    )
+  }
 
-  // if (isLoading) {
-  //   return <div>로딩중입니다..</div>
-  // }
-
-  // 9월 1일자로 한거
-  // 파이어베이스에서 내가 쓴 게시글에서 단어 검색 해서 찾아내는 함수
   const GetFindPostData: any = async (
     postCategory: string,
     postBoard: string,
-    keyword: string,
-    getPosts: Post[]
+    keyword: string
   ) => {
     const postsTemp: Post[] = []
-    getPosts?.map((post) => {
-      if (post.postContent.includes(keyword)) {
-        const newPost: Post = {
-          id: post.id,
-          postCategory: post.postCategory,
-          postTitle: post.postTitle,
-          postTime: post.postTime,
-          postContent: post.postContent,
-          postBoard: post.postBoard,
-          likes: post.likes,
-          comments: post.comments
+    const dbPosts = query(
+      collection(db, "posts"),
+      where("postUserEmail", "==", userId),
+      where("postBoard", "==", postBoard)
+    )
+    const userSnapshot = await getDocs(dbPosts)
+    userSnapshot.forEach((doc: any) => {
+      if (
+        doc != null &&
+        doc.data().postUserEmail === userId &&
+        postBoard === doc.data().postBoard
+      ) {
+        if (doc.data().postContent.includes(keyword) === true) {
+          const newPost: Post = {
+            id: doc.id,
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
+            likes: doc.data().likes,
+            comments: doc.data().comments
+          }
+
+          postsTemp.push(newPost)
+        } else if (doc.data().postTitle.includes(keyword) === true) {
+          const newPost: Post = {
+            id: doc.id,
+            postCategory: doc.data().postCategory,
+            postTitle: doc.data().postTitle,
+            postTime: doc.data().postTime,
+            postContent: doc.data().postContent,
+            postBoard: doc.data().postBoard,
+            likes: doc.data().likes,
+            comments: doc.data().comments
+          }
+
+          postsTemp.push(newPost)
         }
-        postsTemp.push(newPost)
-      } else if (post.postTitle.includes(keyword)) {
-        const newPost: Post = {
-          id: post.id,
-          postCategory: post.postCategory,
-          postTitle: post.postTitle,
-          postTime: post.postTime,
-          postContent: post.postContent,
-          postBoard: post.postBoard,
-          likes: post.likes,
-          comments: post.comments
-        }
-        postsTemp.push(newPost)
       }
     })
     if (postCategory !== "카테고리") {
@@ -122,14 +164,12 @@ const MyLikePage: React.FC = () => {
     return postsTemp
   }
 
-  // 게시글을 클릭시 디테일페이지로 이동하도록하는 함수
   const GoToDetailPage: any = (id: string) => {
     navigate(`/DetailPage/${id}`)
   }
 
-  // 돋보기 버튼 클릭시 작동하는 이벤트 함수
   const SearchIncludeWord: any = () => {
-    GetFindPostData(categorySelected, activeTab, searchTerm, posts).then(
+    GetFindPostData(categorySelected, activeTab, searchTerm).then(
       (dummyData: any) => {
         setPosts(dummyData)
       }
@@ -137,10 +177,9 @@ const MyLikePage: React.FC = () => {
     setSearchTerm("")
   }
 
-  // 검색창에서 엔터를 누를시 작동하는 이벤트 함수
   const handleOnKeyPress = (e: any) => {
     if (e.key === "Enter") {
-      GetFindPostData(categorySelected, activeTab, searchTerm, posts).then(
+      GetFindPostData(categorySelected, activeTab, searchTerm).then(
         (dummyData: any) => {
           setPosts(dummyData)
         }
@@ -149,11 +188,11 @@ const MyLikePage: React.FC = () => {
     }
   }
 
-  // 탭탭탭
   const tabOptions: TabOption[] = [
     { value: "questions", label: "질의응답" },
     { value: "tips", label: "코딩 팁" },
-    { value: "meetups", label: "모임" }
+    { value: "meetups", label: "모임" },
+    { value: "comments", label: "댓글" }
   ]
 
   function DropDown() {
@@ -221,9 +260,9 @@ const MyLikePage: React.FC = () => {
 
   return (
     <MyPostWrap>
-      <MyPageMenuBar activeMenuItem={activeMenuItem} />
+      <AdminMenuBar activeMenuItem={activeMenuItem} />
       <StyledContainer>
-        <StyledTitle>좋아요 한 게시물</StyledTitle>
+        <StyledTitle>내가 쓴 글</StyledTitle>
 
         <StyledTabButtons>
           {tabOptions.map((tab) => (
@@ -235,9 +274,15 @@ const MyLikePage: React.FC = () => {
                 setCategoryOpen(false)
                 setSearchTerm("")
                 setCategorySelected("카테고리")
-                void getUserLikesPost(userId).then((dummyData: any) => {
-                  setPosts(dummyData)
-                })
+                if (tab.value === "comments") {
+                  GetCommentData(userId).then((dummyData: any) => {
+                    setPosts(dummyData) // 내가 쓴 글 댓글
+                  })
+                } else {
+                  GetPostData(tab.value).then((dummyData: any) => {
+                    setPosts(dummyData)
+                  })
+                }
               }}
             >
               {tab.label}
@@ -249,7 +294,9 @@ const MyLikePage: React.FC = () => {
             전체
             <StyledNumberBlue>
               {" "}
-              {posts?.filter((post) => post.postBoard === activeTab)?.length}
+              {activeTab === "comments"
+                ? posts?.length
+                : posts?.filter((post) => post.postBoard === activeTab)?.length}
             </StyledNumberBlue>
             개
           </NumberBox>
@@ -292,13 +339,35 @@ const MyLikePage: React.FC = () => {
           </StyledPostTitlePostCommentNum>
         </StyledPostTitleBox>
         <StyledPostContainer>
-          {currentPost === undefined ? (
+          {posts.length === 0 ? (
             <p>작성된 게시글이 없습니다.</p>
           ) : (
             <StyledPostList>
               {categorySelected === "카테고리"
-                ? currentPost
-                    ?.filter((post) => post.postBoard === activeTab)
+                ? posts.map((post) => (
+                    <StyledPost
+                      key={post.id}
+                      onClick={() => {
+                        GoToDetailPage(post.id)
+                      }}
+                    >
+                      <StyledPostCategory>
+                        {post.postCategory}
+                      </StyledPostCategory>
+                      <StyledPostTitle>{post.postTitle}</StyledPostTitle>
+                      <TimeAndLikeAndCommentBox>
+                        <p>{formatDate(post.postTime)}</p>
+                        <StyledNumber>{post.likes}</StyledNumber>
+                        <StyledNumber>{post.comments}</StyledNumber>
+                      </TimeAndLikeAndCommentBox>
+                    </StyledPost>
+                  ))
+                : posts
+                    .filter(
+                      (post) =>
+                        categorySelected !== "카테고리" &&
+                        post.postCategory === categorySelected
+                    )
                     .map((post) => (
                       <StyledPost
                         key={post.id}
@@ -316,45 +385,10 @@ const MyLikePage: React.FC = () => {
                           <StyledNumber>{post.comments}</StyledNumber>
                         </TimeAndLikeAndCommentBox>
                       </StyledPost>
-                    ))
-                : currentPost
-                    ?.filter((post) => post.postBoard === activeTab)
-                    ?.filter(
-                      (post) =>
-                        categorySelected !== "카테고리" &&
-                        post.postCategory === categorySelected
-                    )
-                    .map((post) => (
-                      <StyledPost
-                        key={post.id}
-                        onClick={() => {
-                          GoToDetailPage(post.id)
-                        }}
-                      >
-                        <StyledPostCategory>
-                          {post.postCategory}
-                        </StyledPostCategory>
-
-                        <StyledPostTitle>{post.postTitle}</StyledPostTitle>
-                        <TimeAndLikeAndCommentBox>
-                          <p>{post.postTime}</p>
-                          <StyledNumber>{post.likes}</StyledNumber>
-                          <StyledNumber>{post.comments}</StyledNumber>
-                        </TimeAndLikeAndCommentBox>
-                      </StyledPost>
                     ))}
             </StyledPostList>
           )}
         </StyledPostContainer>
-        <Pagination
-          activePage={page}
-          itemsCountPerPage={postPerPage}
-          totalItemsCount={postLength}
-          pageRangeDisplayed={10}
-          prevPageText={"‹"}
-          nextPageText={"›"}
-          onChange={handlePageChange}
-        />
       </StyledContainer>
     </MyPostWrap>
   )
@@ -382,11 +416,11 @@ const MyPostWrap = styled.div`
   display: flex;
   margin-top: 2rem;
   justify-content: center;
+  height: 780px;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
-  height: 780px;
 `
 
 const StyledTitle = styled.div`
@@ -620,4 +654,4 @@ const SearchWord = styled.span`
   font-size: 0.875rem;
 `
 
-export default MyLikePage
+export default AdminPostPage

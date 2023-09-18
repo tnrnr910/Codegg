@@ -144,6 +144,7 @@ const PointShopPage: React.FC = () => {
       }
       return tempItem
     })
+
     if (userPoints >= totalPrice) {
       await updatePoint(userId, userPoints - totalPrice)
       setUserPoints(userPoints - totalPrice)
@@ -164,7 +165,7 @@ const PointShopPage: React.FC = () => {
         <p>
           보유 포인트:{" "}
           <span style={{ fontWeight: "bold", color: "#0c356a" }}>
-            {userPoints}P
+            {userPoints.toLocaleString()}P
           </span>
         </p>
         <ItemList>
@@ -217,7 +218,7 @@ const PointShopPage: React.FC = () => {
 const PointShopWrap = styled.div`
   display: flex;
   margin-top: 2rem;
-  height: 780px;
+  min-height: 800px;
 `
 const PointListNameBox = styled.div`
   width: 100%;

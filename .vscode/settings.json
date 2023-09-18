@@ -24,8 +24,8 @@
     "followuserinfo",
     "getfollow",
     "getfollower",
-    "getusersinfo",
-    "getusersinfos",
+    "getUsersInfo",
+    "getUsersInfos",
     "Imgs",
     "isfollow",
     "Mainpage",
@@ -33,6 +33,7 @@
     "Pagelist",
     "Pictur",
     "Postbody",
+    "Reportpost",
     "seonyoug",
     "setfollow",
     "setfollower",
@@ -47,10 +48,10 @@
     "Tabmenu",
     "uesrsinfoes",
     "Userdisplay",
-    "usersinfo",
-    "usersinfoes",
-    "usersinfoid",
-    "usersinfos",
+    "usersInfo",
+    "usersInfoes",
+    "usersInfoid",
+    "usersInfos",
     "userst"
   ]
 }

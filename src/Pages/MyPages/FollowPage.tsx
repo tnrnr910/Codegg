@@ -5,12 +5,12 @@ import {
   getfollowData,
   getfollowerData,
   getfollowerInfo,
-  getusersinfo
+  getUsersInfo
 } from "../../axios/api"
 import { useNavigate } from "react-router"
 import { auth } from "../../axios/firebase"
 
-interface usersinfo {
+interface usersInfo {
   id: string
   badgeImg: string
   displayName: string
@@ -21,9 +21,9 @@ interface usersinfo {
   following: number
 }
 
-interface followinfo {
+interface followInfo {
   id: string
-  followuserEmail: string
+  followUserEmail: string
   userEmail: string
 }
 
@@ -35,27 +35,27 @@ interface TabOption {
 const FollowPage: React.FC = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("Follow")
-  const [followuserinfo, setfollowUserinfo] = useState<usersinfo[]>([])
-  const [followerinfo, setfollowerInfo] = useState<usersinfo[]>([])
+  const [followUserInfo, setFollowUserInfo] = useState<usersInfo[]>([])
+  const [followerinfo, setFollowerInfo] = useState<usersInfo[]>([])
   const activeMenuItem = "/FollowPage"
 
   useEffect(() => {
     if (auth.currentUser !== null) {
       void getfollowData(auth.currentUser?.email).then((followData: any) => {
-        const followuserEmail = followData.map(
-          (item: followinfo) => item.followuserEmail
+        const followUserEmail = followData.map(
+          (item: followInfo) => item.followUserEmail
         )
-        if (followuserEmail !== undefined) {
+        if (followUserEmail !== undefined) {
           const userInfopromises: any[] = []
 
-          followuserEmail.forEach((item: string) => {
-            const userInfoPromise = getusersinfo(item)
+          followUserEmail.forEach((item: string) => {
+            const userInfoPromise = getUsersInfo(item)
             userInfopromises.push(userInfoPromise)
           })
           Promise.all(userInfopromises)
             .then((userInfos) => {
               const userInfoes = userInfos.flat(Infinity)
-              setfollowUserinfo(userInfoes)
+              setFollowUserInfo(userInfoes)
             })
             .catch((error) => {
               console.error(error)
@@ -66,7 +66,7 @@ const FollowPage: React.FC = () => {
       void getfollowerData(auth.currentUser?.email).then(
         (followerData: any) => {
           const followerEmail = followerData.map(
-            (item: followinfo) => item.userEmail
+            (item: followInfo) => item.userEmail
           )
 
           if (followerEmail !== undefined) {
@@ -79,7 +79,7 @@ const FollowPage: React.FC = () => {
             Promise.all(followerInfopromises)
               .then((followerInfos) => {
                 const followerInfoes = followerInfos.flat(Infinity)
-                setfollowerInfo(followerInfoes)
+                setFollowerInfo(followerInfoes)
               })
               .catch((error) => {
                 console.error(error)
@@ -116,7 +116,7 @@ const FollowPage: React.FC = () => {
         </StyledTabButtons>
         <UserCardContainer>
           {activeTab === "Follow"
-            ? followuserinfo.map((user) => (
+            ? followUserInfo.map((user) => (
                 <UserCard
                   key={user.id}
                   onClick={() => {
@@ -153,13 +153,13 @@ const FollowPage: React.FC = () => {
 }
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 4rem;
+  margin-top: 2rem;
   justify-content: center;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
-  height: 800px;
+  height: 780px;
 `
 
 const StyledTitle = styled.div`

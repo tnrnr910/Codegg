@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useEffect, useState } from "react"
 import { styled } from "styled-components"
-// import { getAuth } from "firebase/auth"
 import { useParams, useNavigate } from "react-router-dom"
-import { findLikes, getPost, setLikes } from "../axios/api"
+import {
+  findLikes,
+  getPost,
+  setLikes,
+  getUserLevelAndBadge
+} from "../axios/api"
 import Comments from "../Components/Comments"
 import { auth, db } from "../axios/firebase"
 import { PiSiren } from "react-icons/pi"
@@ -34,6 +38,12 @@ interface Post {
   comments: number
 }
 
+interface LevelAndBadge {
+  id: string
+  badgeImg: string
+  userLevel: string
+}
+
 function DetailPage() {
   const { id } = useParams<string>()
   const navigate = useNavigate()
@@ -42,6 +52,7 @@ function DetailPage() {
   const [commentsCount, setCommentsCount] = useState(0)
   const [checkLikeBtn, setCheckLikeBtn] = useState<boolean>(false)
   const [LikeBtnOne, setLikeBtnOne] = useState<boolean>(false)
+  const [userLevelAndBadge, setUserLevelAndBadge] = useState<LevelAndBadge>()
 
   // post 정보를 하나만 가져오기
   useEffect(() => {
@@ -53,6 +64,16 @@ function DetailPage() {
           setLikesCount(postInfo.likes)
           setCommentsCount(postInfo.comments)
         }
+
+        // 유저레벨과 뱃지 가져오기
+        void getUserLevelAndBadge().then((data: any) => {
+          // postUserEmail과 일치하는 사용자 정보 찾기
+          const userLevelAndBadge = data.find(
+            (userLevelAndBadge: any) =>
+              userLevelAndBadge.id === dummyData.postUserEmail
+          )
+          setUserLevelAndBadge(userLevelAndBadge)
+        })
       })
 
       // 실시간 좋아요 숫자 업데이트
@@ -185,6 +206,10 @@ function DetailPage() {
                 navigate(`/OtherProfilePage/${postInfo?.postUserEmail}`)
               }}
             >
+              <PostUserBadge
+                src={userLevelAndBadge?.badgeImg}
+                alt="badgeImage"
+              />
               {postInfo?.postDisplayName}
             </DetailUserName>
             <DetailUserInfo>
@@ -211,10 +236,12 @@ function DetailPage() {
               <br />
             </DetailContentBody>
           </DetailContent>
-          <EditBox>
-            <EditBtn onClick={editBtn}>수정</EditBtn>
-            <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
-          </EditBox>
+          {auth.currentUser?.email === postInfo?.postUserEmail ? (
+            <EditBox>
+              <DeleteBtn onClick={deleteBtn}>삭제</DeleteBtn>
+              <EditBtn onClick={editBtn}>수정</EditBtn>
+            </EditBox>
+          ) : null}
         </DetailContainer>
         <Comments />
         <ButtonBox>
@@ -299,6 +326,16 @@ const DetailUserName = styled.div`
   color: #b5b5b5;
   padding-left: 16px;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+`
+
+const PostUserBadge = styled.img`
+  width: 1rem;
+  height: 1.3rem;
+  object-fit: contain;
 `
 
 const DetailUserInfo = styled.div`
@@ -368,10 +405,6 @@ const TopBtn = styled.div`
   cursor: pointer;
 `
 
-const EditBtn = styled.button`
-  cursor: pointer;
-`
-
 const EditBox = styled.div`
   width: 52rem;
   display: flex;
@@ -379,6 +412,24 @@ const EditBox = styled.div`
   gap: 8px;
 `
 
+const EditBtn = styled.button`
+  color: white;
+  background: #0c356a;
+  border: 1px solid #dadada;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
+  cursor: pointer;
+`
+
 const DeleteBtn = styled.button`
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #dadada;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 197px;
+  height: 46px;
   cursor: pointer;
 `

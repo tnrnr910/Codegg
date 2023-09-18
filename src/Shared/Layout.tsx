@@ -62,6 +62,7 @@ function Header() {
       .then((searchResults) => {
         dispatch({ type: SET_SEARCH_RESULTS, payload: searchResults })
         navigate("/SearchResultPage")
+        setSearchTerm("")
       })
       .catch((error) => {
         console.error("검색 에러:", error)
@@ -135,7 +136,7 @@ function Header() {
             onChange={handleSearchInputChange}
             onKeyDown={handleEnterKeyPress}
           />
-          <SearchIcon onClick={handleSearch} />
+          <SearchIcon onClick={handleSearch} size="20px" />
         </SearchInput>
         <Authcontainer>
           {auth.currentUser == null ? (
@@ -303,12 +304,14 @@ const SearchInput = styled.div`
   align-items: center;
   width: 16.875rem;
   height: 2.5rem;
-  border: solid 1px #63717f;
+  border: solid 1px #333333;
   float: left;
   color: #63717f;
   -webkit-border-radius: 0.3125rem;
   -moz-border-radius: 0.3125rem;
   border-radius: 0.3125rem;
+  margin-left: 30px;
+  padding: 0 8px;
 `
 
 const InputField = styled.input`
@@ -320,6 +323,5 @@ const InputField = styled.input`
 `
 
 const SearchIcon = styled(BiSearch)`
-  color: #63717f;
   cursor: pointer;
 `
