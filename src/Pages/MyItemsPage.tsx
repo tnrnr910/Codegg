@@ -2,7 +2,12 @@
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import PointShopMenuBar from "../Components/PointShopMenuBar"
-import { getPoint, getUserItems, updateUserItems } from "../axios/api"
+import {
+  applyPostItems,
+  getPoint,
+  getUserItems,
+  updateUserItems
+} from "../axios/api"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 interface ShopItem {
@@ -204,6 +209,21 @@ const PointShopPage: React.FC = () => {
     }
   }
 
+  const applySelectedItems = async () => {
+    const items: item[] = selectedItems.map((item) => {
+      const tempItem = {
+        type: item.type,
+        value: item.value
+      }
+      return tempItem
+    })
+
+    await applyPostItems(userId, items)
+    setSelectedItems([])
+    setSelectedItemsList([])
+    alert("선택한 아이템이 적용되었습니다.")
+  }
+
   return (
     <PointShopWrap>
       <PointShopMenuBar activeMenuItem={activeMenuItem} />
@@ -243,14 +263,19 @@ const PointShopPage: React.FC = () => {
           ))}
         </ItemList>
         <BtnBox>
-          <CancelButton
-            onClick={() => {
-              setSelectedItemsList([])
-            }}
-          >
-            선택 취소
-          </CancelButton>
-          <ApplyButton onClick={deleteSelectedItems}>삭제하기</ApplyButton>
+          <div>
+            <CancelButton
+              onClick={() => {
+                setSelectedItemsList([])
+              }}
+            >
+              선택 취소
+            </CancelButton>
+          </div>
+          <Box>
+            <CancelButton onClick={applySelectedItems}>적용 하기</CancelButton>
+            <ApplyButton onClick={deleteSelectedItems}>삭제하기</ApplyButton>
+          </Box>
         </BtnBox>
       </ShopContainer>
     </PointShopWrap>
@@ -339,7 +364,7 @@ const CheckBox = styled.input`
 const BtnBox = styled.div`
   width: 70%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
 `
 const CancelButton = styled.button`
   background-color: white;
@@ -385,4 +410,8 @@ const DescriptionContainer = styled.div`
   display: none;
 `
 
+const Box = styled.div`
+  display: flex;
+  gap: 5px;
+`
 export default PointShopPage

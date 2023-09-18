@@ -30,6 +30,9 @@ interface Post {
   postTitle: string
   postTime: Timestamp
   postUserEmail: string
+  postSkin: string
+  postColor: string
+  postFontsize: string
   likes: number
   comments: number
 }
@@ -737,6 +740,53 @@ const getUserLevelAndBadge = async (): Promise<levelAndBadge[]> => {
   return userLevelAndBadge
 }
 
+const applyPostItems = async (userEmail: string | null, items: item[]) => {
+  if (userEmail == null) {
+    return 0
+  }
+  const userPostRef = query(
+    collection(db, "posts"),
+    where("postUserEmail", "==", userEmail)
+  )
+  const userPostsSnap = await getDocs(userPostRef)
+
+  let docId = ""
+
+  void Promise.all(
+    items.map(async (item: item) => {
+      if (item.type === "postTitleBold") {
+        userPostsSnap.forEach((doc) => {
+          docId = doc.id
+        })
+        await updateDoc(doc(collection(db, "posts"), docId), {
+          postSkin: item.value
+        })
+      } else if (item.type === "postTitleColor") {
+        userPostsSnap.forEach((doc) => {
+          docId = doc.id
+        })
+        await updateDoc(doc(collection(db, "posts"), docId), {
+          postColor: item.value
+        })
+      } else if (item.type === "postTitleFont") {
+        userPostsSnap.forEach((doc) => {
+          docId = doc.id
+        })
+        await updateDoc(doc(collection(db, "posts"), docId), {
+          postColor: item.value
+        })
+      } else if (item.type === "postTitleSize") {
+        userPostsSnap.forEach((doc) => {
+          docId = doc.id
+        })
+        await updateDoc(doc(collection(db, "posts"), docId), {
+          postFontsize: item.value
+        })
+      }
+    })
+  )
+}
+
 export {
   getPost,
   getPosts,
@@ -766,6 +816,7 @@ export {
   updateUserItems,
   getUserItems,
   getSearchedDataTTTT,
-  getUserLevelAndBadge
+  getUserLevelAndBadge,
+  applyPostItems
 }
 export type { usersInfo }
