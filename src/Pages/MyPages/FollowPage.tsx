@@ -153,13 +153,13 @@ const FollowPage: React.FC = () => {
 }
 const MyPostWrap = styled.div`
   display: flex;
-  margin-top: 4rem;
+  margin-top: 2rem;
   justify-content: center;
 `
 const StyledContainer = styled.div`
   padding: 1.25rem;
   width: 66rem;
-  height: 800px;
+  height: 780px;
 `
 
 const StyledTitle = styled.div`
