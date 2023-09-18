@@ -28,7 +28,7 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
   const [currentPost, setCurrentPost] = useState(list) // 게시판 목록에 보여줄 게시글
   const [page, setPage] = useState<number>(1) // 현재 페이지 번호
 
-  const postPerPage = 5 // 페이지 당 게시글 개수
+  const postPerPage = 20 // 페이지 당 게시글 개수
   const indexOfLastPost = page * postPerPage
   const indexOfFirstPost = indexOfLastPost - postPerPage
 
