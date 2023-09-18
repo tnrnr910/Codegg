@@ -165,7 +165,7 @@ const PointShopPage: React.FC = () => {
         <p>
           보유 포인트:{" "}
           <span style={{ fontWeight: "bold", color: "#0c356a" }}>
-            {userPoints}P
+            {userPoints.toLocaleString()}P
           </span>
         </p>
         <ItemList>
