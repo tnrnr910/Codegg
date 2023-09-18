@@ -170,7 +170,6 @@ const StyledContainer = styled.div`
   margin-top: 4rem;
   width: 100%;
   display: flex;
-  height: 800px;
 `
 
 const StyledBox = styled.div`

@@ -260,7 +260,7 @@ const PointShopPage: React.FC = () => {
 const PointShopWrap = styled.div`
   display: flex;
   margin-top: 2rem;
-  height: 780px;
+  min-height: 800px;
 `
 const PointListNameBox = styled.div`
   width: 100%;
