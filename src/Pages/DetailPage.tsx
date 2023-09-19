@@ -54,7 +54,6 @@ function DetailPage() {
   const [LikeBtnOne, setLikeBtnOne] = useState<boolean>(false)
   const [userLevelAndBadge, setUserLevelAndBadge] = useState<LevelAndBadge>()
 
-  // post 정보를 하나만 가져오기
   useEffect(() => {
     if (id !== undefined) {
       void getPost(id).then((dummyData: any) => {
@@ -65,9 +64,7 @@ function DetailPage() {
           setCommentsCount(postInfo.comments)
         }
 
-        // 유저레벨과 뱃지 가져오기
         void getUserLevelAndBadge().then((data: any) => {
-          // postUserEmail과 일치하는 사용자 정보 찾기
           const userLevelAndBadge = data.find(
             (userLevelAndBadge: any) =>
               userLevelAndBadge.id === dummyData.postUserEmail
@@ -76,13 +73,11 @@ function DetailPage() {
         })
       })
 
-      // 실시간 좋아요 숫자 업데이트
       onSnapshot(doc(db, "posts", id), (doc) => {
         setLikesCount(doc?.data()?.likes)
         setCommentsCount(doc?.data()?.comments)
       })
 
-      // TODO: userId는 로그인 했을 때만 존재하는 값!
       if (auth.currentUser != null) {
         findLikes(auth.currentUser.email, id).then((bool: boolean) => {
           if (bool) {
@@ -95,7 +90,6 @@ function DetailPage() {
     }
   }, [])
 
-  // 좋아요 버튼을 눌렀을 때 +/- 해주는 기능
   const clickLikeFn = () => {
     if (LikeBtnOne) {
       return
@@ -127,7 +121,7 @@ function DetailPage() {
 
   const deleteBtn = async () => {
     if (postInfo == null) {
-      return // postInfo가 null 또는 undefined일 때 함수 종료
+      return
     }
 
     if (
@@ -230,7 +224,7 @@ function DetailPage() {
               <br />
               <img
                 src={postInfo?.postImgUrl}
-                style={{ maxWidth: "100%", maxHeight: "200px" }} // 이미지 크기 조절 가능
+                style={{ maxWidth: "100%", maxHeight: "200px" }}
               />
               <br />
               <br />
