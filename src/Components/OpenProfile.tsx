@@ -20,14 +20,13 @@ interface auth {
 
 function OpenProfile({ closeModal }: any) {
   const navigate = useNavigate()
-  const [currentUser, setCurrentUser] = useState(auth.currentUser)
   const { data } = useQuery("usersInfo", getUsersInfos)
   const usersInfoData: any = data
+  const [currentUser, setCurrentUser] = useState(auth.currentUser)
   const [userCurrentPoint, setUserCurrentPoint] = useState<number | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
-    // 사용자 인증 정보 확인하기
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
     })
@@ -49,7 +48,6 @@ function OpenProfile({ closeModal }: any) {
     }
   }, [currentUser, usersInfoData])
 
-  // 로그아웃 함수
   const logOut = (event: any) => {
     event.preventDefault()
     if (currentUser != null) {
@@ -63,11 +61,9 @@ function OpenProfile({ closeModal }: any) {
     }
   }
 
-  // 회원탈퇴 함수
   const deleteCurrentUser = (event: any) => {
     event.preventDefault()
     if (currentUser != null) {
-      // currentUser가 null이 아닌 경우에만 실행
       void Swal.fire({
         title: "정말로 탈퇴하시겠습니까?",
         text: "탈퇴 버튼 선택 시, 계정은 삭제되며 복구되지 않습니다.",
@@ -78,7 +74,6 @@ function OpenProfile({ closeModal }: any) {
         cancelButtonText: "취소"
       }).then(async (result) => {
         if (result.isConfirmed) {
-          // 현재 로그인한 사용자 문서를 삭제
           if (currentUser.email != null) {
             const currentUserInfoData = usersInfoData.find((data: any) => {
               return data.email === currentUser.email
@@ -90,9 +85,7 @@ function OpenProfile({ closeModal }: any) {
               })
               .then(async () => {
                 await deleteDoc(doc(db, "usersInfo", currentUserInfoData?.id))
-                // 현재 로그인한 사용자를 Authentication에서 삭제
                 await deleteUser(currentUser)
-                // 알림창 띄우고 홈페이지로 이동
                 await Swal.fire({
                   title: "탈퇴 완료",
                   text: "정상적으로 탈퇴되었습니다.",
