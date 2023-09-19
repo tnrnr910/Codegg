@@ -42,6 +42,13 @@ const AdminPostPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const activeMenuItem = "/AdminPostPage"
 
+  const tabOptions: TabOption[] = [
+    { value: "questions", label: "질의응답" },
+    { value: "tips", label: "코딩 팁" },
+    { value: "meetups", label: "모임" },
+    { value: "comments", label: "댓글" }
+  ]
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user !== null) {
@@ -187,13 +194,6 @@ const AdminPostPage: React.FC = () => {
       setSearchTerm("")
     }
   }
-
-  const tabOptions: TabOption[] = [
-    { value: "questions", label: "질의응답" },
-    { value: "tips", label: "코딩 팁" },
-    { value: "meetups", label: "모임" },
-    { value: "comments", label: "댓글" }
-  ]
 
   function DropDown() {
     return (
@@ -456,24 +456,24 @@ const StyledCategoryDropdown = styled.div<{ open: boolean }>`
 
 const StyledCategoryList = styled.ul`
   list-style: none;
-  margin: 0; /* 수정 */
-  padding: 0; /* 추가 */
+  margin: 0;
+  padding: 0;
   background-color: #ffffff;
-  border: 1px solid #e7e7e7; /* 추가 */
+  border: 1px solid #e7e7e7;
 `
 
 const StyledCategoryItem = styled.li<{ selected: boolean }>`
   cursor: pointer;
   border: none;
-  border-top: 1px solid #e7e7e7; /* 추가 */
-  padding: 8px 12px; /* 수정 */
+  border-top: 1px solid #e7e7e7;
+  padding: 8px 12px;
   background-color: ${(props) => (props.selected ? "#f0f0f0" : "transparent")};
-  transition: background-color 0.3s ease; /* 추가 */
+  transition: background-color 0.3s ease;
   &:first-child {
-    border-top: none; /* 추가 */
+    border-top: none;
   }
   &:hover {
-    background-color: #f0f0f0; /* 추가 */
+    background-color: #f0f0f0;
   }
 `
 
