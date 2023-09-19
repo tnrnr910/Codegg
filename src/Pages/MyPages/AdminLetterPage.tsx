@@ -29,20 +29,39 @@ function AdminLetterPage() {
   const activeMenuItem = "/AdminLetterPage"
   const user = auth.currentUser
   const displayName = user?.displayName
-
+  const batch = writeBatch(db)
   const [receivedMessages, setReceivedMessages] = useState<Message[]>([])
   const [recipient, setRecipient] = useState("")
   const [message, setMessage] = useState("")
   const [recipientEmail, setRecipientEmail] = useState("")
-
+  const [selectedMessages, setSelectedMessages] = useState<string[]>([])
+  const [isModalOpen, setModalOpen] = useState(false)
   const [messageType, setMessageType] = useState<"received" | "sent">(
     "received"
   )
+
+  useEffect(() => {
+    void fetchMessages()
+
+    if (recipient.length > 0) {
+      void getUsersInfos().then((users: any[]) => {
+        const recipientUser = users.find(
+          (user) => user.displayName === recipient
+        )
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (recipientUser) {
+          setRecipientEmail(recipientUser.email)
+        } else {
+          console.error("받는 사람을 찾을 수 없습니다.")
+        }
+      })
+    }
+  }, [messageType, recipient])
+
   const handleTabClick = (type: "received" | "sent") => {
     setMessageType(type)
   }
 
-  const [selectedMessages, setSelectedMessages] = useState<string[]>([])
   const handleCheckboxChange = (messageId: string) => {
     if (selectedMessages.includes(messageId)) {
       setSelectedMessages((prevState) =>
@@ -56,8 +75,6 @@ function AdminLetterPage() {
     if (selectedMessages.length === 0) {
       return
     }
-
-    const batch = writeBatch(db)
 
     selectedMessages.forEach((messageId) => {
       const messageRef = doc(db, "messages", messageId)
@@ -73,7 +90,6 @@ function AdminLetterPage() {
     }
   }
 
-  const [isModalOpen, setModalOpen] = useState(false)
   const openModal = () => {
     setModalOpen(true)
   }
@@ -138,24 +154,6 @@ function AdminLetterPage() {
       console.error("쪽지 가져오기 중 오류 발생:", error)
     }
   }
-
-  useEffect(() => {
-    void fetchMessages()
-
-    if (recipient.length > 0) {
-      void getUsersInfos().then((users: any[]) => {
-        const recipientUser = users.find(
-          (user) => user.displayName === recipient
-        )
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (recipientUser) {
-          setRecipientEmail(recipientUser.email)
-        } else {
-          console.error("받는 사람을 찾을 수 없습니다.")
-        }
-      })
-    }
-  }, [messageType, recipient])
 
   return (
     <MyPostWrap>

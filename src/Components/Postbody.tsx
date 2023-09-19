@@ -22,17 +22,15 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
   const navigate = useNavigate()
   const { isLoading, data } = useQuery(
     ["posts", postBoard],
-    // eslint-disable-next-line @typescript-eslint/return-await
     async () => await getPostsOfBoard(postBoard)
   )
   const list: any = data
-  const [currentPost, setCurrentPost] = useState(list) // 게시판 목록에 보여줄 게시글
-  const [page, setPage] = useState<number>(1) // 현재 페이지 번호
+  const [currentPost, setCurrentPost] = useState(list)
+  const [page, setPage] = useState<number>(1)
 
-  const postPerPage = 20 // 페이지 당 게시글 개수
+  const postPerPage = 20
   const indexOfLastPost = page * postPerPage
   const indexOfFirstPost = indexOfLastPost - postPerPage
-
   const postLength = list?.length
 
   const handlePageChange = (page: number) => {
@@ -153,7 +151,6 @@ function Postbody({ categorySelected, postBoard }: PointApplyProps) {
             </>
           )}
         </BodyDiv>
-        {/* # yarn add react-js-pagination @types/react-js-pagination 설치 */}
         <Pagination
           activePage={page}
           itemsCountPerPage={postPerPage}
@@ -176,7 +173,6 @@ const BodyDiv = styled.div`
 
 const ListContainer = styled.div`
   display: flex;
-  /* justify-content: space-between; */
   align-items: center;
   height: 25px;
   padding: 0.6rem 0;

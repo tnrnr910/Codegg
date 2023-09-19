@@ -8,7 +8,7 @@ import { getUsersInfos, getUserLevelAndBadge } from "../../axios/api"
 
 function AdminPage() {
   const activeMenuItem = "/AdminPage"
-  const [currentUser, setCurrentUser] = useState<User | null>(null) // User 타입 사용
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
   const { data } = useQuery("usersInfo", getUsersInfos)
   const usersInfoData: any = data
   const [userLevelAndBadge, setUserLevelAndBadge] = useState<any>(null)

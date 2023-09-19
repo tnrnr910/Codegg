@@ -42,8 +42,6 @@ const SliderContainer = styled.div`
     & .slick-dots {
       bottom: 25%;
       left: 25%;
-      /* bottom: 6rem;
-      left: 29.5rem; */
       text-align: start;
       color: #fff;
     }
