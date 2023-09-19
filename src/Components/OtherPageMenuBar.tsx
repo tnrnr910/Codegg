@@ -27,6 +27,7 @@ function OtherPageMenuBar({ activeMenuItem }: OtherPageMenuBarProps) {
   const { email } = useParams()
   const navigate = useNavigate()
   const [userstInfo, setuserstInfo] = useState<UserData>()
+
   const userEmail = email
 
   const handleMenuItemClick = (path: string) => {
