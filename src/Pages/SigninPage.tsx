@@ -6,6 +6,7 @@ import Swal from "sweetalert2"
 import { SigninSignupBtns } from "../Components/Buttons"
 import { useSelector } from "react-redux"
 import { getUsersInfos } from "../axios/api"
+import backgroundImg from "../asset/img/background_auth.png"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -467,14 +468,10 @@ function SigninPage() {
 
 export default SigninPage
 
-// Styled-Component 라이브러리를 활용해 CSS를 구현.
-
 const SigninSignoutBackground = styled.div`
   width: 100%;
   height: 56rem;
-  background: url(https://i.postimg.cc/TwNqmVkj/background-signin1.png)
-    // TODO: asset 폴더 안에 이미지 넣기!!!!
-    no-repeat center;
+  background: url(${backgroundImg}) no-repeat center;
   background-size: cover;
   display: flex;
   align-items: center;
