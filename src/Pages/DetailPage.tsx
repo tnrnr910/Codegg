@@ -56,8 +56,8 @@ function DetailPage() {
 
   useEffect(() => {
     if (id !== undefined) {
-      void getPost(id).then((dummyData: any) => {
-        setPostInfo(dummyData)
+      void getPost(id).then((PostData: any) => {
+        setPostInfo(PostData)
 
         if (postInfo !== undefined) {
           setLikesCount(postInfo.likes)
@@ -67,7 +67,7 @@ function DetailPage() {
         void getUserLevelAndBadge().then((data: any) => {
           const userLevelAndBadge = data.find(
             (userLevelAndBadge: any) =>
-              userLevelAndBadge.id === dummyData.postUserEmail
+              userLevelAndBadge.id === PostData.postUserEmail
           )
           setUserLevelAndBadge(userLevelAndBadge)
         })
