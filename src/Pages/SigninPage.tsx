@@ -6,7 +6,8 @@ import Swal from "sweetalert2"
 import { SigninSignupBtns } from "../Components/Buttons"
 import { useSelector } from "react-redux"
 import { getUsersInfos } from "../axios/api"
-import backgroundImg from "../asset/img/background_auth.png"
+import backgroundImgWebp from "../asset/img/background_auth.webp"
+import backgroundImgJpg from "../asset/img/background_auth.jpg"
 
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -322,7 +323,9 @@ function SigninPage() {
   const confirmPasswordWatch = watch("confirmPassword")
 
   return (
-    <SigninSignoutBackground>
+    <SigninSignoutWrap>
+      <BackgroundSource srcSet={backgroundImgWebp} type="image/webp" />
+      <BackgroundImg src={backgroundImgJpg} alt="backgroundImage" />
       <SigninSignoutContainer>
         <TabBox>
           <TabMenu>
@@ -462,25 +465,36 @@ function SigninPage() {
           </Desc>
         </TabBox>
       </SigninSignoutContainer>
-    </SigninSignoutBackground>
+    </SigninSignoutWrap>
   )
 }
 
 export default SigninPage
 
-const SigninSignoutBackground = styled.div`
+const SigninSignoutWrap = styled.picture`
   width: 100%;
   height: 56rem;
-  background: url(${backgroundImg}) no-repeat center;
-  background-size: cover;
   display: flex;
+  justify-content: center;
   align-items: center;
+  position: relative;
+`
+
+const BackgroundSource = styled.source`
+  height: 100%;
+  object-fit: cover;
+`
+
+const BackgroundImg = styled.img`
+  height: 100%;
+  object-fit: cover;
 `
 
 const SigninSignoutContainer = styled.div`
+  position: absolute;
   width: 100%;
   display: flex;
-  justify-content: end;
+  justify-content: right;
 `
 
 const TabBox = styled.div`
